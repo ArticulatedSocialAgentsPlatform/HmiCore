@@ -667,14 +667,25 @@ public final class Mat4f
     // }
 
     /**
-     * Sets the translation vector column for a 4X4 (or 3X4) matrix m, i.e. the last 3X1 column, from a translation Vec3f vector t. The remaining
-     * parts are not modified.
+     * Sets the translation vector column for a 4X4 (or 3X4) matrix m, i.e. the last 3X1 column, from a translation Vec3f vector t.
+     * The remaining parts are not modified.
      */
     public static void setTranslation(float[] m, float[] t)
     {
         m[M03] = t[0];
         m[M13] = t[1];
         m[M23] = t[2];
+    }
+    
+    /**
+     * Sets the translation vector column for a 4X4 (or 3X4) matrix m, i.e. the last 3X1 column, from a translation vector (x, y, z). 
+     * The remaining parts are not modified.
+     */
+    public static void setTranslation(float[] m, float x, float y, float z)
+    {
+        m[M03] = x;
+        m[M13] = y;
+        m[M23] = z;
     }
 
     /**

@@ -68,6 +68,13 @@ public final class Vec3f {
     public static float[] getVec3f(float[] vec3f) {
        return new float[] {vec3f[0], vec3f[1], vec3f[2]};
     }
+    
+    /**
+     * Rturns a new float[3] array with initialized components, taken at some offset within an existing float array.
+     */
+    public static float[] getVec3f(float[] vec3f, int offset) {
+       return new float[] {vec3f[offset], vec3f[offset+1], vec3f[offset+2]};
+    }
    
     /**
      * Returns a new float[3] array with zero components
@@ -137,7 +144,7 @@ public final class Vec3f {
     }
     
     /**
-     * Tests for equality of vectror components within epsilon.
+     * Tests for equality of vector components within epsilon.
      */
     public static boolean epsilonEquals(float[] a, float[] b, float epsilon){
        float diff = a[0] - b[0];
@@ -156,7 +163,7 @@ public final class Vec3f {
     }
     
     /**
-     * Tests for equality of vectror components within epsilon.
+     * Tests for equality of vector components within epsilon.
      */
     public static boolean epsilonEquals(float[] b,float ax, float ay, float az,  float epsilon){
        float diff = ax - b[0];
