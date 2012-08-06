@@ -1,0 +1,213 @@
+<project name="HMI-ALL" default="build" basedir="." 
+   xmlns:ac="antlib:net.sf.antcontrib"   
+>
+ 
+ <filelist id="rebuildList" dir="${shared.project.root}" files="${rebuild.list}" />
+ <!--filelist id="nbList" dir="${shared.project.root}" files="${nb.list}" /-->
+   
+   <target name="resolveAll">
+      <antcall target="Ivy.resolve"/>
+      <delegate target="resolve" list="rebuildList" verbose="true"/>
+   </target>
+   <!-- targets: -->
+   
+   <target name="nbuild" depends="nightlybuild" description="produce a nightly build of the Hmi project"/>
+   <target name="testnbuild" depends="testnightlybuild" description="performs a nightly build of the Hmi project, without actually publishing"/>
+    
+   <target name="releaseAll"  description="produce a full minor release of the Hmi project">
+       <property name="release.target" value="-minorrelease"/>
+      <antcall target="releaselist" />
+   </target>
+   
+   <target name="nightlybuild" >
+    <!-- first some checking for parameters. We require either a version or a build number -->
+      <fail message="HMI nightlybuild: No release.list specified" unless="release.list" />
+      <ac:if>
+         <isset property="version"/> 
+      <ac:then>
+          <ac:if>
+              <or>
+                 <isset property="build"/>
+                 <isset property="devnum"/>
+              </or>   
+          <ac:then>
+              <fail message="HMI nightlybuild: When forcing a particular version, a devnum or build number cannot be used" />
+          </ac:then>
+          </ac:if>
+      </ac:then>
+      <ac:else>
+          <ac:if>
+             <not>
+                <isset property="build"/>
+             </not>
+          <ac:then>
+             <fail message="HMI nightlybuild: No build number specified"  />
+          </ac:then>
+          </ac:if>
+      </ac:else> 
+      </ac:if>
+      <!-- after checking, we finally do the real work here: -->
+      <property name="devnum" value="${build}"/>
+      <property name="release.target" value="-devrelease"/>
+    
+      <property name="nb.release.code" value="true"/>
+      <property name="nb.release.resources" value="true"/>
+      <ac:if>
+         <equals arg1="${nb.release.code}" arg2="true"/>
+      <ac:then>
+         <antcall target="releaselist" >
+            <param name="publish.resolver" value="hmicore.sftp.publish"/> <!-- overrides build.properties value -->
+         </antcall>
+      </ac:then>
+      <ac:else>
+         <echo message="NO RELEASE of CODE"/>
+      </ac:else>
+      </ac:if>   
+      
+      <ac:if>
+         <equals arg1="${nb.release.resources}" arg2="true"/>
+      <ac:then>
+         <antcall target="releaseresourcelist">
+            <param name="publish.resolver" value="resource.sftp.publish"/> <!-- overrides build.properties value -->
+         </antcall>
+      </ac:then>
+       <ac:else>
+         <echo message="NO RELEASE of RESOURCES"/>
+      </ac:else>
+      </ac:if>  
+   </target>
+   
+   
+   
+   <target name="testnightlybuild" >
+    <!-- first some checking for parameters. We require either a version or a build number -->
+      <fail message="HMI nightlybuild: No release.list specified" unless="release.list" />
+      <antcall target="testreleaselist" />  
+   </target>
+   
+   
+   
+   
+   
+   <target name="buildAll" depends="cleanAll, compileAll" description="cleanAll, compileAll"/>  
+  
+   <target name="compileAll"  description="compile HMI projects">     
+    <antcall target="Core.compile"/>
+    <delegate target="compile" list="rebuildList" verbose="true"/>
+   </target>
+   
+   <target name="compilelistAll">
+    <antcall target="Core.compile"/>
+    <delegate target="compilelist" list="rebuildList" verbose="true"/>     
+   </target> 
+    
+   <target name="cleanAll"  description="cleans HMI projects">     
+        <antcall target="Core.clean"/> <!-- JavaProjects.clean is the clean target from  (.../JavaProjects/)ant/build-impl.xml -->
+        <delegate target="clean" list="rebuildList" verbose="true"/>
+   </target>
+ 
+   <target name="compile-testsAll"  description="Runs junit tests on all HMI projects">     
+        <!--antcall target="Core.junit"/--> 
+        <delegate target="compile-tests" list="rebuildList"/>
+   </target>
+    
+   <target name="junitAll"  description="Runs junit tests on all HMI projects">     
+        <!--antcall target="Core.junit"/--> 
+        <delegate target="-junit" list="rebuildList"/>
+   </target>
+ 
+    <target name="junitreportAll"  description="Runs junit tests on all HMI projects">     
+        <!--antcall target="Core.junit"/--> 
+        <delegate target="junitreport" list="rebuildList"/>
+   </target>
+    <target name="eclipseAll"  description="Create eclipse projects for all HMI projects">   
+		<delegate target="eclipseproject" list="rebuildList"/>
+	</target>
+	<target name="eclipsesourceAll"  description="Create eclipse projects for all HMI projects">   
+		<delegate target="eclipsesourceproject" list="rebuildList" verbose="true"/>
+	</target>
+   <target name="findbugsAll"  description="Runs findbugs on all HMI projects">     
+        <delegate target="findbugsxml" list="rebuildList"/>
+   </target>
+
+
+   <target name="cpdAll"  description="Runs the code duplication checker on all Asap projects">     
+        <mkdir dir="build"/>
+        <cpd minimumTokenCount="100" format="xml" encoding="UTF-8" outputFile="build/cpd.xml"
+   	ignoreLiterals="true" ignoreIdentifiers="true">
+        <fileset dir=".">
+            <include name="**/*.java"/>
+        </fileset>
+        </cpd>
+   </target>
+   
+    <target name="cpdreportAll" depends="cpdAll">
+	  <xslt in="build/cpd.xml" style="${shared.ant.dir}/pmd/etc/xslt/cpdhtml.xslt" 	  
+	  out="build/cpd.html" />
+    </target>
+   
+
+   <target name="checkstyleAll"  description="Runs checkstyle on all HMI projects">     
+        <delegate target="checkstylexml" list="rebuildList"/>
+   </target>
+
+
+   <target name="docall" description="Generate integrated Javadoc for all HMI/* projects">     
+        <javadoc source="1.6" 
+            destdir="${javadoc.dir}"
+            Overview="javadoc-overview.html" 
+            doctitle="API Documentation for HMI packages, including the Elckerlyc BML Realizer"
+            private="true" 
+            use="true"
+            author="true"
+            link="http://java.sun.com/javase/6/docs/api/"
+            breakiterator="yes"
+        > 
+<!--
+            header="&lt;a href='http://hmi.ewi.utwente.nl' target='_blank'&gt;HMI Homepage&lt;/a%gt;" 
+            footer="&lt;a href='http://hmi.ewi.utwente.nl' target='_blank'&gt;HMI Homepage&lt;/a%gt;" 
+            bottom="Disclaimer, availability, License..."
+-->
+            <classpath refid="javac-classpath"/>
+                <group title="HmiAnimation" packages="hmi.animation*"/>
+                <group title="HmiFaceAnimation" packages="hmi.faceanimation*"/>
+                <group title="HmiFaceGraphics" packages="hmi.facegraphics*"/>
+                <group title="HmiGraphics" packages="hmi.graphics*"/>
+                <group title="HmiMath" packages="hmi.math*"/>
+                <group title="HmiNeurophysics" packages="hmi.neurophysics*"/>
+                <group title="HmiPhysics" packages="hmi.physics*"/>
+                <group title="HmiTestUtil" packages="hmi.testutil*"/>
+                <group title="HmiTTS" packages="hmi.tts*"/>
+                <group title="HmiUtil" packages="hmi.util*"/>
+                <group title="HmiXml" packages="hmi.xml*"/>
+                <sourcepath>
+                    <pathelement path="HmiAnimation/src/"/>
+                    <pathelement path="HmiFaceAnimation/src/"/>
+                    <pathelement path="HmiFaceGraphics/src/"/>
+                    <pathelement path="HmiGraphics/src/"/>
+                    <pathelement path="HmiMath/src/"/>
+                    <pathelement path="HmiNeurophysics/src/"/>
+                    <pathelement path="HmiPhysics/src/"/>
+                    <pathelement path="HmiTestUtil/src/"/>
+                    <pathelement path="HmiTTS/src/"/>
+                    <pathelement path="HmiTTSMary/src/"/>
+                    <pathelement path="HmiTTSSapi5/src/"/>
+                    <pathelement path="HmiUtil/src/"/>
+                    <pathelement path="HmiXml/src/"/>
+                </sourcepath>
+        </javadoc>
+        <mkdir dir="${dist.dir}"/>
+	     <zip basedir="${javadoc.dir}" destfile="${dist.dir}/javadoc.zip" />
+    </target>
+    
+    <target name="javancssAll" description="Generate a javancs report">
+      <mkdir dir="${build.classes.dir}"/>
+      <javancss srcdir="."
+            generateReport="true"
+            format="xml"
+             outputfile="${build.classes.dir}/javancss_metrics.xml"
+            abortOnFail="false"
+            includes="**/*.java"
+            />
+    </target> 
+</project>

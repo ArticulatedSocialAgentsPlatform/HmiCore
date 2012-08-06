@@ -1,0 +1,58 @@
+<ivy-module version="2.0">
+   <info organisation="HMI" module="Hmi" />
+   <configurations>
+      <include file="${ivy.settings.dir}/configurations.xml"/>
+   </configurations>
+   <dependencies>
+      <dependency org="HMI"   name="HmiTTS"            rev="latest.${resolve.status}"  />
+      <dependency org="HMI"   name="HmiTTSMary"        rev="latest.${resolve.status}"  />
+      <dependency org="HMI"   name="HmiTTSSapi5"       rev="latest.${resolve.status}"  />
+      <dependency org="HMI"   name="HmiTTSnative"      rev="latest.${resolve.status}"  />
+      <dependency org="HMI"   name="HmiEyebox"         rev="latest.${resolve.status}"  />
+      <dependency org="HMI"   name="HmiNeurophysics"   rev="latest.${resolve.status}"  />
+      <dependency org="HMI"   name="HmiDebug"          rev="latest.${resolve.status}"  />
+      <dependency org="HMI"   name="HmiGraphics"       rev="latest.${resolve.status}"  />
+      <dependency org="HMI"   name="HmiFaceGraphics"   rev="latest.${resolve.status}"  />
+      <dependency org="HMI"   name="HmiElckerlyc"      rev="latest.${resolve.status}"  />
+      <!--dependency org="HMI"   name="HmiEnvironment"   rev="latest.${resolve.status}"  /-->
+      <!--dependency org="HMI"   name="Semaine"   rev="latest.${resolve.status}"  /-->
+
+      <dependency org="jcip"              name="jcip-annotations"  rev="latest.${resolve.status}"  />   
+      <dependency org="odejava"           name="odejava"           rev="latest.${resolve.status}"  />   
+      <dependency org="singularsystems"   name="jep"               rev="latest.${resolve.status}"  />   
+      <dependency org="slf4j"   name="slf4j-api"                   rev="latest.${resolve.status}"  />   
+      <dependency org="slf4j"   name="log4j-over-slf4j"            rev="latest.${resolve.status}"  />   
+      <dependency org="slf4j"   name="jul-to-slf4j"                rev="latest.${resolve.status}"  />   
+      <dependency org="slf4j"   name="jcl-over-slf4j"              rev="latest.${resolve.status}"  />   
+      <dependency org="logback"   name="logback-classic"           rev="latest.${resolve.status}"  />   
+      <dependency org="logback"   name="logback-core"              rev="latest.${resolve.status}"  />   
+
+     
+      <dependency org="google" name="guava"       rev="latest.${resolve.status}"  />
+      <dependency org="junit" name="junit"        rev="latest.${resolve.status}"  />
+
+      <!-- below: needed for Mary TTS -->
+     
+      <dependency org="dfki"   name="mary-common"    rev="latest.${resolve.status}"  />   
+
+      <dependency org="apache" name="commons-collections" rev="latest.${resolve.status}"  />   
+      <dependency org="opennlp" name="opennlp-tools"      rev="latest.${resolve.status}"  />   
+      <dependency org="opennlp" name="maxent"             rev="latest.${resolve.status}"  />   
+      <dependency org="freetts" name="freetts"            rev="latest.${resolve.status}"  />   
+      <dependency org="gnu" name="trove"                  rev="latest.${resolve.status}"  />   
+      <dependency org="hsqldb" name="hsqldb"              rev="latest.${resolve.status}"  />         
+      <dependency org="Sun" name="jlfgr"                  rev="latest.${resolve.status}"  />         
+      <dependency org="apache" name="log4j"               rev="latest.${resolve.status}"  />   
+
+      <!-- below: needed for Enterface? Remaining libs from SEMAINE -->
+      <dependency org="semaine" name="semaine-core"       rev="latest.${resolve.status}"  />         
+      <dependency org="semaine" name="semaine-dialogue"   rev="latest.${resolve.status}"  />         
+      <dependency org="semaine" name="semaine-mary"       rev="latest.${resolve.status}"  />         
+      <dependency org="apache" name="activemq"            rev="latest.${resolve.status}"  />         
+      <dependency org="swing-layout" name="swing-layout"  rev="latest.${resolve.status}"  />         
+      <dependency org="jgraph" name="jgraph"              rev="latest.${resolve.status}"  />         
+      <dependency org="opennlp" name="jwnl"               rev="latest.${resolve.status}"  />         
+      <dependency org="Jama" name="Jama"                  rev="latest.${resolve.status}"  />         
+
+   </dependencies>
+</ivy-module>
