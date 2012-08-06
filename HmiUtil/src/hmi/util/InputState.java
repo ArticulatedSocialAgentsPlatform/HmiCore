@@ -80,6 +80,8 @@ public class InputState implements KeyListener, MouseListener, FocusListener
    private  int x1Pressed, y1Pressed, x1Released, y1Released;    // screen positions of last press and release events
    private  int x2Pressed, y2Pressed, x2Released, y2Released;    // for  mouse buttons. 
    private  int x3Pressed, y3Pressed, x3Released, y3Released;
+   private boolean resetMouseOnExit = true;                      // when true, reset all mouse button states (to "unpressed") upon mouseExit events.
+   
    
 //   private  int xDragged, yDragged, xMoved, yMoved;              // positions of last mouseDragged and mouseMoved events.
    private  int x, y;                                            // position of last mouse  press, release, drag, or move
@@ -152,6 +154,14 @@ public class InputState implements KeyListener, MouseListener, FocusListener
       //if ( (listenerMode & MOUSEWHEELLISTENER) != 0)  c.removeMouseWheelListener(this);
    }
 
+   /**
+    * Set the resetMouseOnExit flag (default true)
+    * When true, all mouse buttons are reset to "unpressed" 
+    * upon the mouse exiting the AWT Component to which this InputState is listening
+    */
+   public void setResetMouseOnExit(boolean mode) {
+      resetMouseOnExit = mode;
+   }
    
    /**
     * Adds a key pattern, consisting of keys required to be down,
@@ -435,7 +445,21 @@ public class InputState implements KeyListener, MouseListener, FocusListener
    /**
     * mouseExited handler from the MouseListener interface for this tracker: ignored
     */
-   public final void mouseExited(MouseEvent e) {     
+   public final void mouseExited(MouseEvent e) {  
+      if (resetMouseOnExit) {
+         button1Down = false; keyDown[MB1] = 0; 
+         clickCount1 = 0;
+         x1Released = -1;
+         y1Released = -1;
+         button2Down = false; keyDown[MB2] = 0; 
+         clickCount2 = 0;
+         x2Released = -1;
+         y2Released = -1;
+         button3Down = false; keyDown[MB3] = 0; 
+         clickCount3 = 0;  
+         x3Released = -1;
+         y3Released = -1;     
+      }   
    }
 
 
