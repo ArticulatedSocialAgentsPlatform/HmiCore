@@ -452,6 +452,33 @@ public final class Quat4f
     }
 
     /**
+     * Convert from XYZW format (with the real component at the end) to (our) WXYZ format, with the real component as first component.
+     * Input: qXYZW   Output: qWXYZ. The two float arrays can be aliased.
+     */
+    public static void setFromXYZW(float[] qWXYZ, float[] qXYZW)
+    {
+        float w = qXYZW[3];
+        qWXYZ[3] = qXYZW[2];
+        qWXYZ[2] = qXYZW[1];
+        qWXYZ[1] = qXYZW[0];
+        qWXYZ[0] = w;       
+    }
+    
+    /**
+     * Convert from XYZW format (with the real component at the end) to (our) WXYZ format, with the real component as first component.
+     * Input: qXYZW starting at [xyzwIndex]  Output: qWXYZ starting at [wxyzIndex]. The two float arrays can be aliased.
+     */
+    public static void setFromXYZW(float[] qWXYZ, int wxyzIndex, float[] qXYZW, int xyzwIndex)
+    {
+        float w = qXYZW[xyzwIndex+3];
+        qWXYZ[wxyzIndex+3] = qXYZW[xyzwIndex+2];
+        qWXYZ[wxyzIndex+2] = qXYZW[xyzwIndex+1];
+        qWXYZ[wxyzIndex+1] = qXYZW[xyzwIndex];
+        qWXYZ[wxyzIndex]   = w;       
+    }
+
+
+    /**
      * Convert Euler angles to quaternion coefficients.
      */
     public static void setFromEulerAngles(float[] q, float[] ea)
