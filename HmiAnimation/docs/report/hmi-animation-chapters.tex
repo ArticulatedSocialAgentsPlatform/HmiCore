@@ -1,0 +1,18 @@
+% The chapters for hmi/animation, for inclusion within a master LaTeX document
+% include files must specify a path like \hmianimationreportdir/filename
+% where \hmianimationreportdir should be defined in the master document.
+% We have a fall back:
+\ifx \hmianimationreportdir \undefinedmacro \def \hmianimationreportdir{.} \fi
+\ifx \webserver \undefinedmacro \def \webserver{http://elckerlyc.sourceforge.net/javadoc/Hmi/} \fi
+
+\chapter{The HmiAnimation package}
+The hmi/animation package is meant for 3D animation purposes.
+
+\input{\hmianimationreportdir/hmi-animation-overview.tex}
+\input{\hmianimationreportdir/hmi-animation-xmlencoding.tex}
+\input{\hmianimationreportdir/hmi-animation-interpolators.tex}
+
+
+\chapter{Animation, Physic simulation, and 3D rendering}
+\input{\hmianimationreportdir/hmi-animation-scenegraphs.tex} 
+\input{\hmianimationreportdir/hmi-animation-procanimation.tex} 

@@ -1,0 +1,86 @@
+
+Some remarks/comments on the structure of woman23.dae
+
+
+*) The geometry consists on one set of vertices, two triangle meshes, each with its own material. One for the body, one for the head.
+*) The mesh uses weight blending for mesh deformation. The skeleton (a controller in Collada) and the mesh are two separate branches
+within the Collada scenegrap. 
+* The mesh itself is a node with id=CWom0023-Mesh-node (no transform)
+* The skeleton is a child of the root with id=CWom0023-Bip-node.
+* The skeleton root itself has id=CWom0023-Pelvis-node. This will become joint[0] within the scenegraph
+* The natural position of the mesh is as follows:  "up" is in the +Z-direction, nose is pointing in the -Y direction.
+  (So, with the standard OpenGL viewer, the avatar lies down on her nose, head in the +Z direction.
+  This is in accordance with the Collada line that say: <up_axis>Z_UP</up_axis>
+* The natural bind pose is the T-shape model.
+* When no transformations are performed (forced inside the GLSkinnedMesh rendering), the avatar lies along the +Z axis, nose down, T-shape pose.
+* The joint matrices (specified via the Collada (skeleton-) nodes and the inverse bind matrices more or less cancel. 
+  So the joint positions can be determined either from the joint matrices, or via the inverse bind matrices. 
+  For some reason some of the joint matrices are, for instance, 180 degree turns, 
+  whereas the corresponding inverse bind matrices are 178.8 degree turns,
+  so they do not cancel perfectly. The result (after multiplying them together) is a netto rotation of +- 1.7 degrees on some body parts. 
+  Unclear whether this is the result of roundoff errors etcetera, or whethere there is a slight mistake in either the joint matrices or the inverse bind matrices.
+* addition: when both the inverse bind matrices and the joint matrices are used, the position of the joint centeres (calculated via the joint nodes)
+  matches the correct position in the mesh. With combined tranform disabled (inside the render process), they do NOT match perfectly. In particular,
+  the finger joint markers end up outside the finger mesh.
+* The rotations inside the skeleton ( so disregarding inverse bind matrices) are somewhat strange. Except for "numerical errors" etc.
+the first few matrices are as follows:
+ Bip  (not part of the skeleton, but the root on the transform chain)
+  0  1  0  0
+ -1  0  0  0
+  0  0  1  0.9
+  0  0  0  1
+  
+  This is a rotation of -90 degrees around the Z axis. 
+  
+  Pelvis:
+  0  1  0  0
+  0  0  1  0
+  1  0  0  0
+  0  0  0  1
+  This is a rotation of -120 degrees around (1,1,1) Alternatively, it exchanges x->z->y->x in a circular fashion
+  
+  Bip o Pelvis =
+   0  0  1  0
+   0 -1  0  0
+   1  0  0  0.9
+   0  0  0  1
+   
+   This ia a rotation of 180 degrees around (1, 0, 1)
+   The effect of this combination would be to have the avatar lying along the X-axis, nose in the +Y direction. 
+   Indeed all node matrices along the spine specify translations in the X-direction.  
+   
+ It is possible to reset the bip node as well as the pelvis node to identity matrices (no rotation, no translation),
+ without distorting the final avatar rendering. In this case the avatar lies on her back, aligned with the X-axis, head in
+ the direction of the positive X-axis. 
+ 
+ The inverse bind matrices, however, seem to be set with the bip and pelvis rotations in place: basically,
+ the combined transform matrices, resulting from the existing node matrices and the inverse bind matrices
+ yields identity matrices (+- some small error in the translation vector of the order 0.01, i.e. 1cm)
+ 
+ NOTE: when "forcing" these transform matrices to REALLY Id inside the rendering process, it turns out that mesh and joint markers are NOT
+ properly aligned anymore. In particular, finger joint markers end up slightly outside the finger geometry.   
+   
+   
+ * For some unclear reasons there are some joint (actually  they are to be seen as end-effectors) that have a transform matrix that 
+ incorporates a reflection operation. Example: CWom0023-L_Finger0Nub ( sid=Bone16)          
+ Since there is no geometry associated with these bones, the reflection has no real impact, but is annoying anyway.          
+ 
+ * The skeleton structure tree is strange: (Spine is parent of Spine1, but also of L/R_Thigh !!!)
+   The weights for Spine show some area AROUND the Pelvis region.
+ 
+ CWom0023-Bip  NOT an official skeleton joint, according to the Collada file. Does not occur among the joints of the skinned mesh.
+    CWom0023-Pelvis    sid="Bone1"     This is (according to the Collada file) the skeleton root
+       CWom0023-Spine    sid="Bone2" 
+          CWom0023-Spine1    sid="Bone3" 
+             CWom0023-Spine2    sid="Bone4" 
+                CWom0023-Spine3    sid="Bone5"
+                   CWom0023-Neck    sid="Bone6" 
+                      CWom0023-Head    sid="Bone7"    
+                      
+          CWom0023-L_Thigh     sid="Bone57" 
+             CWom0023-L_Calf       sid="Bone58" 
+                CWom0023-L_Foot" sid="Bone59" 
+    
+          CWom0023-R_Thigh"    sid="Bone62" 
+             CWom0023-R_Calf"      sid="Bone63" 
+                CWom0023-R_Foot"        sid="Bone64" 

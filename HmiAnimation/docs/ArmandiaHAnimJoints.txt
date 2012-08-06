@@ -1,0 +1,89 @@
+
+The "HAnim" version of the Armandia joints.
+Not all joints are presented here; in particular, may "pivot" joints have been omitted.
+Moreover, there are some serious deviations from HAnim, marked in the joint tree below.
+Finally, there are some joints (like "Torsion" joints for the hips?, that are not part of the normal hierarchy anyway.?)
+
+
+
+HumanoidRoot
+   
+   vl5               <-- remove from thius position, make parent of ONLY vt10, child of HumanoidRoot
+     (sacroiliac)    <-- add this, parent of just the two hips, not the parent of vl5, Itself child of HumanoidRoot  
+      l_hip                  NB according to HAnim this should be a child of HumanoidRoot or sacroiliac, not vl5
+         l_knee            
+            l_ankle           
+               l_subtalar        
+                  l_midtarsal       
+                     l_metatarsal      
+                        l_forefoot_tip    
+      r_hip             
+         r_knee            
+            r_ankle           
+               r_subtalar        
+                  r_midtarsal       
+                     r_metatarsal      
+                        r_forefoot_tip    
+      
+      
+                      
+      vt10             NB this should have been the *only* (HAnim) child of vl5         
+         vt6               
+            vt1               
+               vc4               
+                  skullbase         
+                     skullbase_pivot   
+                        skulltop      
+                                                             
+                     l_eyeball_joint                  NB not a proper HAnim joint
+                     r_eyeball_joint
+                     temporomandibular                 NB "dents", not prpoer HAnim joint
+                  l_sternoclavicular                   NB according to HAnim this should have been a child of vc7, Since there is no vc7, we shoud use vt1, not vc4
+                     l_shoulder
+                        l_elbow
+                           l_wrist
+                              l_thumb1
+                                 l_thumb2
+                                    l_thumb3
+                                       l_thumb_distal_tip
+                              l_index1
+                                 l_index2
+                                    l_index3
+                                       l_index_distal_tip
+                              l_middle1
+                                 l_middle2
+                                    l_middle3
+                                       l_middle_distal_tip
+                              l_ring1
+                                 l_ring2
+                                    l_ring3
+                                       l_ring_distal_tip
+                              l_pinky1
+                                 l_pinky2
+                                    l_pinky3
+                                       l_pinky_distal_tip
+                  r_sternoclavicular
+                     r_shoulder
+                        r_elbow
+                           r_wrist
+                              r_thumb1
+                                 r_thumb2
+                                    r_thumb3
+                                       r_thumb_distal_tip
+                              r_index1
+                                 r_index2
+                                    r_index3
+                                       r_index_distal_tip
+                              r_middle1
+                                 r_middle2
+                                    r_middle3
+                                       r_middle_distal_tip
+                              r_ring1
+                                 r_ring2
+                                    r_ring3
+                                       r_ring_distal_tip
+                              r_pinky1
+                                 r_pinky2
+                                    r_pinky3
+                                       r_pinky_distal_tip
+

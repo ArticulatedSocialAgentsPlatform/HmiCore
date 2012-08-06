@@ -1,0 +1,96 @@
+\section{The GLRenderContext: usage, implementation, and generation}
+Rendering within the hmi.graphics package is OpenGL based. Several Java based implementations
+and ``bindings'' for OpenGL exist. Currently, the most promising are Jogl (supported by Sun)
+and LWJGL (very active community and some real commercial usage). Jogl is in a state of transition from a stable version based upon OpenGL 2.1 towards a new ``Jogl 2'' version that supports OpenGL 3.x. 
+They all have much in common, since, basically, they are all just wrappers for the C functions from the OpenGL drivers.
+At the same time, they differ enough so that one cannot serve as a ``drop in'' replacement for one of the others.
+The answer to this unfortunate situation is (yet another) wrapper. (Fortunately, the wrapper is pretty straightforward and performance is not affected.)
+Some of the differences between Jogl and LWJGL:
+\begin{itemize}
+\item Jogl represents the OpenGL context by means of an \emph{object} op type \verb"GL" that has a large number of methods, one for every relevant OpenGL function.  This is clearly the `object oriented'' style 
+    and allows for more sophisticated handling of OpenGL by several processes concurrently. For instance, Jogl will
+    (re-)acquire the OpenGL context  for every frame that is to be rendered. 
+\item LWJGL on the other hand represents these OpenGL functions by means of \emph{static Java methods}, bundled in a few classes like \verb"GL11".
+    The class names (\verb"GL11", \verb"GL12", ..., \verb"21") correspond to OpenGL versions $1.1, 1.2, ..., 2.1$.
+    Each of them defines the methods for function introduced in that OpenGL version, which is nice if you want to keep track of the OpenGL version needed to run your application, but otherwise it's just an annoyance.  
+\item In principle there would have been a one-to-one correspondence between the C functions for OpenGL and their Java counterparts, if Java would have dealt with pointers and arrays in the same style as within the C language. Such is not the case, and so each Java binding must somehow deal with function arguments like a pointer-to-float which is just the C representation of a float array parameter. There are some complications here, so there is no obvious solution, so, unavoidably,  Jogl and LWJGL have selected \emph{different} solutions.
+    \begin{itemize}
+     \item An ``array of floats'' is in C just a pointer to a float. That pointer points to the first element
+     of the array, but by adding some ``offset'', it can point just as easily to some other starting point.
+     \item An ``array of floats'' in Java can be represented as a Java float array, i.e. of type \verb"float[]".
+     It can also be represented by means of a ``direct'' or ``indirect'' \verb"FloatBuffer" object. 
+     \item Both Java float arrays and indirect \verb"FloatBuffers" are represented within the Java ``heap'', but direct \verb"FloatBuffers" are kept ``outside'' that heap. As a consequence, the Java native interface calls         can deal more efficiently with direct \verb"FloatBuffers" than with indirect buffers or float arrays. The flip side is that direct buffers are not automatically garbage collected, and although cpying large chunks of information from or to a direct buffer is ok, accessing individual buffer elements is not very efficient. (Basically, Java performs some checks when it passes information across the boundary of the Java virtual machine, for safety and security reasons). 
+     \item Java float arrays have no means to represent ``offsets'' into an array the same way you can do this in C. But \verb"FloatBuffers" can represent such offsets by means of the current buffer position.
+     \item Both Jogl and LWJGL use \verb"FloatBuffers" as the preferred way of representing C style float pointers. But Jogl also allows plain Java float arrays, as a convenience, whereas LWJGL suggest that you introduce a \verb"FloatBuffer" wrapper in such cases. When you do use an array in Jogl, you must also specify
+         an ``offset'' in the form of a (long) integer, and as an ``extra'' argument for the Java method. 
+    \end{itemize}
+    
+    
+\end{itemize}
+The \verb"GLRenderContext" interface from the hmi.graphics.opengl package (or more precisely, the \verb"GLBinding" sub-interface) has been introduced to get rid of the interface differences between Jogl and LWJGL. (It seems that the Jogl 2 interfaces introduce yet another variation, so we will capture that one as well).
+The \verb"GLBinding" interface introduces a selection of the more useful OpenGL calls, and uses the more useful
+ parameter conventions. So:
+ \begin{itemize}
+ \item Like Jogl, and unlike LWJGL, the \verb"GLBinding" interface represents the OpenGL conext by means of an Java object. The \verb"GLRenderContext" extends \verb"GLBinding", and adds a few render attributes, like the render ``pass''.
+ \item There is one context, no annoying distictions between OpenGL versions.
+ \item \verb"FloatBuffers" are preferred, but for a few cases float arrays are allowed as convenience method, but without the superfluous integer offset from Jogl. (When you really  want offsets, you want to use \verb"FloatBuffers" anyway)
+ \end{itemize}
+ 
+ \subsection{Generating the Java bindings}
+ From the section above it should be clear that we have a number of Java classes and interfaces that need to be ``in sync'' so to say. These are:
+ \begin{enumerate}
+ \item \verb"GLRenderContext" and \verb"GLBinding.java" from hmi.graphics.opengl
+ \item \verb"JOGLContext" from hmi.graphics.jogl
+ \item \verb"LWJGLContext" from hmi.graphics.lwjgl
+ \end{enumerate} 
+ Rather than manually updating each of these files, they are being \emph{generated} from a common definitions file called \verb"GLF.def", located in hmi.graphics.opengl, plus a few short binding-specific header files. The \verb"GLF.def" files contains templates from which the three files above can be generated. The \verb"GLBinding.header", \verb"JOGLContext.header", and \verb"LWJGLContext.header" deal with the few things that could not be dealt with in a generic way.
+ 
+ To be concrete:
+ \begin{enumerate}
+ \item \verb"GLBinding.java" is generated by running \verb"GenGLBinding" from the hmi.graphics.gen package.
+ (\verb"GLRenderContext" simply extends \verb"GLBinding", so it us updated implicitly)
+ \item \verb"JOGLContext" is generated by running \verb"GenJOGLContext" from hmi.graphics.gen
+ \item \verb"LWJGLLContext" is generated by running \verb"GenLWJGLContext" from hmi.graphics.gen
+ \end{enumerate}
+ 
+ 
+  The format for the \verb"GLF.def" file is as follows:
+  \begin{itemize}
+  \item A line like :\\
+  \verb"GL11  public void glClear(int mask);"\\
+  denotes a simple OpenGL function \verb"glClear" with one int-typed argument called \verb"mask". 
+  It is prefixed by \verb"GL11" to denote that it is an OpenGL 1.1 function. ( Jogl  will ignore this,
+  but  LWJGL  needs it.)
+  \item The two lines:\\
+  \verb"GL11  public void glGetFloatv(int pname, FloatBuffer params);"
+  \verb"GL11  public void glGetFloatv(int pname, float[] params);"\\
+  denote two variations of the OpenGL function \verb"glGetFloatv", one with a \verb"FloatBuffer",
+  one with a Java float array. Note that we have no Jogl-style array offset.
+  For Jogl, the translation in JOGLContext.java becomes:\\
+  \verb"public final void glGetFloatv(int pname, FloatBuffer params) "\\
+  \verb"  { gl.glGetFloatv(pname, params); }"\\
+  \verb"public final void glGetFloatv(int pname, float[] params) "\\
+  \verb"  { gl.glGetFloatv(pname, params, 0); }"\\
+  Whereas for LWJGL, we have inside LWJGLContext.java:\\
+  \verb"public final void glGetFloatv(int pname, FloatBuffer params)  "\\
+  \verb"  { GL11.glGetFloat(pname, params); }"\\
+  \verb"public final void glGetFloatv(int pname, float[] params)  "\\
+  \verb"  { GL11.glGetFloat(pname, FloatBuffer.wrap(params));}"\\
+  
+  \item Finally, we sometimes need some "hack" in cases like this line in \verb"GLF.def":\\
+  \verb"GL11  public void glDrawElements"\\
+  \verb"    (int mode, int bufcount, int buftype, IntBuffer indices);"\\
+  For Jogl, this translated in straightforward manner:\\
+  \verb"public final void glDrawElements"\\
+  \verb"    (int mode, int bufcount, int buftype, IntBuffer indices)"\\
+   \verb"   { gl.glDrawElements(mode, bufcount, buftype, indices); }"\\
+   But for LWJGL, the fact that we use an \verb"IntBuffer" argument is used to infer the buftype and bufcount
+   arguments. So the translation becomes:\\
+   \verb" public final void glDrawElements"\\
+   \verb"   (int mode, int bufcount, int buftype, IntBuffer indices) "\\
+   \verb"   { GL11.glDrawElements(mode, indices); }"\\
+  \end{itemize}
+  
+  This works only because of a "hack": the two parameter names \verb"bufcount" and \verb"buftype"
+  are recognized as such when used in a parameterlist where also some buffer is used,
+  and the LWJGL translation will omit them for the LWJGL translation. 

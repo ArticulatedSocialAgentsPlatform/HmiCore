@@ -1,0 +1,18 @@
+Conventions for shaders:
+
+- no deprecated variables is the goal: no gl_Vertex, gl_Normal, gl_MultiTexCoord etc.
+- This also applies to unioforms: no gl_ModelViewMatrix
+
+replacemens for the "standard" variables from OGL 2.1, (The original names are still available from  the "compatibity profile"):
+
+Old name             New attribute
+gl_Vertex            mcPosition               (note: mc denotes "model coordinates"; you also have "ec" for "eye coordinates" like in ecPosition etc)
+gl_Normal            mcNormal
+gl_Color             color
+gl_SecondaryColor    secondaryColor
+gl_MultiTexCoordn    texCoordn              (n = 0, 1, 2, ....)
+gl_FogCoord          fogCoord
+
+
+
+

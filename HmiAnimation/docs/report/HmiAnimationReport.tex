@@ -1,0 +1,62 @@
+\documentclass[10pt]{report}
+%\documentclass[10pt]{amsbook}
+%\usepackage{a4}
+%\frenchspacing
+%\setlength{\parskip}{1ex plus0.5ex minus0.5ex}
+%\setlength{\parindent}{0cm}
+\usepackage{tikz}
+% Optional PGF libraries
+\usetikzlibrary {arrows}
+\usetikzlibrary {snakes}
+%\usepackage{pgflibraryarrows}
+%\usepackage{pgflibrarysnakes}
+
+\usepackage{hyperref}
+\hypersetup{
+%backref=false,
+pdfdisplaydoctitle=true,
+%pdfpagelayout=TwoColumnLeft,
+pdffitwindow=true,
+pdfpagetransition=Dissolve,
+pdfpagemode=UseOutlines,
+pdfnewwindow=true,
+pdfstartpage=3,
+colorlinks=true,
+linkcolor=blue
+}
+
+
+
+
+\title{HmiAnimation}
+\date{}
+
+\makeatletter
+\renewcommand{\@makechapterhead}[1]{%
+\vspace*{50 pt}%
+{\setlength{\parindent}{0pt} \raggedright \normalfont
+\bfseries\Huge#1
+\par\nobreak\vspace{40 pt}}}
+\makeatother
+\begin{document}
+
+%\maketitle
+%\begin{titlepage}
+%\begin{center}
+%\
+%\vspace{10ex}
+%
+%{\Huge The HMIAnimation packages}
+%\vspace{3ex}
+%
+%{\large Design and documentation for the HmiAnimation Java package.}
+%\end{center}
+%\end{titlepage}
+
+\setcounter{chapter}{0}
+
+\input{hmi-animation-chapters.tex}
+
+
+\end{document}
+

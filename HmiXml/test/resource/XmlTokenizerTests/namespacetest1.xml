@@ -1,0 +1,3 @@
+<ns:test xmlns:ns="http://hmi.ns.test">
+   <ns:innertag> </ns:innertag>
+</ns:test>

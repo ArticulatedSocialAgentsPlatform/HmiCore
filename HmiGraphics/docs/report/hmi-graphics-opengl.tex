@@ -1,0 +1,86 @@
+
+\section{OpenGL}
+
+The hmi.graphics.opengl package defines a basic render engine based upon the Jogl binding for OpenGL.
+
+\begin{itemize}
+\item GLRenderContext: wrapper class for a Jogl GL object. This is the Jogl defined interface to OpenGL functionality.
+In addition a GLRenderContext can define extra render state information, such as
+the current \emph{renderpass}.
+\item GLRenderObject: Interface for all objects that can be ``rendered'' using an OpenGL render context.
+The two methods: glInit and glRender are called with a GLRenderContext parameter that includes
+a Jogl GL object with what is called a \emph{current} OpenGL context.
+
+\item GLRenderList: Basically a List of GLRenderObjects, that can be treated as a GLRenderObject itself.
+
+\item GLShape: An GLRenderObject that defines, by means of a user specified GLRenderList,  an OpenGL render state,
+that defines geometry by means of a second user defined GLRenderList, and
+that defines a transform matrix to be applied to the geometry.
+The render state objects are ``rendered'' only nor non-shadow passes, and they are rendered
+immediately before the geometry.
+The render state settings are ``additive'', that is, they will affect the current OpenGL state,
+but there is no pop/push mechanism for restoring the old state after rendering.
+The transformation on the other hand is passed on to OpenGL by means of the OpenGL glPushMatrix/glPopMatrix
+mechanism. The matrix itself should be in row-major order. (It is multiplied with the OpenGL modelview matrix
+by means of glMultTransposeMatrix, to conform to OpenGL's column-major matrix order.)
+The transform matrix is \emph{not} kept inside the GLShape object. Rather, it is a reference to a matrix
+elsewhere, typically inside a VJoint object from hmi.animation.
+
+\item GLBasicMesh: A GLRenderObject that defines a simple geometry ``mesh''.
+It defines a number of OpenGL vertex attributes and a (shared) index structure.
+The attributes are kept in objects of type GLVertexAttribute.
+The vertices should be arranged by means of triangles.
+
+\item SkinnedMesh: an extension of GLBasicMesh that can handle meshes which can be
+\emph{modified} or \emph{deformed} real-time by means of a skeleton based technique.
+It keeps references to several transform matrices (one for every skeleton joint), and
+uses some extra vertex attributes like joint indices and joint weights.
+Since it must deform the \emph{original} vertex data, it keeps copies of these original
+data arrays for vertex coordinates and vertex normals.
+
+\item GLVertexAttribute: helper class for GLBasicMesh. Basically a wrapper for
+a java.nio.FloatBuffer containing the raw data for one OpenGL vertex attribute.
+This data can be initialized in various ways, for instance, by copying from a hmi.scenegraph.VertexAttribute object.
+GLVertexAttribute deals with the complex OpenGL attributes ``old style'', as well as with attributes
+for more modern shader programming.
+
+\item GLUtil: a basic util, for reporting GL errors etcetera.
+
+\item Renderer4: A basic top-level ``render engine'' that deals with the obligatory Jogl setup.
+So it defines the Jogl GLEventListener interface, deals with Jogl generated events
+like int(), display(), displayChanged(), and reshape(). It will \emph{cause} a Jogl display call
+whenever it receives a time() call, typically  from a hmi.util.SystemClock. Then, upon receiving
+the (self-indiced) Jogl display call, it will start a render phase by calling the glRender() method
+for a top-level GLRenderObject, that is called the ``scene''.
+A few display settings can be made: the near and far plane, and the field-of-view angle.
+
+\end{itemize}
+
+\subsection{Package: hmi.graphics.opengl.scenegraph}
+
+Although the opengl package can be used for ``standalone'' OpenGL demo programs,
+it will typically be part of a larger setup, where the graphics is being defined using
+the hmi.graphics.scenegraph package. OpenGL is not a scene graph api, therefore the scenegraph related
+elements of the render engine have been placed in a special package: hmi.graphics.opengl.scenegraph.
+This package mainly includes classes for the \emph{compilation} from hmi.grapgics.scenegraph structures
+to hmi.graphics.opengl structures. But it also contains a few scenegraph classes: VGLNode
+and VGLRenderStruct. These classes are based not only on the opengl classes, but also on hmi.animation.VJoint.
+
+\begin{itemize}
+\item VGLNode: A GLRenderObject containing a VJoint that defines a transform matrix, and a GLRenderList
+containing GLRenderObjects, to be rendered with a OpenGL modelview matrix defined by the VJoint.
+A VGLNode is a scenegraph node: you can \emph{add}  child VGLNodes. The effect
+of an addChild operation is to create a VJoint parent-child relationship, and to
+simply \emph{combine} the GLRenderLists. Of course, one would typically expect the GLRenderObjects
+to refer to matrices from the VJoint tree.
+
+\item GLScene: ``work under construction''. The idea is that VGLNodes are not quite sufficient
+when complete Collada-like structures have to be dealt with.
+So, we have a GLScene that should keep the ``top-level'' structures:
+a list of ``root'' VJoints, a list of GLShapes, a list of SkinnedMeshes.
+
+
+
+\end{itemize}
+
+

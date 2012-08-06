@@ -1,0 +1,107 @@
+/*
+ * 
+ */
+package hmi.graphics.lwjgl;
+
+import java.nio.*;
+import hmi.graphics.opengl.GLRenderContext;
+import org.lwjgl.*;    
+
+import static  org.lwjgl.opengl.GL11.*; 
+import static  org.lwjgl.opengl.GL12.*; 
+import static  org.lwjgl.opengl.GL13.*; 
+import static  org.lwjgl.opengl.GL14.*; 
+import static  org.lwjgl.opengl.GL15.*; 
+import static  org.lwjgl.opengl.GL20.*; 
+import static  org.lwjgl.opengl.GL21.*;     
+import static  org.lwjgl.opengl.GL30.*;    
+
+
+import org.lwjgl.opengl.*;
+import org.lwjgl.util.glu.GLU;
+import  hmi.graphics.util.BufferUtil;
+
+
+/**
+ * Generated file for LWJGL based opengl rendering
+ * @author generated file
+ */
+public final class LWJGLContext implements GLRenderContext {
+
+   public LWJGLContext() {   
+   }
+
+   private int pass;
+   
+   public void setPass(int pass) {
+      this.pass = pass;
+   }
+   
+   public int getPass() {
+      return pass;
+   }
+
+   // special cases:
+
+   public void gluLookAt(double eyeX, double eyeY, double eyeZ, double centerX, double centerY, double centerZ, double upX, double upY, double upZ) 
+   { GLU.gluLookAt((float)eyeX, (float)eyeY, (float)eyeZ, (float)centerX, (float)centerY, (float)centerZ, (float)upX, (float)upY, (float)upZ); }
+
+
+   public boolean gluCheckExtension(String extName, String extString) 
+   { return GLU.gluCheckExtension(extName, extString); }
+   
+   public void glVertex2fv(float[] v) { GL11.glVertex2f(v[0], v[1]); }
+   public void glVertex3fv(float[] v) { GL11.glVertex3f(v[0], v[1], v[2]); }
+   public void glVertex4fv(float[] v) { GL11.glVertex4f(v[0], v[1], v[2], v[3]); }
+   public void glNormal3fv(float[] v) { GL11.glNormal3f(v[0], v[1], v[2]); }
+   public void glTexCoord2fv(float[] v) { GL11.glTexCoord2f(v[0], v[1]); }
+   public void glVertexAttrib2fv(int target, float[] v) { GL20.glVertexAttrib2f(target, v[0], v[1]); }
+   public void glVertexAttrib3fv(int target, float[] v) { GL20.glVertexAttrib3f(target, v[0], v[1], v[2]); }
+   public void glVertexAttrib4fv(int target, float[] v) { GL20.glVertexAttrib4f(target, v[0], v[1], v[2], v[3]); }
+     
+   
+   
+   public void glShaderSource(int shader, int count, String[] prog, int[] length)  {   
+      byte[] bytes = prog[0].getBytes();
+      ByteBuffer buf = ByteBuffer.allocateDirect(bytes.length);
+      buf.put(bytes);
+      buf.rewind();
+      GL20.glShaderSource(shader, buf);   
+   }
+    
+   public void glBufferData(int target, int bufcount, IntBuffer data, int usage) {
+      if (data==null) {
+         GL15.glBufferData(target, (long)bufcount, usage);
+      } else {
+         GL15.glBufferData(target, data, usage);
+      }
+   } 
+    
+   public void glBufferData(int target, int bufcount, FloatBuffer data, int usage) {
+      if (data==null) {
+         GL15.glBufferData(target, (long)bufcount, usage);
+      } else {
+         GL15.glBufferData(target, data, usage);
+      }
+   }
+   
+    public void glTexImage2D(int target, int level, int internalFormat, int width, int height, int border, int format, int type, Buffer pixels) { 
+      if (pixels instanceof ByteBuffer) {
+         GL11.glTexImage2D(target, level, internalFormat, width, height, border, format, type, (ByteBuffer) pixels); 
+      }
+   }
+   
+   public void glTexImage2D(int target, int level, int internalFormat, int width, int height, int border, int format, int type, long pixels_buffer_offset) 
+    { GL11.glTexImage2D(target, level, internalFormat, width, height, border, format, type, pixels_buffer_offset); }
+   
+   public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, int type, Buffer pixels) { 
+      if (pixels instanceof ByteBuffer) {
+         GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type,(ByteBuffer) pixels); 
+      }
+   }
+   
+   public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, int type, long pixels_buffer_offset) 
+    { GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels_buffer_offset); }
+    
+    
+    // generated:

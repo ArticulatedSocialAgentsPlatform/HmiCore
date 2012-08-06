@@ -1,0 +1,15 @@
+% The chapters for hmi/xml, for inclusion within a master LaTeX document
+% include files must specify a path like \hmixmlreportdir/filename
+% where \hmixmlreportdir should be defined in the master document.
+% We have a fall back:
+\ifx \hmixmlreportdir \undefinedmacro \def \hmixmlreportdir{.} \fi
+\ifx \webserver \undefinedmacro \def \webserver{http://elckerlyc.sourceforge.net/javadoc/Hmi/} \fi
+
+\chapter{The HmiXml package}
+The hmi/xml package contains utilities for reading, parsing, and generating XML documents.
+
+\input{\hmixmlreportdir/hmi-xml-xmlstructures.tex}
+
+
+See the \href{\webserver}{javadoc}.
+%\input{\hmixmlreportdir/hmi-xml-overview.tex}

@@ -1,0 +1,6 @@
+<ivy-module version="2.0">
+   <info organisation="HMI" module="HmiOpenGLTest"/>
+   <dependencies> 
+	   <dependency org="slf4j" name="slf4j-api"        rev="latest.release" />
+   </dependencies>
+</ivy-module>

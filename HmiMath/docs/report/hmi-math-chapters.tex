@@ -1,0 +1,12 @@
+% The chapters for hmi/math, for inclusion within a master LaTeX document
+% include files must specify a path like \hmimathreportdir/filename
+% where \hmimathreportdir should be defined in the master document.
+% We have a fall back:
+\ifx \hmimathreportdir \undefinedmacro \def \hmimathreportdir{.} \fi
+\ifx \webserver \undefinedmacro \def \webserver{http://elckerlyc.sourceforge.net/javadoc/Hmi/} \fi
+
+\chapter{The HmiMath package}
+The hmi/math package contains mathematics utilities, mainly useful for 3D graphics applications.
+
+See the \href{\webserver}{javadoc}.
+%\input{\hmimathreportdir/hmi-math-overview.tex}

@@ -1,0 +1,30 @@
+
+\begin{figure}
+
+\begin{tikzpicture}
+  [joint/.style={shape=ellipse,draw=blue!50,fill=blue!20, thick,
+         inner sep=0pt, minimum width=12mm, minimum height=12mm},
+  auto
+  ]
+   \begin{scope}[line width=6pt]
+
+  \draw (-4,0) -- (4,0);
+   \end{scope}
+  \node (origin) [minimum size = 0] at(-1, 0) {  };
+ \path
+   (0, 2) node (j0)        [joint, label=170:{$A_0=L_0$}] {$J_0$}
+  ++(0, 4)   node (j1)   [joint, label=160:{$A_1=A_0\circ L_1$}]         {$J_1$}
+  ++(2, 0.5)   node (j2)    [joint, label=90:{$A_2=A_1\circ L_2$}]         {$J_2$}
+  ++(1.5, -3)   node (j3)     [joint, label=20:{$A_3=A_2\circ L_3$}]         {$J_3$}
+
+   ;
+   \begin{scope}[line width=1.4pt]
+   \draw [->] (origin) to node{$t_0$} (j0);
+   \draw [->] (j0) to node{$t_1$}(j1);
+   \draw [->] (j1) to node{$t_2$}(j2);
+   \draw [->] (j2) to node{$t_3$}(j3);
+   \end{scope}
+
+\end{tikzpicture}
+\caption{Part of a skeleton, with Translations $t_i$, Local Transforms $D_i$, and global transforms $A_i$}\label{figure:skeletonfragment}
+\end{figure} 

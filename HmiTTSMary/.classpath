@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/en_us.jar"/>
+	<classpathentry kind="lib" path="lib/freetts.jar"/>
+	<classpathentry kind="lib" path="lib/hsqldb-2.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/Jama-1.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/jcip-annotations-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jsresources.jar"/>
+	<classpathentry kind="lib" path="lib/jtok.jar"/>
+	<classpathentry kind="lib" path="lib/mary-common.jar"/>
+	<classpathentry kind="lib" path="lib/mary-de.jar"/>
+	<classpathentry kind="lib" path="lib/mary-en.jar"/>
+	<classpathentry kind="lib" path="lib/mary-freetts.jar"/>
+	<classpathentry kind="lib" path="lib/mary-mbrola.jar"/>
+	<classpathentry kind="lib" path="lib/mary-te.jar"/>
+	<classpathentry kind="lib" path="lib/mary-tr.jar"/>
+	<classpathentry kind="lib" path="lib/maxent-2.5.2.jar"/>
+	<classpathentry kind="lib" path="lib/opennlp-tools-1.4.3.jar"/>
+	<classpathentry kind="lib" path="lib/signalproc.jar"/>
+	<classpathentry kind="lib" path="lib/trove-2.1.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/HmiTTS"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/HmiUtil"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/HmiXml"/>
+	<classpathentry kind="lib" path="lib/guava-10.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-over-slf4j-1.6.4.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.6.4.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

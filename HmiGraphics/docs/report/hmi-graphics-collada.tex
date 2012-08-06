@@ -1,0 +1,42 @@
+
+\section{Collada}
+The next format that we discuss is that of Collada documents. These are considerable more complex
+than hmi.graphics.scenegraphs. We therefore provide a cursory overview. (The Collada document
+is several hundreds of pages).
+\subsubsection{The Collada top-level document structure}
+A Collada document at the top level is just an instance of a \verb"scene". This is basically just a reference
+to one of the  \verb"visual_scene" elements in the library for visual scenes. This \verb"visual_scene"
+element in turn consists in essence of a number of \verb"node" elements.
+
+Collada \verb"node"s can occur directly within a \verb"visual_scene" or within a library for nodes.
+These \verb"node"s form recursive scene graph hierarchies, possibly with extra \emph{sub graph sharing} via
+the mechanism of \emph{instances} of \verb"node"s.
+
+A single \verb"node" is, apart from being the parent of possible recursive child verb"node"s, a container
+for \emph{instances} of various entities: geometry, lights, camera's, and ``controller''s.
+Moreover, a \verb"node" defines a local transformation.
+
+The \verb"hmi.graphics.collada" representation of a Collada document is a more or less straightforward
+representation of the syntax of the document. So we find classes like \verb"Collada", \verb"Scene",
+\verb"Instance_Visual_Scene", \verb"Node", etcetera, each in direct correspondance with some Collada XML element.
+
+\subsection{Collada controllers}
+
+Collada ``controllers'' are rather complicated, and not always very clearly defined within the Collada specs.
+There are ``skin'' controllers as well as ``morph'' controllers. We only discuss ``skin controllers'' here.
+\begin{itemize}
+\item A \verb"controller" is defined within a \verb"library_controllers" section, then ``instanced'' within
+a Collada \verb"node".
+\item The \emph{instance} defines references to the (skin) controller as well as to (one or more) \verb"skeleton"s.
+The instance also includes a \verb"bind_material", similar to \verb"instance_geometry".
+\item The controller itself defines a \verb"skin", \verb"bind_shape_matrix", joint names, inverse bind matrices,
+and skinning weights.
+Strange enough, the controller does \emph{not} define the actual skeleton.
+\item Collada seems not to rule out any combination of \verb"controller" and \verb"instance_controller".
+So we could have several instances of the  same controller, but each instance with a different skeleton.
+But we could also have several instances (potentially from various controllers) all sharing the \emph{same}
+skeleton. Collada is unclear how to deal with this sort of `instancing'' issues, and leaves it up
+to the implementor.
+\item For the time being we assume that there is a one-to-one correspondence between skin controller and skeleton
+
+\end{itemize}

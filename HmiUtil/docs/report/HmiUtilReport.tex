@@ -1,0 +1,35 @@
+\documentclass[10pt]{report}
+\usepackage{hyperref}
+\hypersetup{
+%backref=false,
+pdfdisplaydoctitle=true,
+%pdfpagelayout=TwoColumnLeft,
+pdffitwindow=true,
+pdfpagetransition=Dissolve,
+pdfpagemode=UseOutlines,
+pdfnewwindow=true,
+pdfstartpage=3,
+colorlinks=true,
+linkcolor=blue
+}
+
+
+\title{HmiUtil}
+\date{}
+
+\makeatletter
+\renewcommand{\@makechapterhead}[1]{%
+\vspace*{50 pt}%
+{\setlength{\parindent}{0pt} \raggedright \normalfont
+\bfseries\Huge#1
+\par\nobreak\vspace{40 pt}}}
+\makeatother
+\begin{document}
+
+\setcounter{chapter}{0}
+
+\input{hmi-util-chapters.tex}
+
+
+\end{document}
+

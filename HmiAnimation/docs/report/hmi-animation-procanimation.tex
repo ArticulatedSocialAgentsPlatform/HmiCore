@@ -1,0 +1,42 @@
+\section{Procedural Animation}
+
+\subsection{XML format}
+...\\
+Note that some symbols need to be XML encoded: $>$ as \&gt; , $<$ as \&lt; , \&\& as \&amp;\&amp; etc.
+\subsubsection{JEP examples and custom macros}
+Function of time ($0 \leq t \leq 1$) and float parameters (as constructed using \textless Parameter\textgreater).
+
+\paragraph{If-statement}
+\begin{verbatim}
+if(<condition>,<expression_true>,<expression_false>)
+\end{verbatim}
+Evaluates the condition and executes 'expression\_true' if its true, expression\_false otherwise.
+
+\paragraph{Random}
+\begin{verbatim}rand()\end{verbatim}
+Generates a random number between 0 and 1.
+
+\paragraph{Hermite-spline}
+\begin{verbatim}
+hermite(time,v0,vn, p0,...,pn)
+\end{verbatim}
+Constructs a uniform Hermite spline, time distance between the points is 1.\\
+time: time to execute the spline at, typically t*n to interpolate smoothly from p0 to pn as t ranges from 0 to 1.\\
+v0:		speed at p0\\
+vn:   speed at pn\\
+pi:		position at i\\
+
+\paragraph{TCB-spline}
+\begin{verbatim}
+tcbspline(time,v0,vn, p0,t0, pi,ti,tensi,conti,biasi,...,pn,tn)
+\end{verbatim}
+Constructs a non-uniform TCB spline.\\
+time:time to execute the spline at $t0 \leq time \leq tn$\\
+v0:  start speed\\
+vn:  end speed\\
+pi:  point i\\
+ti:  time stamp i, $ti-1<ti<ti+1$\\
+tensi: tensity i, $-1<tensity<1$, default = 0 \\
+conti: continuity i, $-1<conti<1$, default = 0 \\
+bias:  bias i, $-1<bias<1$, default = 0\\
+

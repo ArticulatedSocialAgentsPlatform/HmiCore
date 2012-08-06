@@ -1,0 +1,74 @@
+<gshape name="ey02-mesh">
+   <gmaterial name="coinoeil" shader="blinnTextured1" emission="0.0 0.0 0.0 1.0" ambient="0.588 0.588 0.588 1.0" diffuse="0.0 0.0 0.0 1.0" specular="0.9 0.9 0.9 1.0" shininess="79.0">
+      <diffuse>
+         <gtexture imageFile="visage_2008_low.jpg"/>
+      </diffuse>
+   </gmaterial>
+   <gskinnedmesh id="ey02-mesh" meshType="Triangles" nrOfVertices="16" >
+         <skeletonids count="1">
+         Bip01_Bassin-node
+      </skeletonids>
+      <jointnames count="100">
+         Bip01_Bassin Bip01_Colonne Bip01_Colonne1 Bip01_Colonne2 Bip01_Colonne3 Bip01_Cou Bip01_T_te Bip01_T_teMorceau Factice01 Eye_L
+         Factice02 Eye_R Factice_eyes_move Factice04 Factice07 Factice_eyes_base tongue dents_L dents_H Sun_glass
+         lun Bip01_G_Clavicule Bip01_G_Membre_sup_rieur_du_bras Bip01_G_Avant_bras Bip01_G_Main Bip01_Doigt_G0 Bip01_Doigt_G01 Bip01_Doigt_G02 Bip01_Doigt_G0Morceau Bip01_Doigt_G1
+         Bip01_Doigt_G11 Bip01_Doigt_G12 Bip01_Doigt_G1Morceau Bip01_Doigt_G2 Bip01_Doigt_G21 Bip01_Doigt_G22 Bip01_Doigt_G2Morceau Bip01_Doigt_G3 Bip01_Doigt_G31 Bip01_Doigt_G32
+         Bip01_Doigt_G3Morceau Bip01_Doigt_G4 Bip01_Doigt_G41 Bip01_Doigt_G42 Bip01_Doigt_G4Morceau Bip01_Torsion_avbras_G Bip01_Torsion_avbras_G1 Bip01_Torsion_brassup_G Bip01_Torsion_brassup_G1 Bip01_D_Clavicule
+         Bip01_D_Membre_sup_rieur_du_bras Bip01_D_Avant_bras Bip01_D_Main Bip01_Doigt_D0 Bip01_Doigt_D01 Bip01_Doigt_D02 Bip01_Doigt_D0Morceau Bip01_Doigt_D1 Bip01_Doigt_D11 Bip01_Doigt_D12
+         Bip01_Doigt_D1Morceau Bip01_Doigt_D2 Bip01_Doigt_D21 Bip01_Doigt_D22 Bip01_Doigt_D2Morceau Bip01_Doigt_D3 Bip01_Doigt_D31 Bip01_Doigt_D32 Bip01_Doigt_D3Morceau Bip01_Doigt_D4
+         Bip01_Doigt_D41 Bip01_Doigt_D42 Bip01_Doigt_D4Morceau Bip01_Torsion_avbras_D Bip01_Torsion_avbras_D1 Bip01_Torsion_brassup_D Bip01_Torsion_brassup_D1 Factice_align_sword_to_Sheath_sword Bip01_G_Cuisse Bip01_G_Mollet
+         Bip01_G_Pied Bip01_Orteil_G0 Bip01_Orteil_G01 Bip01_Orteil_G02 Bip01_Orteil_G0Morceau Bip01_Torsion_mollet_G Bip01_Torsion_mollet_G1 Bip01_D_Cuisse Bip01_D_Mollet Bip01_D_Pied
+         Bip01_Orteil_D0 Bip01_Orteil_D01 Bip01_Orteil_D02 Bip01_Orteil_D0Morceau Bip01_Torsion_mollet_D Bip01_Torsion_mollet_D1 Bip01_Torsion_cuisse_G Bip01_Torsion_cuisse_G1 Bip01_Torsion_cuisse_D Bip01_Torsion_cuisse_D1
+      </jointnames>
+      <jointsids count="100">
+         HumanoidRoot vl5 vt10 vt6 vt1 vc4 skullbase skulltop Bone9 l_eyeball_joint
+         Bone11 r_eyeball_joint Bone13 Bone14 Bone15 Bone16 Bone17 temporomandibular Bone19 Bone20
+         Bone21 l_sternoclavicular l_shoulder l_elbow l_wrist l_thumb1 l_thumb2 l_thumb3 l_thumb_distal_tip l_index1
+         l_index2 l_index3 l_index_distal_tip l_middle1 l_middle2 l_middle3 l_middle_distal_tip l_ring1 l_ring2 l_ring3
+         l_ring_distal_tip l_pinky1 l_pinky2 l_pinky3 l_pinky_distal_tip Bone46 Bone47 Bone48 Bone49 r_sternoclavicular
+         r_shoulder r_elbow r_wrist r_thumb1 r_thumb2 r_thumb3 r_thumb_distal_tip r_index1 r_index2 r_index3
+         r_index_distal_tip r_middle1 r_middle2 r_middle3 r_middle_distal_tip r_ring1 r_ring2 r_ring3 r_ring_distal_tip r_pinky1
+         r_pinky2 r_pinky3 r_pinky_distal_tip Bone74 Bone75 Bone76 Bone77 Bone78 l_hip l_knee
+         l_ankle l_subtalar l_midtarsal l_metatarsal l_forefoot_tip Bone86 Bone87 r_hip r_knee r_ankle
+         r_subtalar r_midtarsal r_metatarsal r_forefoot_tip Bone95 Bone96 Bone97 Bone98 Bone99 Bone100
+      </jointsids>
+      <parentindices count="100">
+         -1 0 1 2 3 4 5 6 6 8 6 10 6 12 12 6 6 6 6 6 19 5 21 22 23 24 25 26 27 24
+         29 30 31 24 33 34 35 24 37 38 39 24 41 42 43 22 45 21 47 5 49 50 51 52 53 54 55 52 57 58
+         59 52 61 62 63 52 65 66 67 52 69 70 71 50 73 49 75 4 1 78 79 80 81 82 83 78 85 1 87 88
+         89 90 91 92 87 94 1 96 1 98
+      </parentindices>
+      <vertexweights>
+         <jcount count="52">
+            2 2 1 1 1 2 1 2 1 2 2 2 2 2 2 2 2 2 2 1 2 3 3 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+         </jcount>
+         <jointindices count="72">
+            89 88 89 88 89 89 89 89 88 89 89 88 89 89 90 89 90 89 90 90 89 90 89 90 89 90 89 90 89 90 89 90 89 90 91 92 91 92 90 91 92 90 91 92 92 92 92 91 92 92 92 89 89 89 89 89 89 89 89 89
+            89 89 89 89 89 89 89 89 89 89 89 89
+         </jointindices>
+         <jointweights count="72">
+            0.998672 0.001328 1.0 8.7E-5 1.0 1.0 1.0 0.999642 3.57E-4 1.0 1.0 3.0E-6 1.0 0.976449 0.023551 0.983309 0.01669 0.99974 2.59E-4 0.921198 0.078802 0.629843 0.370157 0.680843 0.319157 0.992695 0.007305 0.956431 0.043568 0.987813
+            0.012186 1.0 0.0 1.0 0.988656 0.011343 0.995705 0.004295 0.0 0.998918 0.001081 0.0 1.0 1.0 1.0 1.0 1.0 0.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0
+            1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0
+         </jointweights>
+      </vertexweights>
+         
+         <indices count="66">
+            0 1 2 3 4 5 4 3 0 0 2 4 6 7 8 6 8 1 6 1 0 9 10 11 11 12 9 3 5 13
+            3 13 14 3 14 15 12 8 7 7 9 12 13 11 10 10 14 13 2 1 8 8 12 2 5 4 11 11 13 5
+            12 11 4 4 2 12
+         </indices>
+         <vertexattribute name="mcPosition" count="16" size="3">
+            0.0160679 1.6500187 0.06035722 0.017864129 1.6492223 0.06043855 0.017142609 1.6502687 0.06051271 0.016119929 1.6510764 0.06035722 0.01716085 1.6513314 0.06051271 0.01750771 1.6532006 0.06066133 0.0160679 1.6500187 0.05859433 0.019816458 1.648563 0.05901791 0.01899711 1.6486696 0.060735002 0.018952599 1.6503915 0.058710188
+            0.0189255 1.6514769 0.058603372 0.018066268 1.6514769 0.06018295 0.0179906 1.6503915 0.06019416 0.018462239 1.6536888 0.06057794 0.01964735 1.6542239 0.059177723 0.016119929 1.6510764 0.05859433
+         </vertexattribute>
+         <vertexattribute name="mcNormal" count="16" size="3">
+            -34.638 -59.159405 72.8037 -45.900803 -71.3934 52.8782 2.7242 0.40629408 99.962105 -50.2999 40.295197 76.46061 9.7964 -4.870306 99.399704 -39.1648 87.19571 29.377209 -39.2701 -91.9176 -3.0030055 74.6858 -44.289707 49.602898 41.9991 -53.274406 73.470505 82.8121 24.047398 50.634804
+            86.2772 -10.421404 49.473705 63.578 -11.835405 76.2742 58.4512 23.664099 77.61101 6.0366 72.3639 68.75341 51.103096 41.8554 75.07731 -66.576996 74.61571 4.447443E-6
+         </vertexattribute>
+         <vertexattribute name="texCoord1" count="16" size="2">
+            0.130505 0.855078 0.122514 0.85466 0.124902 0.85922 0.133755 0.865859 0.126854 0.865703 0.125498 0.871897 0.125308 0.848481 0.103986 0.854109 0.114821 0.854436 0.107956 0.860945 0.111004 0.868074 0.118616 0.867342 0.116813 0.859372 0.119236 0.874444 0.113887 0.876909
+            0.128438 0.876919
+         </vertexattribute>
+   </gskinnedmesh>
+</gshape>

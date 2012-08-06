@@ -1,0 +1,93 @@
+
+The "HAnim" version of the Armandia joints.
+Not all joints are presented here; in particular, may "pivot" joints have been omitted.
+Moreover, there are some serious deviations from HAnim, marked in the joint tree below.
+Finally, there are some joints (like "Torsion" joints for the hips?, that are not part of the normal hierarchy anyway.?)
+
+
+  // Name        -    LocationID
+  "Pelvis",        // 1
+     "L5",            // 2
+        "L3",            // 3
+           "T12",           // 4
+              "T8",            // 5
+                 "Neck",          // 6
+                    "Head",          // 7
+              "RightShoulder", // 8              
+                    "RightUpperArm", // 9
+                       "RightForeArm",  // 10
+                          "RightHand",     // 11
+              "LeftShoulder",  // 12
+                    "LeftUpperArm",  // 13
+                       "LeftForeArm",   // 14
+                          "LeftHand",      // 15
+     "RightUpperLeg", // 16                                
+        "RightLowerLeg", // 17
+           "RightFoot",     // 18
+              "RightToe",      // 19
+     "LeftUpperLeg",  // 20
+        "LeftLowerLeg",  // 21
+           "LeftFoot",      // 22
+              "LeftToe",       // 23
+
+
+
+
+Hierbij de bone gebruikte bone structuur:
+-------------------------------------------------------
+Pelvis							
+	L5						
+		L3					
+			T12				
+				LeftShoulder			
+					LeftUpperArm		
+						LeftForeArm	
+							LeftHand
+				RightShoulder			
+					RightUpperArm		
+						RightForeArm	
+							RightHand
+				T8			
+					Neck		
+						Head	
+	LeftUpperLeg						
+		LeftLowerLeg					
+			LeftFoot				
+				LeftToe			
+	RightUpperLeg						
+		RightLowerLeg					
+			RightFoot				
+				RightToe			
+
+
+
+
+HumanoidRoot
+   vl5  
+     (sacroiliac)
+      l_hip                  
+         l_knee            
+            l_ankle           
+               l_subtalar                         
+      r_hip             
+         r_knee            
+            r_ankle           
+               r_subtalar        
+                                       
+      vt10                
+         vt6               
+            vt1               
+               vc4               
+                  skullbase         
+                    
+    
+                  l_sternoclavicular                   NB according to HAnim this should have been a child of vt1
+                     l_shoulder
+                        l_elbow
+                           l_wrist
+                              
+                  r_sternoclavicular
+                     r_shoulder
+                        r_elbow
+                           r_wrist
+                              

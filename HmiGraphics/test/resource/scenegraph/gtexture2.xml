@@ -1,0 +1,8 @@
+
+ <gtexture imageFile="visage_2008_low.jpg"  
+   wrapS="CLAMP_TO_EDGE"  wrapT="REPEAT"  
+   repeatS="2.0" repeatT="3.0"
+   offsetS="0.5" offsetT="0.0"
+   
+ />
+   

@@ -1,0 +1,65 @@
+\documentclass[10pt]{report}
+\usepackage{ifthen}
+\usepackage{tikz}
+% Optional PGF libraries
+%\usetikzlibrary {arrows}
+%\usetikzlibrary {snakes}
+\usetikzlibrary{arrows}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{backgrounds}
+%\usetikzlibrary{placements}
+\usetikzlibrary{fit}
+\usepgflibrary{shapes.geometric}
+\usetikzlibrary[shapes.misc]
+\usetikzlibrary{positioning}
+\usetikzlibrary{scopes}
+\usepackage{amsopn}
+\usepackage[fleqn,reqno]{amsmath}
+%\usepackage[fleqn,tbtags]{amsmath}
+\usepackage{mathtools}
+
+\usepackage{hyperref}
+\hypersetup{
+%backref=false,
+pdfdisplaydoctitle=true,
+%pdfpagelayout=TwoColumnLeft,
+pdffitwindow=true,
+pdfpagetransition=Dissolve,
+pdfpagemode=UseOutlines,
+pdfnewwindow=true,
+pdfstartpage=10,
+colorlinks=true,
+linkcolor=blue
+}
+\title{HmiGraphics}
+\date{}
+
+\makeatletter
+\renewcommand{\@makechapterhead}[1]{%
+\vspace*{50 pt}%
+{\setlength{\parindent}{0pt} \raggedright \normalfont
+\bfseries\Huge#1
+\par\nobreak\vspace{40 pt}}}
+\makeatother
+\begin{document}
+
+%\maketitle
+%\begin{titlepage}
+%\begin{center}
+%\
+%\vspace{10ex}
+%
+%{\Huge The HMIGraphics packages}
+%\vspace{3ex}
+%
+%{\large Design and documentation for the HmiGraphics Java packages.}
+%\end{center}
+%\end{titlepage}
+
+\setcounter{chapter}{0}
+
+\input{hmi-graphics-chapters.tex}
+
+
+\end{document}
+

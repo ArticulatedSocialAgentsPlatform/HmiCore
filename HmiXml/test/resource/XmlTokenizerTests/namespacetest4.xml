@@ -1,0 +1,6 @@
+<test xmlns ="http://hmi.ns.test">
+   <ns:innertag xmlns:ns="ns-namespace"> </ns:innertag>
+   <innertag> </innertag>
+   <sometag xmlns:some="some-namespace"/>
+   <ex:extratag xmlns:ex="ex-namespace"/>
+</test>

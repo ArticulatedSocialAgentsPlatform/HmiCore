@@ -1,0 +1,53 @@
+\section{Overview}
+
+The hmi.animation package defines classes for animation of objects and humanoids inside
+a virtual environment. It deals only with abstract descriptions of such environments,
+but not, for instance, the implementation of visualization virtual environments.
+As a consequence, it is necessary to combine this package either with
+simple 2D graphics, or with more complicated 3D graphics.
+The basic entity defines in this package is the VObject. (``Virtual and/or Visual Object'').
+Such VObjects have a defined name, they define some set of \emph{attributes} and they define a
+limited set of physical attributes, like position and orientation in 3D space.
+Moreover, VObjects are arranged in a hierarchical scene-graph like arrangement,
+where VObjects are built up from smaller parts.
+There can be a direct \emph{parent-child relationship} between two VObjects, or some
+VObject V can be considered a \emph{part} of some other VObject P if it is \emph{recursively}
+a child of P.
+This scene-graph takes into account the positioning and orientation (and possibly scaling) of child parts, relative
+to the position and orientation of their parent VObject.
+The relative position, called the \emph{translation}, the relative \emph{orientation}, and the relative \emph{scaling} together define the \emph{local transform} of a VObject.
+
+See the \href{\webserver}{javadoc}.
+
+%A VirtualObject has a
+%unique identity, called its ``Id'', and if you want, than that's all there is to it.
+%In practice, virtual objects have some more structure:
+%\begin{itemize}
+%\item They can define \emph{attributes}
+%\item They can define a \emph{Category}, to be understood
+%as a category or class as defined by ontologies. (Since the word ``class'' is heavily overloaded,
+%and has a conflicting meaning already for Java programs, we use ``category'', like in %\ref{}%)
+%\item They can have \emph{child elements}, which are VirtualObjects themselves.
+%\end{itemize}
+%
+%VirtualObject is a base class, to be extended by other classes. A first step here is the VisualObject class,
+%which extends VirtualObject, and adds a number of properties like physical location and possibly orientation
+%in 3D space. VisualObjects can also act as the ``target'' of various animation techniques,
+%which modify location or orientation. Since VisualObjects are VirtualObject, they can have parts that
+%are VisualObjects themselves. There are VisualObjectInterpolators that are able to control
+%the orientation (and location) of all parts of a structured VisualObject in an interpolation process,
+%based on key framing. This forms the basis for, for instance, avatar animation, where avatars posses
+%a certain ``bone structure''.
+%
+%The name ``visual'' object is not completely appropriate, since no visualization
+%is actually \emph{required} for VisualObjects.
+%Instead, a VisualObject acts as a common ground for potentially maby forms of visualization,
+%in 3D or 2D, possibly at the same time.
+%All such visualizations need location and orientation information, regardless of whether they are 2D or 3D,
+%and regardless of the rendering technique being used.
+%The actual visualizations are defined outside the environment package, as they
+%are tightly bound to some particular rendering technique.
+%As a result, the environment package is independent of for instance the Java3D based parlevink.x3d package.
+%A small concession here is that as far as the usage of positions an orientations is concerned,
+%we rely on the javax.vecmath package. This package is usually distributed as part of the java3D packages, but it is
+%available as a separate jar file.

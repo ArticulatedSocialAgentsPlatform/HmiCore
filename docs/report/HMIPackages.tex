@@ -1,0 +1,72 @@
+\documentclass[10pt, oneside]{memoir}
+
+
+\usepackage{ifthen}
+\usepackage{tikz}
+% Optional PGF libraries
+%\usetikzlibrary {arrows}
+%\usetikzlibrary {snakes}
+\usetikzlibrary{arrows}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{backgrounds}
+%\usetikzlibrary{placements}
+\usetikzlibrary{fit}
+\usepgflibrary{shapes.geometric}
+\usetikzlibrary[shapes.misc]
+\usetikzlibrary{positioning}
+\usetikzlibrary{scopes}
+\usepackage{amsopn}
+\usepackage[fleqn,reqno]{amsmath}
+
+\usepackage{hyperref}
+\hypersetup{
+%backref=false,
+pdfdisplaydoctitle=true,
+%pdfpagelayout=TwoColumnLeft,
+pdffitwindow=true,
+pdfpagetransition=Dissolve,
+pdfpagemode=UseOutlines,
+pdfnewwindow=true,
+pdfstartpage=1,
+colorlinks=true,
+linkcolor=blue
+}
+
+
+\chapterstyle{ell}
+
+\begin{document}
+
+\title{The HMI packages}
+\date{\today}
+\author{}
+
+
+
+\maketitle{}
+\def\abstractname{}
+\begin{abstract}
+\noindent
+A description of the HMI Java packages HmiUtil, HmiXml, HmiMath, HmiAnimation, HmiGraphics, and HmiPhysics.
+\end{abstract}
+
+
+% Try to load the locations of the project report directories
+\IfFileExists{projectreportdirs}{\input{projectreportdirs}}{}
+
+\input{\hmiutilreportdir/hmi-util-chapters}
+\input{\hmixmlreportdir/hmi-xml-chapters}
+\input{\hmimathreportdir/hmi-math-chapters}
+\input{\hmianimationreportdir/hmi-animation-chapters}
+\input{\hmigraphicsreportdir/hmi-graphics-chapters}
+\input{\hmiphysicsreportdir/hmi-physics-chapters}
+%\input{\hmimediareportdir/hmi-media-chapters}
+\input{\hmibmlreportdir/hmi-bml-chapters}
+%\input{\hmisemainereportdir/hmi-semaine-chapters}
+
+%\input{SoftwareRequirements.tex}
+%\input{ProjectBuild.tex}
+
+
+
+\end{document}

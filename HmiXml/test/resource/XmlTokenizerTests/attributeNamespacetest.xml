@@ -1,0 +1,6 @@
+<test xmlns ="http://hmi.ns.test" >
+   <ns:innertag ns:atr0="value0" xmlns:ns="ns-namespace" atr1="value1" ns:atr2="value2"> </ns:innertag>
+   <innertag ns:innerAttr="val"> </innertag>
+   <sometag xmlns:some="some-namespace"/>
+   <ex:extratag xmlns:ex="ex-namespace"/>
+</test>

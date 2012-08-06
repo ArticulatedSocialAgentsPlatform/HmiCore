@@ -1,0 +1,146 @@
+/* 
+ */
+
+
+package hmi.graphics.collada;
+
+import java.util.Iterator;
+import java.io.*;
+import hmi.xml.*;
+import hmi.util.Resources;
+
+/** 
+ * include is an XML element that (temporarily) switches 
+ * to a different Reader, specified by means of a  URL(s).
+ * The current tokenizer state is pushed on a stack, so
+ * settings made while processing the included XML has no
+ * effect on the context of the <include> element.
+ * The EndOfDocument, expected at the end of the included
+ * XML, is silently removed, by setting the popOnEndOfDocument
+ * attribute to true. So, in general, the effect is as if the
+ * included contents is physically inserted within the current 
+ * input, like a C style include file.
+ */
+
+public class include extends XMLStructureAdapter {
+   
+
+   protected String fileName = "";
+   protected String url = "";
+   private Resources resources;
+   public static java.util.logging.Logger logger = java.util.logging.Logger.getLogger("hmi.xml");
+   
+   public include() {
+      super(); 
+   }
+   
+   public include(Resources resources) {
+      this();
+      if (resources == null) {
+         hmi.util.Console.println("Collada include with null resources ");
+      }
+      this.resources = resources;
+   }
+
+   
+   public void setURL(String url) {
+      this.url = url;
+   }
+   
+   /**
+    * Sets the (Resources) file name for the include element
+    */
+   public void setFile(String resourceFileName) {
+      this.url = resourceFileName;
+   }
+   
+   /**
+    *
+    */
+   public boolean switchReader(XMLTokenizer tokenizer) {
+      if (url == null || url.length() == 0) {
+         hmi.util.Console.println("Collada include: null or empty url");
+         return false;
+      }
+      if (resources == null) {
+         hmi.util.Console.println("Collada include: null Resources");
+         return false;
+      }
+      Reader reader = resources.getReader(url);
+      tokenizer.pushReader(reader);
+      tokenizer.setpopOnEndOfDocument(true); // will be restored on pop
+      return true;
+   }
+
+   /**
+    * executed after all the ETag has been read.
+    */
+   public void postProcess(XMLTokenizer tokenizer) {
+      boolean switched = switchReader(tokenizer);
+      if (!switched) {
+         hmi.util.Console.println("include: Could not switch input stream");
+         //logger.warning("include: Could not switch input stream");
+      } else {
+      }
+   }
+  
+   /**
+    * decodes the content of the included URL
+    */
+   public void decodeContent(XMLTokenizer tokenizer) throws IOException {
+   
+   }
+
+   /**
+    * appends a String of Group attributes to buf.
+    * Attributes: 
+    */
+   public StringBuilder appendAttributeString(StringBuilder buf) {
+      super.appendAttributeString(buf);
+      return buf;
+   }
+
+   /**
+    * decodes a single attribute, as encoded by appendAttributeString()
+    */
+   public boolean decodeAttribute(String attrName, String valCode, XMLTokenizer tokenizer) {
+      if (attrName.equals("url")) {
+          String urlspec = valCode.trim();
+          if (urlspec.length() == 0) {
+            logger.warning("Empty URL at line " + tokenizer.getLine());
+          } else {
+            //logger.warning("No support for url include" + tokenizer.getLine());
+            setURL(urlspec); 
+          }          
+          return true;
+      } else if (attrName.equals("file")) {
+          String fileName = valCode.trim();
+          if (fileName.length() == 0) {
+             logger.warning("Empty file name at line " + tokenizer.getLine());
+          } else {
+             setFile(fileName); 
+          }  
+          return true;        
+      } else {
+         return super.decodeAttribute(attrName, valCode, tokenizer);
+      }  
+   } 
+ 
+
+
+   /**
+    * The XML Stag for XML encoding, and the class name
+    */
+   public static String XMLTag = "include";
+   public static String CLASSNAME = "hmi.graphics.collada.include";
+ 
+   /**
+    * returns the XML Stag for XML encoding
+    */
+   public String getXMLTag() {
+      return XMLTag;
+   }
+
+
+
+}

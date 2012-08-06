@@ -1,0 +1,77 @@
+Binary encoding
+UTF-8: UTF-8 String (Java-modified UTF-8, which is equivalent to standard UTF-8 for all practical purposes. 
+In practice, this is a 16-bit integer number (string length) followed by that number of bytes interpreted as asci chars.
+int: 4 byte integer
+float: 4 byte float
+int[size], float[size]:  "array" of int's or float's, with "size" elements
+
+
+VertexAttribute:
+   name                    UTF-8      
+   indexDataSize           int                                  
+   indexData               int[indexDataSize]                                                           
+   attributeValueSize      int  
+   vertexDataSize          int                                         
+   vertexData              float[vertexDataSize] 
+   
+VertexWeights
+   name                    UTF-8     (fixed: "vertexweights")    
+   jcountSize              int                                  
+   jcount                  int[jcountSize]    
+   jointIndicesSize        int                              
+   jointIndices            int[jointIndicesSize]                              
+   jointWeightsSize        int                              
+   jointWeights            float[jointIndicesSize]    
+   
+GTexture:
+   imageFile               UTF-8
+   wrapS                   UTF-8
+   wrapT                   UTF-8
+   wrapR                   UTF-8
+   repeatS                 float
+   repeatT                 float
+   repeatR                 float
+   offsetS                 float
+   offsetT                 float
+   offsetR                 float
+ 
+GMaterial:
+   name                    UTF-8
+   shader                  UTF-8
+   emissionColor           float[4]
+   ambientColor            float[4]
+   diffuseColor            float[4]
+   specularColor           float[4]
+   
+GMesh:
+   id                      UTF-8
+   meshType                UTF-8
+   nrOfVertices            int
+   vcountsSize             int
+   vcounts                 int[vcountsSize]
+   indexDataSize           int
+   indexData               int[indexDataSize]
+   attributeListSize       int
+   attributeList           VertexAttribute[attributeListSize]
+   morphTargetsSize        int
+   morphTargets            String[morphTargetsSize]
+   morphAttributeListSize  int 
+   morphAttributeList      ArrayList<VertexAttribute>[morphAttributeListSize]
+   
+GSkinnedMesh:
+   GMesh encoding
+   skeletonIdsSize         int
+   skeletonIds             String[skeletonIdsSize]
+   jointNamesSize          int
+   jointNames              String[jointNamesSize]
+   jointSIDsSize           int
+   jointSIDs               String[jointSIDsSize]
+   parentIndexSize         int
+   parentIndex             int[parentIndexSize]
+
+   -1/+1                   boolean denoting null/non-null vertexWeights
+   vertexWeights           (when non-null)
+   inverseBindMatricesSize int 
+   inverseBindMatrices     float[inverseBindMatricesSize * 16]
+    
+   

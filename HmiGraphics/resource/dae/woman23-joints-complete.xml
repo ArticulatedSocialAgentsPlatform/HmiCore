@@ -1,0 +1,513 @@
+<!-- ALL nodes from the woman23.dae joint structure -->
+<node id="CWom0023-Bip-node" name="CWom0023-Bip" type="JOINT">
+  <matrix>0.000001 1 0 -0.000068 -1 0.000001 0 0.016062 0 0 1 0.905944 0 0 0 1</matrix>
+  <node id="CWom0023-Bip-node_PIVOT" name="CWom0023-Bip_PIVOT" type="NODE">
+    <matrix>0.004044 0 0 0 0 0.004044 0 0 0 0 0.004044 0 0 0 0 1</matrix>
+  </node>
+  <node id="CWom0023-Footsteps-node" name="CWom0023-Footsteps" type="JOINT">
+    <matrix>0.000001 -1 0 0 1 0.000001 0 0 0 0 1 -0.905708 0 0 0 1</matrix>
+    <node id="CWom0023-Footsteps-node_PIVOT" name="CWom0023-Footsteps_PIVOT" type="NODE">
+      <matrix>0.004044 0 0 0 0 0.004044 0 0 0 0 0.004044 0 0 0 0 1</matrix>
+    </node>
+  </node>
+  <node id="CWom0023-Pelvis-node" name="CWom0023-Pelvis" sid="Bone1" type="JOINT">
+    <matrix>0 1 -0.000001 -0.007917 -0.000001 0.000001 1 0 1 0 0.000001 0 0 0 0 1</matrix>
+    <node id="CWom0023-Pelvis-node_PIVOT" name="CWom0023-Pelvis_PIVOT" type="NODE">
+      <matrix>0.202231 0 0 0 0 0.202231 0 0 0 0 0.161785 0 0 0 0 1</matrix>
+    </node>
+    <node id="CWom0023-Spine-node" name="CWom0023-Spine" sid="Bone2" type="JOINT">
+      <matrix>1 -0.000796 -0.000001 0.093026 0.000796 1 0.000004 -0.000077 0.000001 -0.000004 1 0.000000 0 0 0 1</matrix>
+      <node id="CWom0023-Spine-node_PIVOT" name="CWom0023-Spine_PIVOT" type="NODE">
+        <matrix>0.09781 0 0 0 0 0.10516 0 0 0 0 0.10516 0 0 0 0 1</matrix>
+      </node>
+      <node id="CWom0023-Spine1-node" name="CWom0023-Spine1" sid="Bone3" type="JOINT">
+        <matrix>1 0 0 0.09781 0 1 0 -0.000077 0 0 1 0 0 0 0 1</matrix>
+        <node id="CWom0023-Spine1-node_PIVOT" name="CWom0023-Spine1_PIVOT" type="NODE">
+          <matrix>0.09781 0 0 0 0 0.10516 0 0 0 0 0.10516 0 0 0 0 1</matrix>
+        </node>
+        <node id="CWom0023-Spine2-node" name="CWom0023-Spine2" sid="Bone4" type="JOINT">
+          <matrix>1 0 0 0.09781 0 1 0 -0.000077 0 0 1 0 0 0 0 1</matrix>
+          <node id="CWom0023-Spine2-node_PIVOT" name="CWom0023-Spine2_PIVOT" type="NODE">
+            <matrix>0.09781 0 0 0 0 0.10516 0 0 0 0 0.10516 0 0 0 0 1</matrix>
+          </node>
+          <node id="CWom0023-Spine3-node" name="CWom0023-Spine3" sid="Bone5" type="JOINT">
+            <matrix>1 0 0 0.09781 0 1 0 -0.000077 0 0 1 0 0 0 0 1</matrix>
+            <node id="CWom0023-Spine3-node_PIVOT" name="CWom0023-Spine3_PIVOT" type="NODE">
+              <matrix>0.09781 0 0 0 0 0.10516 0 0 0 0 0.10516 0 0 0 0 1</matrix>
+            </node>
+            <node id="CWom0023-Neck-node" name="CWom0023-Neck" sid="Bone6" type="JOINT">
+              <matrix>0.968607 -0.248595 -0.000000 0.097 0.248595 0.968607 0 -0.027531 0.000000 0 1 0 0 0 0 1</matrix>
+              <node id="CWom0023-Neck-node_PIVOT" name="CWom0023-Neck_PIVOT" type="NODE">
+                <matrix>0.109256 0 0 0 0 0.10516 0 0 0 0 0.10516 0 0 0 0 1</matrix>
+              </node>
+              <node id="CWom0023-Head-node" name="CWom0023-Head" sid="Bone7" type="JOINT">
+                <matrix>0.995237 0.097485 0.000000 0.109256 -0.097485 0.995237 0 0 -0.000000 0 1 0 0 0 0 1</matrix>
+                <node id="CWom0023-Head-node_PIVOT" name="CWom0023-Head_PIVOT" type="NODE">
+                  <matrix>0.238281 0 0 0 0 0.293252 0 0 0 0 0.34726 0 0 0 0 1</matrix>
+                </node>
+                <node id="CWom0023-HeadNub-node" name="CWom0023-HeadNub" sid="Bone8" type="JOINT">
+                  <matrix>1 0 0 0.238281 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+                  <node id="CWom0023-HeadNub-node_PIVOT" name="CWom0023-HeadNub_PIVOT" type="NODE">
+                    <matrix>0.043407 0 0 0 0 0.043407 0 0 0 0 0.043407 0 0 0 0 1</matrix>
+                    <extra>
+                      <technique profile="MAX3D" >
+                        <helper>
+                          <bounding_min>0 -1 -1</bounding_min>
+                          <bounding_max>2 1 1</bounding_max>
+                        </helper>
+                      </technique>
+                    </extra>
+                  </node>
+                </node>
+              </node>
+              <node id="CWom0023-L_Clavicle-node" name="CWom0023-L_Clavicle" sid="Bone9" type="JOINT">
+                <matrix>-0.135586 -0.248395 0.959123 0.031792 -0.055537 -0.964635 -0.257673 0.019809 0.989208 -0.088203 0.116996 0.028312 0 0 0 1</matrix>
+                <node id="CWom0023-L_Clavicle-node_PIVOT" name="CWom0023-L_Clavicle_PIVOT" type="NODE">
+                  <matrix>0.130386 0 0 0 0 0.262901 0 0 0 0 0.202231 0 0 0 0 1</matrix>
+                </node>
+                <node id="CWom0023-L_UpperArm-node" name="CWom0023-L_UpperArm" sid="Bone10" type="JOINT">
+                  <matrix>0.998734 0.02739 0.042187 0.130386 -0.026703 0.999503 -0.016751 0 -0.042625 0.015603 0.998969 0.000000 0 0 0 1</matrix>
+                  <node id="CWom0023-L_UpperArm-node_PIVOT" name="CWom0023-L_UpperArm_PIVOT" type="NODE">
+                    <matrix>0.258958 0 0 0 0 0.333188 0 0 0 0 0.339832 0 0 0 0 1</matrix>
+                  </node>
+                  <node id="CWom0023-L_Forearm-node" name="CWom0023-L_Forearm" sid="Bone11" type="JOINT">
+                    <matrix>0.991493 0.130158 0 0.258958 -0.130158 0.991493 0 0 0 0 1 -0.000000 0 0 0 1</matrix>
+                    <node id="CWom0023-L_Forearm-node_PIVOT" name="CWom0023-L_Forearm_PIVOT" type="NODE">
+                      <matrix>0.213827 0 0 0 0 0.333188 0 0 0 0 0.339832 0 0 0 0 1</matrix>
+                    </node>
+                    <node id="CWom0023-L_Hand-node" name="CWom0023-L_Hand" sid="Bone12" type="JOINT">
+                      <matrix>0.969685 0.206563 -0.130552 0.213827 0.152818 -0.095723 0.983608 0 0.19068 -0.97374 -0.124388 0 0 0 0 1</matrix>
+                      <node id="CWom0023-L_Hand-node_PIVOT" name="CWom0023-L_Hand_PIVOT" type="NODE">
+                        <matrix>0.078416 0 0 0 0 0.124441 0 0 0 0 0.115521 0 0 0 0 1</matrix>
+                      </node>
+                      <node id="CWom0023-L_Finger0-node" name="CWom0023-L_Finger0" sid="Bone13" type="JOINT">
+                        <matrix>0.6278 0.459993 0.627912 0.022211 0.440502 0.455123 -0.773836 0.004176 -0.641736 0.76241 0.083098 -0.033809 0 0 0 1</matrix>
+                        <node id="CWom0023-L_Finger0-node_PIVOT" name="CWom0023-L_Finger0_PIVOT" type="NODE">
+                          <matrix>0.03117 0 0 0 0 0.034654 0 0 0 0 0.037776 0 0 0 0 1</matrix>
+                        </node>
+                        <node id="CWom0023-L_Finger01-node" name="CWom0023-L_Finger01" sid="Bone14" type="JOINT">
+                          <matrix>0.994743 0.102399 0 0.03117 -0.102399 0.994743 0 0 0 0 1 -0.000000 0 0 0 1</matrix>
+                          <node id="CWom0023-L_Finger01-node_PIVOT" name="CWom0023-L_Finger01_PIVOT" type="NODE">
+                            <matrix>0.027069 0 0 0 0 0.034654 0 0 0 0 0.037776 0 0 0 0 1</matrix>
+                          </node>
+                          <node id="CWom0023-L_Finger02-node" name="CWom0023-L_Finger02" sid="Bone15" type="JOINT">
+                            <matrix>1 0 0 0.027069 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+                            <node id="CWom0023-L_Finger02-node_PIVOT" name="CWom0023-L_Finger02_PIVOT" type="NODE">
+                              <matrix>0.020467 0 0 0 0 0.034654 0 0 0 0 0.037776 0 0 0 0 1</matrix>
+                            </node>
+                            <node id="CWom0023-L_Finger0Nub-node" name="CWom0023-L_Finger0Nub" sid="Bone16" type="JOINT">
+                              <matrix>1 0 0 0.020467 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+                              <node id="CWom0023-L_Finger0Nub-node_PIVOT" name="CWom0023-L_Finger0Nub_PIVOT" type="NODE">
+                                <matrix>0.003411 0 0 0 0 0.008663 0 0 0 0 0.009444 0 0 0 0 1</matrix>
+                                <extra>
+                                  <technique profile="MAX3D">
+                                    <helper>
+                                      <bounding_min>0 -1 -1</bounding_min>
+                                      <bounding_max>2 1 1</bounding_max>
+                                    </helper>
+                                  </technique>
+                                </extra>
+                              </node>
+                            </node>
+                          </node>
+                        </node>
+                      </node>
+                      <node id="CWom0023-L_Finger1-node" name="CWom0023-L_Finger1" sid="Bone17" type="JOINT">
+                        <matrix>0.94007 -0.140609 0.310641 0.075642 0.148855 0.988855 -0.002872 0.00133 -0.306775 0.04894 0.950523 -0.032604 0 0 0 1</matrix>
+                        <node id="CWom0023-L_Finger1-node_PIVOT" name="CWom0023-L_Finger1_PIVOT" type="NODE">
+                          <matrix>0.029781 0 0 0 0 0.030334 0 0 0 0 0.030334 0 0 0 0 1</matrix>
+                        </node>
+                        <node id="CWom0023-L_Finger11-node" name="CWom0023-L_Finger11" sid="Bone18" type="JOINT">
+                          <matrix>0.976138 -0.217153 0 0.029781 0.217153 0.976138 0 0 0 0 1 0 0 0 0 1</matrix>
+                          <node id="CWom0023-L_Finger11-node_PIVOT" name="CWom0023-L_Finger11_PIVOT" type="NODE">
+                            <matrix>0.01853 0 0 0 0 0.030334 0 0 0 0 0.030334 0 0 0 0 1</matrix>
+                          </node>
+                          <node id="CWom0023-L_Finger12-node" name="CWom0023-L_Finger12" sid="Bone19" type="JOINT">
+                            <matrix>1 0 0 0.01853 0 1 0 0.000000 0 0 1 0 0 0 0 1</matrix>
+                            <node id="CWom0023-L_Finger12-node_PIVOT" name="CWom0023-L_Finger12_PIVOT" type="NODE">
+                              <matrix>0.01644 0 0 0 0 0.030334 0 0 0 0 0.030334 0 0 0 0 1</matrix>
+                            </node>
+                            <node id="CWom0023-L_Finger1Nub-node" name="CWom0023-L_Finger1Nub" sid="Bone20" type="JOINT">
+                              <matrix>1 0 0 0.01644 0 1 0 -0.000000 0 0 1 0 0 0 0 1</matrix>
+                              <node id="CWom0023-L_Finger1Nub-node_PIVOT" name="CWom0023-L_Finger1Nub_PIVOT" type="NODE">
+                                <matrix>0.00274 0 0 0 0 0.007583 0 0 0 0 0.007583 0 0 0 0 1</matrix>
+                                <extra>
+                                  <technique profile="MAX3D">
+                                    <helper>
+                                      <bounding_min>0 -1 -1</bounding_min>
+                                      <bounding_max>2 1 1</bounding_max>
+                                    </helper>
+                                  </technique>
+                                </extra>
+                              </node>
+                            </node>
+                          </node>
+                        </node>
+                      </node>
+                      <node id="CWom0023-L_Finger2-node" name="CWom0023-L_Finger2" sid="Bone21" type="JOINT">
+                        <matrix>0.96939 -0.226769 0.094119 0.076268 0.228098 0.973632 -0.003464 -0.001631 -0.090851 0.024827 0.995555 -0.01054 0 0 0 1</matrix>
+                        <node id="CWom0023-L_Finger2-node_PIVOT" name="CWom0023-L_Finger2_PIVOT" type="NODE">
+                          <matrix>0.035803 0 0 0 0 0.03539 0 0 0 0 0.03539 0 0 0 0 1</matrix>
+                        </node>
+                        <node id="CWom0023-L_Finger21-node" name="CWom0023-L_Finger21" sid="Bone22" type="JOINT">
+                          <matrix>0.993244 -0.116048 0 0.035803 0.116048 0.993244 0 0.000000 0 0 1 0 0 0 0 1</matrix>
+                          <node id="CWom0023-L_Finger21-node_PIVOT" name="CWom0023-L_Finger21_PIVOT" type="NODE">
+                            <matrix>0.024212 0 0 0 0 0.03539 0 0 0 0 0.03539 0 0 0 0 1</matrix>
+                          </node>
+                          <node id="CWom0023-L_Finger22-node" name="CWom0023-L_Finger22" sid="Bone23" type="JOINT">
+                            <matrix>0.999523 -0.030876 0 0.024212 0.030876 0.999523 0 -0.000000 0 0 1 0 0 0 0 1</matrix>
+                            <node id="CWom0023-L_Finger22-node_PIVOT" name="CWom0023-L_Finger22_PIVOT" type="NODE">
+                              <matrix>0.019825 0 0 0 0 0.03539 0 0 0 0 0.03539 0 0 0 0 1</matrix>
+                            </node>
+                            <node id="CWom0023-L_Finger2Nub-node" name="CWom0023-L_Finger2Nub" sid="Bone24" type="JOINT">
+                              <matrix>1 0 0 0.019825 0 1 0 0.000000 0 0 1 0 0 0 0 1</matrix>
+                              <node id="CWom0023-L_Finger2Nub-node_PIVOT" name="CWom0023-L_Finger2Nub_PIVOT" type="NODE">
+                                <matrix>0.003304 0 0 0 0 0.008847 0 0 0 0 0.008847 0 0 0 0 1</matrix>
+                                <extra>
+                                  <technique profile="MAX3D">
+                                    <helper>
+                                      <bounding_min>0 -1 -1</bounding_min>
+                                      <bounding_max>2 1 1</bounding_max>
+                                    </helper>
+                                  </technique>
+                                </extra>
+                              </node>
+                            </node>
+                          </node>
+                        </node>
+                      </node>
+                      <node id="CWom0023-L_Finger3-node" name="CWom0023-L_Finger3" sid="Bone25" type="JOINT">
+                        <matrix>0.954946 -0.288055 -0.071433 0.077457 0.28814 0.957543 -0.009337 0.000054 0.07109 -0.011666 0.997402 0.012564 0 0 0 1</matrix>
+                        <node id="CWom0023-L_Finger3-node_PIVOT" name="CWom0023-L_Finger3_PIVOT" type="NODE">
+                          <matrix>0.029949 0 0 0 0 0.030334 0 0 0 0 0.030334 0 0 0 0 1</matrix>
+                        </node>
+                        <node id="CWom0023-L_Finger31-node" name="CWom0023-L_Finger31" sid="Bone26" type="JOINT">
+                          <matrix>0.999963 -0.00864 0 0.029949 0.008641 0.999963 0 -0.000000 0 0 1 0 0 0 0 1</matrix>
+                          <node id="CWom0023-L_Finger31-node_PIVOT" name="CWom0023-L_Finger31_PIVOT" type="NODE">
+                            <matrix>0.024047 0 0 0 0 0.030334 0 0 0 0 0.030334 0 0 0 0 1</matrix>
+                          </node>
+                          <node id="CWom0023-L_Finger32-node" name="CWom0023-L_Finger32" sid="Bone27" type="JOINT">
+                            <matrix>1 0 0 0.024047 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+                            <node id="CWom0023-L_Finger32-node_PIVOT" name="CWom0023-L_Finger32_PIVOT" type="NODE">
+                              <matrix>0.025051 0 0 0 0 0.030334 0 0 0 0 0.030334 0 0 0 0 1</matrix>
+                            </node>
+                            <node id="CWom0023-L_Finger3Nub-node" name="CWom0023-L_Finger3Nub" sid="Bone28" type="JOINT">
+                              <matrix>1 0 0 0.025051 0 1 0 0.000000 0 0 1 0 0 0 0 1</matrix>
+                              <node id="CWom0023-L_Finger3Nub-node_PIVOT" name="CWom0023-L_Finger3Nub_PIVOT" type="NODE">
+                                <matrix>0.004175 0 0 0 0 0.007583 0 0 0 0 0.007583 0 0 0 0 1</matrix>
+                                <extra>
+                                  <technique profile="MAX3D">
+                                    <helper>
+                                      <bounding_min>0 -1 -1</bounding_min>
+                                      <bounding_max>2 1 1</bounding_max>
+                                    </helper>
+                                  </technique>
+                                </extra>
+                              </node>
+                            </node>
+                          </node>
+                        </node>
+                      </node>
+                      <node id="CWom0023-L_Finger4-node" name="CWom0023-L_Finger4" sid="Bone29" type="JOINT">
+                        <matrix>0.964464 -0.225586 -0.137554 0.076524 0.227272 0.973825 -0.003529 0.000927 0.13475 -0.027858 0.990488 0.035965 0 0 0 1</matrix>
+                        <node id="CWom0023-L_Finger4-node_PIVOT" name="CWom0023-L_Finger4_PIVOT" type="NODE">
+                          <matrix>0.023264 0 0 0 0 0.025278 0 0 0 0 0.028862 0 0 0 0 1</matrix>
+                        </node>
+                        <node id="CWom0023-L_Finger41-node" name="CWom0023-L_Finger41" sid="Bone30" type="JOINT">
+                          <matrix>0.999378 -0.035277 0 0.023265 0.035277 0.999378 0 0.000000 0 0 1 0 0 0 0 1</matrix>
+                          <node id="CWom0023-L_Finger41-node_PIVOT" name="CWom0023-L_Finger41_PIVOT" type="NODE">
+                            <matrix>0.016058 0 0 0 0 0.025278 0 0 0 0 0.028862 0 0 0 0 1</matrix>
+                          </node>
+                          <node id="CWom0023-L_Finger42-node" name="CWom0023-L_Finger42" sid="Bone31" type="JOINT">
+                            <matrix>1 0 0 0.016058 0 1 0 -0.000000 0 0 1 0 0 0 0 1</matrix>
+                            <node id="CWom0023-L_Finger42-node_PIVOT" name="CWom0023-L_Finger42_PIVOT" type="NODE">
+                              <matrix>0.016325 0 0 0 0 0.025278 0 0 0 0 0.028862 0 0 0 0 1</matrix>
+                            </node>
+                            <node id="CWom0023-L_Finger4Nub-node" name="CWom0023-L_Finger4Nub" sid="Bone32" type="JOINT">
+                              <matrix>1 0 0 0.016325 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+                              <node id="CWom0023-L_Finger4Nub-node_PIVOT" name="CWom0023-L_Finger4Nub_PIVOT" type="NODE">
+                                <matrix>0.00272 0 0 0 0 0.006319 0 0 0 0 0.007215 0 0 0 0 1</matrix>
+                                <extra>
+                                  <technique profile="MAX3D">
+                                    <helper>
+                                      <bounding_min>0 -1 -1</bounding_min>
+                                      <bounding_max>2 1 1</bounding_max>
+                                    </helper>
+                                  </technique>
+                                </extra>
+                              </node>
+                            </node>
+                          </node>
+                        </node>
+                      </node>
+                    </node>
+                  </node>
+                </node>
+              </node>
+              <node id="CWom0023-R_Clavicle-node" name="CWom0023-R_Clavicle" sid="Bone33" type="JOINT">
+                <matrix>-0.135586 -0.248395 -0.959123 0.031792 -0.055531 -0.964635 0.257673 0.019809 -0.989208 0.088198 0.116997 -0.028312 0 0 0 1</matrix>
+                <node id="CWom0023-R_Clavicle-node_PIVOT" name="CWom0023-R_Clavicle_PIVOT" type="NODE">
+                  <matrix>0.130386 0 0 0 0 0.262901 0 0 0 0 0.202231 0 0 0 0 1</matrix>
+                </node>
+                <node id="CWom0023-R_UpperArm-node" name="CWom0023-R_UpperArm" sid="Bone34" type="JOINT">
+                  <matrix>0.998734 0.02739 -0.042187 0.130386 -0.026703 0.999503 0.016751 0 0.042625 -0.015603 0.998969 -0.000000 0 0 0 1</matrix>
+                  <node id="CWom0023-R_UpperArm-node_PIVOT" name="CWom0023-R_UpperArm_PIVOT" type="NODE">
+                    <matrix>0.258958 0 0 0 0 0.333188 0 0 0 0 0.339832 0 0 0 0 1</matrix>
+                  </node>
+                  <node id="CWom0023-R_Forearm-node" name="CWom0023-R_Forearm" sid="Bone35" type="JOINT">
+                    <matrix>0.991493 0.130158 0 0.258958 -0.130158 0.991493 0 0 0 0 1 0 0 0 0 1</matrix>
+                    <node id="CWom0023-R_Forearm-node_PIVOT" name="CWom0023-R_Forearm_PIVOT" type="NODE">
+                      <matrix>0.213827 0 0 0 0 0.333188 0 0 0 0 0.339832 0 0 0 0 1</matrix>
+                    </node>
+                    <node id="CWom0023-R_Hand-node" name="CWom0023-R_Hand" sid="Bone36" type="JOINT">
+                      <matrix>0.969685 0.206563 0.130552 0.213827 0.152818 -0.095723 -0.983607 0 -0.190679 0.97374 -0.124388 0 0 0 0 1</matrix>
+                      <node id="CWom0023-R_Hand-node_PIVOT" name="CWom0023-R_Hand_PIVOT" type="NODE">
+                        <matrix>0.078416 0 0 0 0 0.124441 0 0 0 0 0.115521 0 0 0 0 1</matrix>
+                      </node>
+                      <node id="CWom0023-R_Finger0-node" name="CWom0023-R_Finger0" sid="Bone37" type="JOINT">
+                        <matrix>0.6278 0.459993 -0.627912 0.022211 0.440502 0.455123 0.773836 0.004176 0.641736 -0.76241 0.083098 0.033809 0 0 0 1</matrix>
+                        <node id="CWom0023-R_Finger0-node_PIVOT" name="CWom0023-R_Finger0_PIVOT" type="NODE">
+                          <matrix>0.03117 0 0 0 0 0.034654 0 0 0 0 0.037776 0 0 0 0 1</matrix>
+                        </node>
+                        <node id="CWom0023-R_Finger01-node" name="CWom0023-R_Finger01" sid="Bone38" type="JOINT">
+                          <matrix>0.994743 0.102399 0 0.03117 -0.102399 0.994743 0 0 0 0 1 0 0 0 0 1</matrix>
+                          <node id="CWom0023-R_Finger01-node_PIVOT" name="CWom0023-R_Finger01_PIVOT" type="NODE">
+                            <matrix>0.027069 0 0 0 0 0.034654 0 0 0 0 0.037776 0 0 0 0 1</matrix>
+                          </node>
+                          <node id="CWom0023-R_Finger02-node" name="CWom0023-R_Finger02" sid="Bone39" type="JOINT">
+                            <matrix>1 0 0 0.027069 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+                            <node id="CWom0023-R_Finger02-node_PIVOT" name="CWom0023-R_Finger02_PIVOT" type="NODE">
+                              <matrix>0.020467 0 0 0 0 0.034654 0 0 0 0 0.037776 0 0 0 0 1</matrix>
+                            </node>
+                            <node id="CWom0023-R_Finger0Nub-node" name="CWom0023-R_Finger0Nub" sid="Bone40" type="JOINT">
+                              <matrix>1 0 0 0.020467 0 1 0 0 0 0 -1 0.000000 0 0 0 1</matrix>
+                              <node id="CWom0023-R_Finger0Nub-node_PIVOT" name="CWom0023-R_Finger0Nub_PIVOT" type="NODE">
+                                <matrix>0.003411 0 0 0 0 0.008663 0 0 0 0 0.009444 0 0 0 0 1</matrix>
+                                <extra>
+                                  <technique profile="MAX3D">
+                                    <helper>
+                                      <bounding_min>0 -1 -1</bounding_min>
+                                      <bounding_max>2 1 1</bounding_max>
+                                    </helper>
+                                  </technique>
+                                </extra>
+                              </node>
+                            </node>
+                          </node>
+                        </node>
+                      </node>
+                      <node id="CWom0023-R_Finger1-node" name="CWom0023-R_Finger1" sid="Bone41" type="JOINT">
+                        <matrix>0.94007 -0.140609 -0.310641 0.075642 0.148855 0.988855 0.002872 0.00133 0.306775 -0.04894 0.950523 0.032604 0 0 0 1</matrix>
+                        <node id="CWom0023-R_Finger1-node_PIVOT" name="CWom0023-R_Finger1_PIVOT" type="NODE">
+                          <matrix>0.029781 0 0 0 0 0.030334 0 0 0 0 0.030334 0 0 0 0 1</matrix>
+                        </node>
+                        <node id="CWom0023-R_Finger11-node" name="CWom0023-R_Finger11" sid="Bone42" type="JOINT">
+                          <matrix>0.976138 -0.217153 0 0.029781 0.217153 0.976138 0 0 0 0 1 0 0 0 0 1</matrix>
+                          <node id="CWom0023-R_Finger11-node_PIVOT" name="CWom0023-R_Finger11_PIVOT" type="NODE">
+                            <matrix>0.01853 0 0 0 0 0.030334 0 0 0 0 0.030334 0 0 0 0 1</matrix>
+                          </node>
+                          <node id="CWom0023-R_Finger12-node" name="CWom0023-R_Finger12" sid="Bone43" type="JOINT">
+                            <matrix>1 0 0 0.01853 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+                            <node id="CWom0023-R_Finger12-node_PIVOT" name="CWom0023-R_Finger12_PIVOT" type="NODE">
+                              <matrix>0.01644 0 0 0 0 0.030334 0 0 0 0 0.030334 0 0 0 0 1</matrix>
+                            </node>
+                            <node id="CWom0023-R_Finger1Nub-node" name="CWom0023-R_Finger1Nub" sid="Bone44" type="JOINT">
+                              <matrix>1 0 0 0.01644 0 1 0 0 0 0 -1 0 0 0 0 1</matrix>
+                              <node id="CWom0023-R_Finger1Nub-node_PIVOT" name="CWom0023-R_Finger1Nub_PIVOT" type="NODE">
+                                <matrix>0.00274 0 0 0 0 0.007583 0 0 0 0 0.007583 0 0 0 0 1</matrix>
+                                <extra>
+                                  <technique profile="MAX3D">
+                                    <helper>
+                                      <bounding_min>0 -1 -1</bounding_min>
+                                      <bounding_max>2 1 1</bounding_max>
+                                    </helper>
+                                  </technique>
+                                </extra>
+                              </node>
+                            </node>
+                          </node>
+                        </node>
+                      </node>
+                      <node id="CWom0023-R_Finger2-node" name="CWom0023-R_Finger2" sid="Bone45" type="JOINT">
+                        <matrix>0.96939 -0.226769 -0.094119 0.076268 0.228098 0.973632 0.003464 -0.001631 0.090851 -0.024827 0.995555 0.01054 0 0 0 1</matrix>
+                        <node id="CWom0023-R_Finger2-node_PIVOT" name="CWom0023-R_Finger2_PIVOT" type="NODE">
+                          <matrix>0.035803 0 0 0 0 0.03539 0 0 0 0 0.03539 0 0 0 0 1</matrix>
+                        </node>
+                        <node id="CWom0023-R_Finger21-node" name="CWom0023-R_Finger21" sid="Bone46" type="JOINT">
+                          <matrix>0.993244 -0.116048 0 0.035803 0.116048 0.993244 0 0 0 0 1 0 0 0 0 1</matrix>
+                          <node id="CWom0023-R_Finger21-node_PIVOT" name="CWom0023-R_Finger21_PIVOT" type="NODE">
+                            <matrix>0.024212 0 0 0 0 0.03539 0 0 0 0 0.03539 0 0 0 0 1</matrix>
+                          </node>
+                          <node id="CWom0023-R_Finger22-node" name="CWom0023-R_Finger22" sid="Bone47" type="JOINT">
+                            <matrix>0.999523 -0.030876 0 0.024212 0.030876 0.999523 0 0 0 0 1 0 0 0 0 1</matrix>
+                            <node id="CWom0023-R_Finger22-node_PIVOT" name="CWom0023-R_Finger22_PIVOT" type="NODE">
+                              <matrix>0.019825 0 0 0 0 0.03539 0 0 0 0 0.03539 0 0 0 0 1</matrix>
+                            </node>
+                            <node id="CWom0023-R_Finger2Nub-node" name="CWom0023-R_Finger2Nub" sid="Bone48" type="JOINT">
+                              <matrix>1 0 0 0.019824 0 1 0 0 0 0 -1 0 0 0 0 1</matrix>
+                              <node id="CWom0023-R_Finger2Nub-node_PIVOT" name="CWom0023-R_Finger2Nub_PIVOT" type="NODE">
+                                <matrix>0.003304 0 0 0 0 0.008847 0 0 0 0 0.008847 0 0 0 0 1</matrix>
+                                <extra>
+                                  <technique profile="MAX3D">
+                                    <helper>
+                                      <bounding_min>0 -1 -1</bounding_min>
+                                      <bounding_max>2 1 1</bounding_max>
+                                    </helper>
+                                  </technique>
+                                </extra>
+                              </node>
+                            </node>
+                          </node>
+                        </node>
+                      </node>
+                      <node id="CWom0023-R_Finger3-node" name="CWom0023-R_Finger3" sid="Bone49" type="JOINT">
+                        <matrix>0.954946 -0.288055 0.071433 0.077457 0.28814 0.957543 0.009337 0.000054 -0.07109 0.011666 0.997402 -0.012564 0 0 0 1</matrix>
+                        <node id="CWom0023-R_Finger3-node_PIVOT" name="CWom0023-R_Finger3_PIVOT" type="NODE">
+                          <matrix>0.029949 0 0 0 0 0.030334 0 0 0 0 0.030334 0 0 0 0 1</matrix>
+                        </node>
+                        <node id="CWom0023-R_Finger31-node" name="CWom0023-R_Finger31" sid="Bone50" type="JOINT">
+                          <matrix>0.999963 -0.008641 0 0.029949 0.00864 0.999963 0 0 0 0 1 0 0 0 0 1</matrix>
+                          <node id="CWom0023-R_Finger31-node_PIVOT" name="CWom0023-R_Finger31_PIVOT" type="NODE">
+                            <matrix>0.024047 0 0 0 0 0.030334 0 0 0 0 0.030334 0 0 0 0 1</matrix>
+                          </node>
+                          <node id="CWom0023-R_Finger32-node" name="CWom0023-R_Finger32" sid="Bone51" type="JOINT">
+                            <matrix>1 0 0 0.024047 0 1 0 0.000000 0 0 1 0 0 0 0 1</matrix>
+                            <node id="CWom0023-R_Finger32-node_PIVOT" name="CWom0023-R_Finger32_PIVOT" type="NODE">
+                              <matrix>0.025051 0 0 0 0 0.030334 0 0 0 0 0.030334 0 0 0 0 1</matrix>
+                            </node>
+                            <node id="CWom0023-R_Finger3Nub-node" name="CWom0023-R_Finger3Nub" sid="Bone52" type="JOINT">
+                              <matrix>1 0 0 0.025051 0 1 0 -0.000000 0 0 -1 0 0 0 0 1</matrix>
+                              <node id="CWom0023-R_Finger3Nub-node_PIVOT" name="CWom0023-R_Finger3Nub_PIVOT" type="NODE">
+                                <matrix>0.004175 0 0 0 0 0.007583 0 0 0 0 0.007583 0 0 0 0 1</matrix>
+                                <extra>
+                                  <technique profile="MAX3D">
+                                    <helper>
+                                      <bounding_min>0 -1 -1</bounding_min>
+                                      <bounding_max>2 1 1</bounding_max>
+                                    </helper>
+                                  </technique>
+                                </extra>
+                              </node>
+                            </node>
+                          </node>
+                        </node>
+                      </node>
+                      <node id="CWom0023-R_Finger4-node" name="CWom0023-R_Finger4" sid="Bone53" type="JOINT">
+                        <matrix>0.964464 -0.225586 0.137554 0.076524 0.227272 0.973825 0.003529 0.000927 -0.13475 0.027858 0.990488 -0.035965 0 0 0 1</matrix>
+                        <node id="CWom0023-R_Finger4-node_PIVOT" name="CWom0023-R_Finger4_PIVOT" type="NODE">
+                          <matrix>0.023264 0 0 0 0 0.025278 0 0 0 0 0.028862 0 0 0 0 1</matrix>
+                        </node>
+                        <node id="CWom0023-R_Finger41-node" name="CWom0023-R_Finger41" sid="Bone54" type="JOINT">
+                          <matrix>0.999378 -0.035277 0 0.023264 0.035277 0.999378 0 0.000000 0 0 1 0 0 0 0 1</matrix>
+                          <node id="CWom0023-R_Finger41-node_PIVOT" name="CWom0023-R_Finger41_PIVOT" type="NODE">
+                            <matrix>0.016058 0 0 0 0 0.025278 0 0 0 0 0.028862 0 0 0 0 1</matrix>
+                          </node>
+                          <node id="CWom0023-R_Finger42-node" name="CWom0023-R_Finger42" sid="Bone55" type="JOINT">
+                            <matrix>1 0 0 0.016058 0 1 0 0.000000 0 0 1 0 0 0 0 1</matrix>
+                            <node id="CWom0023-R_Finger42-node_PIVOT" name="CWom0023-R_Finger42_PIVOT" type="NODE">
+                              <matrix>0.016325 0 0 0 0 0.025278 0 0 0 0 0.028862 0 0 0 0 1</matrix>
+                            </node>
+                            <node id="CWom0023-R_Finger4Nub-node" name="CWom0023-R_Finger4Nub" sid="Bone56" type="JOINT">
+                              <matrix>1 0 0 0.016325 0 1 0 -0.000000 0 0 -1 0 0 0 0 1</matrix>
+                              <node id="CWom0023-R_Finger4Nub-node_PIVOT" name="CWom0023-R_Finger4Nub_PIVOT" type="NODE">
+                                <matrix>0.00272 0 0 0 0 0.006319 0 0 0 0 0.007215 0 0 0 0 1</matrix>
+                                <extra>
+                                  <technique profile="MAX3D">
+                                    <helper>
+                                      <bounding_min>0 -1 -1</bounding_min>
+                                      <bounding_max>2 1 1</bounding_max>
+                                    </helper>
+                                  </technique>
+                                </extra>
+                              </node>
+                            </node>
+                          </node>
+                        </node>
+                      </node>
+                    </node>
+                  </node>
+                </node>
+              </node>
+            </node>
+          </node>
+        </node>
+      </node>
+      <node id="CWom0023-L_Thigh-node" name="CWom0023-L_Thigh" sid="Bone57" type="JOINT">
+        <matrix>-0.993356 0.030974 -0.11084 -0.093026 0.030276 0.99951 0.007975 0.000151 0.111032 0.004566 -0.993806 0.080892 0 0 0 1</matrix>
+        <node id="CWom0023-L_Thigh-node_PIVOT" name="CWom0023-L_Thigh_PIVOT" type="NODE">
+          <matrix>0.439232 0 0 0 0 0.5244 0 0 0 0 0.480641 0 0 0 0 1</matrix>
+        </node>
+        <node id="CWom0023-L_Calf-node" name="CWom0023-L_Calf" sid="Bone58" type="JOINT">
+          <matrix>0.968817 0.247775 0 0.439232 -0.247775 0.968818 0 0 0 0 1 0 0 0 0 1</matrix>
+          <node id="CWom0023-L_Calf-node_PIVOT" name="CWom0023-L_Calf_PIVOT" type="NODE">
+            <matrix>0.388045 0 0 0 0 0.5244 0 0 0 0 0.480641 0 0 0 0 1</matrix>
+          </node>
+          <node id="CWom0023-L_Foot-node" name="CWom0023-L_Foot" sid="Bone59" type="JOINT">
+            <matrix>0.969881 -0.200544 -0.138251 0.388045 0.216897 0.969336 0.115517 0 0.110846 -0.142024 0.983637 0 0 0 0 1</matrix>
+            <node id="CWom0023-L_Foot-node_PIVOT" name="CWom0023-L_Foot_PIVOT" type="NODE">
+              <matrix>0.093026 0 0 0 0 0.180552 0 0 0 0 0.107347 0 0 0 0 1</matrix>
+            </node>
+            <node id="CWom0023-L_Toe0-node" name="CWom0023-L_Toe0" sid="Bone60" type="JOINT">
+              <matrix>0 -0.999998 0.0018 0.093026 1 0 0 0.144442 0 0.0018 0.999999 0 0 0 0 1</matrix>
+              <node id="CWom0023-L_Toe0-node_PIVOT" name="CWom0023-L_Toe0_PIVOT" type="NODE">
+                <matrix>0.097087 0 0 0 0 0.046522 0 0 0 0 0.107109 0 0 0 0 1</matrix>
+              </node>
+              <node id="CWom0023-L_Toe0Nub-node" name="CWom0023-L_Toe0Nub" sid="Bone61" type="JOINT">
+                <matrix>1 0 0 0.097087 0 1 0 0 0 0 -1 0 0 0 0 1</matrix>
+                <node id="CWom0023-L_Toe0Nub-node_PIVOT" name="CWom0023-L_Toe0Nub_PIVOT" type="NODE">
+                  <matrix>0.016181 0 0 0 0 0.01163 0 0 0 0 0.026777 0 0 0 0 1</matrix>
+                  <extra>
+                    <technique profile="MAX3D">
+                      <helper>
+                        <bounding_min>0 -1 -1</bounding_min>
+                        <bounding_max>2 1 1</bounding_max>
+                      </helper>
+                    </technique>
+                  </extra>
+                </node>
+              </node>
+            </node>
+          </node>
+        </node>
+      </node>
+      <node id="CWom0023-R_Thigh-node" name="CWom0023-R_Thigh" sid="Bone62" type="JOINT">
+        <matrix>-0.993356 0.030974 0.11084 -0.093026 0.030277 0.99951 -0.007969 0.000152 -0.111032 -0.004561 -0.993806 -0.080892 0 0 0 1</matrix>
+        <node id="CWom0023-R_Thigh-node_PIVOT" name="CWom0023-R_Thigh_PIVOT" type="NODE">
+          <matrix>0.439232 0 0 0 0 0.5244 0 0 0 0 0.480641 0 0 0 0 1</matrix>
+        </node>
+        <node id="CWom0023-R_Calf-node" name="CWom0023-R_Calf" sid="Bone63" type="JOINT">
+          <matrix>0.968818 0.247775 0 0.439232 -0.247775 0.968818 0 0 0 0 1 0 0 0 0 1</matrix>
+          <node id="CWom0023-R_Calf-node_PIVOT" name="CWom0023-R_Calf_PIVOT" type="NODE">
+            <matrix>0.388045 0 0 0 0 0.5244 0 0 0 0 0.480641 0 0 0 0 1</matrix>
+          </node>
+          <node id="CWom0023-R_Foot-node" name="CWom0023-R_Foot" sid="Bone64" type="JOINT">
+            <matrix>0.969881 -0.200544 0.138252 0.388045 0.216897 0.969335 -0.115517 0 -0.110846 0.142024 0.983637 0 0 0 0 1</matrix>
+            <node id="CWom0023-R_Foot-node_PIVOT" name="CWom0023-R_Foot_PIVOT" type="NODE">
+              <matrix>0.093026 0 0 0 0 0.180552 0 0 0 0 0.107347 0 0 0 0 1</matrix>
+            </node>
+            <node id="CWom0023-R_Toe0-node" name="CWom0023-R_Toe0" sid="Bone65" type="JOINT">
+              <matrix>0 -0.999999 -0.0018 0.093026 1 0 0 0.144442 0 -0.0018 0.999999 0 0 0 0 1</matrix>
+              <node id="CWom0023-R_Toe0-node_PIVOT" name="CWom0023-R_Toe0_PIVOT" type="NODE">
+                <matrix>0.097087 0 0 0 0 0.046522 0 0 0 0 0.107109 0 0 0 0 1</matrix>
+              </node>
+              <node id="CWom0023-R_Toe0Nub-node" name="CWom0023-R_Toe0Nub" sid="Bone66" type="JOINT">
+                <matrix>1 0 0 0.097087 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+                <node id="CWom0023-R_Toe0Nub-node_PIVOT" name="CWom0023-R_Toe0Nub_PIVOT" type="NODE">
+                  <matrix>0.016181 0 0 0 0 0.01163 0 0 0 0 0.026777 0 0 0 0 1</matrix>
+                  <extra>
+                    <technique profile="MAX3D">
+                      <helper>
+                        <bounding_min>0 -1 -1</bounding_min>
+                        <bounding_max>2 1 1</bounding_max>
+                      </helper>
+                    </technique>
+                  </extra>
+                </node>
+              </node>
+            </node>
+          </node>
+        </node>
+      </node>
+    </node>
+  </node>
+</node>

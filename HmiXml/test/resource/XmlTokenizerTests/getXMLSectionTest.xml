@@ -1,0 +1,20 @@
+<test xmlns ="http://hmi.ns.test">
+   <preamble>
+      data
+      <nested></nested>
+   </preamble>
+   <ns:skippedtag attr="val" xmlns:ns="http://ns">
+      <innertag> chardata 
+         <nestedtag> chardata
+             <ns:skippedtag>
+                 more data
+             </ns:skippedtag>
+         </nestedtag>
+      </innertag>
+      <sometag xmlns:some="some-namespace"/>
+      <ns:extratag > moredata </ns:extratag>
+   </ns:skippedtag>
+   <moretags>
+      data
+   </moretags>
+</test>

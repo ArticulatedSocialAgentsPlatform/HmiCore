@@ -1,0 +1,154 @@
+% The chapters for hmi/xml, for inclusion within a master LaTeX document
+% include files must specify a path like \hmixmlreportdir/filename
+% where \hmixmlreportdir should be defined in the master document.
+% We have a fall back:
+\ifx \hmixmlreportdir \undefinedmacro \def \hmixmlreportdir{.} \fi
+\ifx \webserver \undefinedmacro \def \webserver{http://elckerlyc.sourceforge.net/javadoc/Hmi/} \fi
+
+\chapter{HMI Resources and Data}
+Java programs often need to read data files and resource files.
+There are a few reasons why this is not completely straightforward:
+
+\begin{itemize}
+\item programs need to run on all kind of systems, not just on the machine where it was developed.
+Consequently, you cannot assume that there is a completely fixed file/directory structure.
+We discuss our resource strategy in section \ref{resource-files}
+\item A more challenging situations is development via webstart. You simply cannot control
+the locations of resources and data files on systems that start your program via webstart.
+We discuss special requirements for webstart resources and data in section \ref{webstart-resources}
+\item We have a lot of \emph{shared} resources. You must take some measures to read such resources.
+We discuss these issues in section \ref{shared-resources}
+\item Although less variable, resource do change over time, just like program code.
+Sometimes, you must use one \emph{particular} version in combination with some particular program.
+This is the topic of section \ref{resource-management}
+\end{itemize}
+
+\section{Resource files}
+\label{resource-files}
+
+Data that is needed by Java programs comes in two varieties:
+\begin{enumerate}
+\item Data like icons,  images and configurations files. This data tends to be fixed,
+and is is strongly bound to the program itself. You cannot run the program when this data is ``missing''.
+This type of data is called \emph{resource} data, or ``\emph{resources}''
+\item Data that can be read or written by the program, but that is variable, and not essential for the proper functioning
+of the program. Like the document you open with word processor, or the BML document that you want to play with
+our BML realizer. We simply call this ``\emph{data}'', to distinguish it from resources.
+\end{enumerate}
+This chapter deal primarily with resources since it is more difficult to handle this properly than ``data''.
+A few remarks:
+\def\bs{$\backslash$}
+\begin{itemize}
+\item It is bad style to read resource data from fixed file locations like:
+\begin{verbatim}
+ C:\Javaprojects\myproject\resource\config.xml
+\end{verbatim}
+ The reason is simple: not everyone who wants to use your program has the same \verb#C:# disk structure, and maybe
+ not even a \verb#C:# disk at all, in case of a Mac or Linux system.
+ Even on Windows systems, it is annoying that other users \emph{must} have a ``\verb#C:\Javaprojects# directory.
+ \item When you use Java webstart to deploy your system, then it is simply not possible to refer to the local file system
+ except in very limited ways.
+\end{itemize}
+Java has a neat way of reading from (not writing to) resource files via the \verb#getResourceAsStream# methods from the
+Java \verb#Class#  and \verb#ClassLoader# classes.
+We use this method heavily in the Hmi packages and so we explain the ``rules'' of this game:
+\begin{enumerate}
+\item resource data is accessed via the Java \emph{classpath} in use when the program is running.
+Basically, every directory on the classpath is, potentially, a root directory for searching resource files.
+\item The simplest way to use this is to call the \verb#getResourceAsStream# method for a \verb#ClassLoader#.
+You do this like so:
+\begin{verbatim}
+getClass().getClassLoader().getResourceAsStream("myresource-path");
+\end{verbatim}
+Here, ``\verb#myresource-path#'' should be a simple filename or a more complex  path like ``\verb#dir_00/dir_11/.../dir_n/file#.
+This path is appended to each of the directories on the classpath in turn, until the resource file is found.
+
+\noindent
+The alternative method is to use the same method from  \verb#Class#, not \verb#ClassLoader#:
+\begin{verbatim}
+getClass().getResourceAsStream("myresource-path");
+\end{verbatim}
+This works similar, but the rules are a little different in this case:
+\begin{itemize}
+\item When \verb#myresourcepath# begins with a '/' character it is appended to directories on the classpath, as described above for \verb#ClassLoader#.
+\item But when \verb#myresourcepath# is a file or path \emph{not} starting with '/', then the method searches
+for a file name of the form:
+\begin{verbatim}
+modified_package_name/myresourcepath,
+\end{verbatim}
+where \verb#modified_package_name# is the package name of this object with '/' substituted for '.' .
+In itself this is a neat way of \emph{organizing} your resources: each resource file resides
+in a subdirectory that ``matches'' the package name of the class that reads the resource.
+\end{itemize}
+
+\noindent
+Sometimes, you want to read a resource file from within a \emph{static} method.
+In this case, you cannot use ``\verb#getClass().getClassLoader().getResourceAsStream#'', since a static method cannot use
+non-static methods like \verb#getClass#.
+In this case an elegant way to get a Class or ClassLoader is to use idiom like: \verb#<full-classname>.class.getClassLoader()#.
+For example:
+\begin{verbatim}
+ hmi.graphics.collada.scenegraph.ColladaReader.class.getClassLoader()
+  .getResourceAsStream("my-collada-resource.dae");
+ \end{verbatim}
+
+\end{enumerate}
+
+
+\section{Project Resources and Shared resources}
+
+The resource reading methods from section \ref{resource-files} are very useful, but you need some
+organization of your resource files.
+In our Hmi projects, we use a project directory structure as follows:
+\begin{verbatim}
+   project-directory
+       src
+       docs
+       lib
+       resource
+       test
+           src
+           lib
+           resource
+...
+\end{verbatim}
+The important directories here are the two \verb#resource# directories: one at the top-level,
+for ``ordinary'' resources, and a second one within the \verb#test# directory, for resources need only
+for ``junit testing''.
+The \verb#resource# directories are automatically included on the Java classpath when using our
+\verb#ant#-based build system. If you use a tool like Eclipse or Netbeans, you should include these
+directories on the classpath as well.
+The convention is that all resources used by a project are within these two \verb#resource# directories.
+This ensures that the \verb#getResourceAsStream# methods can always find your resources.
+The only exception is that sometimes we want to \emph{share} resource files between different projects,
+especially if they are very large. (If they are not that large, consider simply \emph{copying} resource files
+into the \verb#resource# directory of your own project).
+For sharing, you need to ensure that the correct resource directories are included on the Java classpath.
+For our \verb#ant#-based build system, this works via build properties, that you should set
+within the project's \verb#build.properties# file (located in the top-level directory of your project).
+The relevant property is called ``\verb#resource.path#''. As an example consider this line inside
+ \verb#build.properties# file for a virtual-humans project:
+ \begin{verbatim}
+resource.path=${shared.resources}/HmiHumanoidEmbodiments/resource;\
+              ${shared.resources}/DefaultShaders/resource;\
+              ${shared.resources}/Shared3DModels/resource
+ \end{verbatim}
+ The three directories included on this \verb#resource.path# are added to the classpath, just like the
+ project's own \verb#resource# directory.\\
+(Note: the `\verb#\#' characters at the end of the first two lines are necessary to split the command over several lines)\\
+The \verb#${shared.resources}# property is an \verb#ant# property that refers to the\\ \verb#${shared.project.root}/HmiResource# directory, that is, the \verb#HmiResource# directory within the shared project directory.
+The latter (i.e. \verb#${shared.project.root}#)  is (by definition) the directory where the \verb#HmiShared# directory resides.
+Our ``standard'' \verb#ant# \verb#build.xml# file redirects to the build file in \verb#HmiShared#:
+\begin{verbatim}
+   <import file="../../HmiShared/ant/build.xml" />
+\end{verbatim}
+This shared build file infers (from its own location) the location of the shared project directory and all other places defined relative to the shared project directory.  It defines properties like  \verb#${shared.project.root}# accordingly.
+
+
+\label{shared-resources}
+
+\section{Resource management}
+\label{resource-management}
+
+\section{Webstart resources and data}
+\label{webstart-resources} 

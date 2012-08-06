@@ -1,0 +1,8 @@
+<ivy-module version="2.0">
+   <info organisation="HMI" module="HmiFaceGraphics"/>
+   <dependencies>
+      <dependency org="HMI"   name="HmiGraphics"        transitive="false" rev="latest.{$resolve.status}"  />
+      <dependency org="HMI"   name="HmiFaceAnimation"   rev="latest.{$resolve.status}"  />
+      <dependency org="jcip"  name="jcip-annotations"   rev="latest.release"  /> 
+   </dependencies>
+</ivy-module>

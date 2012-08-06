@@ -1,0 +1,20 @@
+<ivy-module version="2.0">
+   <info organisation="HMI" module="HmiTTSMary"/>
+   <dependencies> 
+      <dependency org="google"   name="guava"     rev="latest.${resolve.status}"   />
+      <dependency org="jcip"      name="jcip-annotations"        rev="latest.release"  />   
+      <dependency org="slf4j"     name="slf4j-api"               rev="latest.release"  />   
+      <dependency org="dfki"      name="mary-common"             rev="latest.release"  />   
+      <dependency org="apache"    name="commons-collections"     rev="latest.release"  />   
+      <dependency org="opennlp"   name="opennlp-tools"           rev="latest.release"  />   
+      <dependency org="opennlp"   name="maxent"                  rev="latest.release"  />   
+      <dependency org="freetts"   name="freetts"                 rev="latest.release"  />   
+      <dependency org="gnu"       name="trove"                   rev="latest.release"  />   
+      <dependency org="hsqldb"    name="hsqldb"                  rev="latest.release"  />   
+      <dependency org="slf4j"     name="log4j-over-slf4j"        rev="latest.release"  /> 
+      <dependency org="Jama"      name="Jama"                    rev="latest.release"  />         
+      <dependency org="HMI"       name="HmiUtil"                 rev="latest.${resolve.status}"  />
+      <dependency org="HMI"       name="HmiTTS"                  rev="latest.${resolve.status}"  />
+      <dependency org="HMI"       name="HmiXml"                  rev="latest.${resolve.status}"  />
+   </dependencies>
+</ivy-module>

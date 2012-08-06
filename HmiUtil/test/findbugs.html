@@ -1,0 +1,858 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>FindBugs Report</title>
+<style type="text/css">
+		.tablerow0 {
+			background: #EEEEEE;
+		}
+
+		.tablerow1 {
+			background: white;
+		}
+
+		.detailrow0 {
+			background: #EEEEEE;
+		}
+
+		.detailrow1 {
+			background: white;
+		}
+
+		.tableheader {
+			background: #b9b9fe;
+			font-size: larger;
+		}
+
+		.tablerow0:hover, .tablerow1:hover {
+			background: #aaffaa;
+		}
+
+		.priority-1 {
+		    color: red;
+		    font-weight: bold;
+		}
+		.priority-2 {
+		    color: orange;
+		    font-weight: bold;
+		}
+		.priority-3 {
+		    color: green;
+		    font-weight: bold;
+		}
+		.priority-4 {
+		    color: blue;
+		    font-weight: bold;
+		}
+		</style>
+<script type="text/javascript">
+			function toggleRow(elid) {
+				if (document.getElementById) {
+					element = document.getElementById(elid);
+					if (element) {
+						if (element.style.display == 'none') {
+							element.style.display = 'block';
+							//window.status = 'Toggle on!';
+						} else {
+							element.style.display = 'none';
+							//window.status = 'Toggle off!';
+						}
+					}
+				}
+			}
+		</script>
+</head>
+<body>
+<h1>
+<a href="http://findbugs.sourceforge.net">FindBugs</a> Report</h1>
+<h2>Project Information</h2>
+<p>Project: 
+		</p>
+<p>FindBugs version: 1.3.9</p>
+<p>Code analyzed:</p>
+<ul>
+<li>C:\JavaProjects\Hmi\HmiUtil\build\classes</li>
+</ul>
+<p>
+<br/>
+<br/>
+</p>
+<h2>Metrics</h2>
+<p>2146 lines of code analyzed,
+	in 55 classes, 
+	in 1 packages.</p>
+<table width="500" cellpadding="5" cellspacing="2">
+<tr class="tableheader">
+<th align="left">Metric</th>
+<th align="right">Total</th>
+<th align="right">Density*</th>
+</tr>
+<tr class="tablerow0">
+<td>High Priority Warnings</td>
+<td align="right">2</td>
+<td align="right">0.93</td>
+</tr>
+<tr class="tablerow1">
+<td>Medium Priority Warnings</td>
+<td align="right">34</td>
+<td align="right">15.84</td>
+</tr>
+<tr class="$totalClass">
+<td>
+<b>Total Warnings</b>
+</td>
+<td align="right">
+<b>36</b>
+</td>
+<td align="right">
+<b>16.78</b>
+</td>
+</tr>
+</table>
+<p>
+<i>(* Defects per Thousand lines of non-commenting source statements)</i>
+</p>
+<p>
+<br/>
+<br/>
+</p>
+<h2>Contents</h2>
+<ul>
+<li>
+<a href="#Warnings_BAD_PRACTICE">Bad practice Warnings</a>
+</li>
+<li>
+<a href="#Warnings_MALICIOUS_CODE">Malicious code vulnerability Warnings</a>
+</li>
+<li>
+<a href="#Warnings_MT_CORRECTNESS">Multithreaded correctness Warnings</a>
+</li>
+<li>
+<a href="#Warnings_PERFORMANCE">Performance Warnings</a>
+</li>
+<li>
+<a href="#Details">Details</a>
+</li>
+</ul>
+<h1>Summary</h1>
+<table width="500" cellpadding="5" cellspacing="2">
+<tr class="tableheader">
+<th align="left">Warning Type</th>
+<th align="right">Number</th>
+</tr>
+<tr class="tablerow0">
+<td>
+<a href="#Warnings_BAD_PRACTICE">Bad practice Warnings</a>
+</td>
+<td align="right">7</td>
+</tr>
+<tr class="tablerow1">
+<td>
+<a href="#Warnings_MALICIOUS_CODE">Malicious code vulnerability Warnings</a>
+</td>
+<td align="right">2</td>
+</tr>
+<tr class="tablerow0">
+<td>
+<a href="#Warnings_MT_CORRECTNESS">Multithreaded correctness Warnings</a>
+</td>
+<td align="right">5</td>
+</tr>
+<tr class="tablerow1">
+<td>
+<a href="#Warnings_PERFORMANCE">Performance Warnings</a>
+</td>
+<td align="right">22</td>
+</tr>
+<tr class="tablerow0">
+<td>
+<b>Total</b>
+</td>
+<td align="right">
+<b>36</b>
+</td>
+</tr>
+</table>
+<h1>Warnings</h1>
+<p>Click on a warning row to see full context information.</p>
+<h2>
+<a name="Warnings_BAD_PRACTICE">Bad practice Warnings</a>
+</h2>
+<table class="warningtable" width="100%" cellspacing="0">
+<tr class="tableheader">
+<th align="left">Code</th>
+<th align="left">Warning</th>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66175');">
+<td>
+<span class="priority-2">CN</span>
+</td>
+<td>hmi.util.Id defines clone() but doesn't implement Cloneable</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66175" style="display: none;">
+<a href="#CN_IMPLEMENTS_CLONE_BUT_NOT_CLONEABLE">Bug type CN_IMPLEMENTS_CLONE_BUT_NOT_CLONEABLE (click for details)</a>
+<br/>In class hmi.util.Id<br/>In method hmi.util.Id.clone()<br/>At Id.java:[line 81]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N65550');">
+<td>
+<span class="priority-1">DE</span>
+</td>
+<td>hmi.util.Console.addTerminator(Terminator) might ignore java.lang.Exception</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N65550" style="display: none;">
+<a href="#DE_MIGHT_IGNORE">Bug type DE_MIGHT_IGNORE (click for details)</a>
+<br/>In class hmi.util.Console<br/>In method hmi.util.Console.addTerminator(Terminator)<br/>Exception class java.lang.Exception<br/>At Console.java:[line 788]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N65811');">
+<td>
+<span class="priority-2">Dm</span>
+</td>
+<td>hmi.util.DefaultDeadlockListener.deadlockDetected(Thread[]) invokes System.exit(...), which shuts down the entire virtual machine</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N65811" style="display: none;">
+<a href="#DM_EXIT">Bug type DM_EXIT (click for details)</a>
+<br/>In class hmi.util.DefaultDeadlockListener<br/>In method hmi.util.DefaultDeadlockListener.deadlockDetected(Thread[])<br/>At DefaultDeadlockListener.java:[line 40]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N67516');">
+<td>
+<span class="priority-2">OS</span>
+</td>
+<td>hmi.util.UnJar.extractJarEntry(JarFile, JarEntry, File) may fail to close stream</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N67516" style="display: none;">
+<a href="#OS_OPEN_STREAM">Bug type OS_OPEN_STREAM (click for details)</a>
+<br/>In class hmi.util.UnJar<br/>In method hmi.util.UnJar.extractJarEntry(JarFile, JarEntry, File)<br/>Need to close java.io.InputStream <br/>At UnJar.java:[line 237]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N67237');">
+<td>
+<span class="priority-2">RV</span>
+</td>
+<td>hmi.util.Lib.extractLib(String, String, boolean) ignores exceptional return value of java.io.File.mkdirs()</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N67237" style="display: none;">
+<a href="#RV_RETURN_VALUE_IGNORED_BAD_PRACTICE">Bug type RV_RETURN_VALUE_IGNORED_BAD_PRACTICE (click for details)</a>
+<br/>In class hmi.util.Lib<br/>In method hmi.util.Lib.extractLib(String, String, boolean)<br/>Called method java.io.File.mkdirs()<br/>At Lib.java:[line 235]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N67584');">
+<td>
+<span class="priority-2">RV</span>
+</td>
+<td>hmi.util.UnJar.extractJarEntry(JarFile, JarEntry, File) ignores exceptional return value of java.io.File.mkdirs()</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N67584" style="display: none;">
+<a href="#RV_RETURN_VALUE_IGNORED_BAD_PRACTICE">Bug type RV_RETURN_VALUE_IGNORED_BAD_PRACTICE (click for details)</a>
+<br/>In class hmi.util.UnJar<br/>In method hmi.util.UnJar.extractJarEntry(JarFile, JarEntry, File)<br/>Called method java.io.File.mkdirs()<br/>At UnJar.java:[line 243]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N67655');">
+<td>
+<span class="priority-2">RV</span>
+</td>
+<td>hmi.util.UnJar.extractJarEntry(JarFile, JarEntry, File) ignores exceptional return value of java.io.File.setLastModified(long)</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N67655" style="display: none;">
+<a href="#RV_RETURN_VALUE_IGNORED_BAD_PRACTICE">Bug type RV_RETURN_VALUE_IGNORED_BAD_PRACTICE (click for details)</a>
+<br/>In class hmi.util.UnJar<br/>In method hmi.util.UnJar.extractJarEntry(JarFile, JarEntry, File)<br/>Called method java.io.File.setLastModified(long)<br/>At UnJar.java:[line 254]</p>
+</td>
+</tr>
+</table>
+<h2>
+<a name="Warnings_MALICIOUS_CODE">Malicious code vulnerability Warnings</a>
+</h2>
+<table class="warningtable" width="100%" cellspacing="0">
+<tr class="tableheader">
+<th align="left">Code</th>
+<th align="left">Warning</th>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N67184');">
+<td>
+<span class="priority-1">MS</span>
+</td>
+<td>hmi.util.Lib.tmpdir isn't final but should be</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N67184" style="display: none;">
+<a href="#MS_SHOULD_BE_FINAL">Bug type MS_SHOULD_BE_FINAL (click for details)</a>
+<br/>In class hmi.util.Lib<br/>Field hmi.util.Lib.tmpdir<br/>At Lib.java:[line 114]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N67308');">
+<td>
+<span class="priority-2">MS</span>
+</td>
+<td>hmi.util.Screen.DEFAULTSCREENSIZELIST should be both final and package protected</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N67308" style="display: none;">
+<a href="#MS_FINAL_PKGPROTECT">Bug type MS_FINAL_PKGPROTECT (click for details)</a>
+<br/>In class hmi.util.Screen<br/>Field hmi.util.Screen.DEFAULTSCREENSIZELIST<br/>At Screen.java:[line 56]</p>
+</td>
+</tr>
+</table>
+<h2>
+<a name="Warnings_MT_CORRECTNESS">Multithreaded correctness Warnings</a>
+</h2>
+<table class="warningtable" width="100%" cellspacing="0">
+<tr class="tableheader">
+<th align="left">Code</th>
+<th align="left">Warning</th>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N65866');">
+<td>
+<span class="priority-2">IS</span>
+</td>
+<td>Inconsistent synchronization of hmi.util.EventDispatchThreadHangMonitor.eventDispatchThread; locked 66% of time</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N65866" style="display: none;">
+<a href="#IS2_INCONSISTENT_SYNC">Bug type IS2_INCONSISTENT_SYNC (click for details)</a>
+<br/>In class hmi.util.EventDispatchThreadHangMonitor<br/>Field hmi.util.EventDispatchThreadHangMonitor.eventDispatchThread<br/>Synchronized 66% of the time<br/>Unsynchronized access at EventDispatchThreadHangMonitor.java:[line 106]<br/>Synchronized access at EventDispatchThreadHangMonitor.java:[line 155]<br/>Synchronized access at EventDispatchThreadHangMonitor.java:[line 159]<br/>Synchronized access at EventDispatchThreadHangMonitor.java:[line 60]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N65961');">
+<td>
+<span class="priority-2">IS</span>
+</td>
+<td>Inconsistent synchronization of hmi.util.EventDispatchThreadHangMonitor.reportedHang; locked 50% of time</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N65961" style="display: none;">
+<a href="#IS2_INCONSISTENT_SYNC">Bug type IS2_INCONSISTENT_SYNC (click for details)</a>
+<br/>In class hmi.util.EventDispatchThreadHangMonitor<br/>Field hmi.util.EventDispatchThreadHangMonitor.reportedHang<br/>Synchronized 50% of the time<br/>Unsynchronized access at EventDispatchThreadHangMonitor.java:[line 99]<br/>Unsynchronized access at EventDispatchThreadHangMonitor.java:[line 104]<br/>Synchronized access at EventDispatchThreadHangMonitor.java:[line 162]<br/>Synchronized access at EventDispatchThreadHangMonitor.java:[line 171]<br/>Synchronized access at EventDispatchThreadHangMonitor.java:[line 57]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66068');">
+<td>
+<span class="priority-2">IS</span>
+</td>
+<td>Inconsistent synchronization of hmi.util.EventDispatchThreadHangMonitor.startedLastEventDispatchAt; locked 75% of time</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66068" style="display: none;">
+<a href="#IS2_INCONSISTENT_SYNC">Bug type IS2_INCONSISTENT_SYNC (click for details)</a>
+<br/>In class hmi.util.EventDispatchThreadHangMonitor<br/>Field hmi.util.EventDispatchThreadHangMonitor.startedLastEventDispatchAt<br/>Synchronized 75% of the time<br/>Unsynchronized access at EventDispatchThreadHangMonitor.java:[line 87]<br/>Synchronized access at EventDispatchThreadHangMonitor.java:[line 130]<br/>Synchronized access at EventDispatchThreadHangMonitor.java:[line 163]<br/>Synchronized access at EventDispatchThreadHangMonitor.java:[line 174]<br/>Synchronized access at EventDispatchThreadHangMonitor.java:[line 54]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N65618');">
+<td>
+<span class="priority-2">LI</span>
+</td>
+<td>Incorrect lazy initialization of static field hmi.util.Console.terminatorList in hmi.util.Console.addTerminator(Terminator)</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N65618" style="display: none;">
+<a href="#LI_LAZY_INIT_STATIC">Bug type LI_LAZY_INIT_STATIC (click for details)</a>
+<br/>In class hmi.util.Console<br/>In method hmi.util.Console.addTerminator(Terminator)<br/>On field hmi.util.Console.terminatorList<br/>At Console.java:[line 785]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N65688');">
+<td>
+<span class="priority-2">LI</span>
+</td>
+<td>Incorrect lazy initialization of static field hmi.util.Console.counters in hmi.util.Console.getCounter(String, int, int)</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N65688" style="display: none;">
+<a href="#LI_LAZY_INIT_STATIC">Bug type LI_LAZY_INIT_STATIC (click for details)</a>
+<br/>In class hmi.util.Console<br/>In method hmi.util.Console.getCounter(String, int, int)<br/>On field hmi.util.Console.counters<br/>At Console.java:[line 210]</p>
+</td>
+</tr>
+</table>
+<h2>
+<a name="Warnings_PERFORMANCE">Performance Warnings</a>
+</h2>
+<table class="warningtable" width="100%" cellspacing="0">
+<tr class="tableheader">
+<th align="left">Code</th>
+<th align="left">Warning</th>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N65758');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.Console$Counter.name</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N65758" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.Console$Counter<br/>Field hmi.util.Console$Counter.name<br/>At Console.java:[line 136]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N66230');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.button1Down</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N66230" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.button1Down<br/>At InputState.java:[line 77]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66283');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.button2Down</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66283" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.button2Down<br/>At InputState.java:[line 78]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N66336');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.button3Down</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N66336" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.button3Down<br/>At InputState.java:[line 79]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66389');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.clickCount1</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66389" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.clickCount1<br/>At InputState.java:[line 80]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N66442');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.clickCount2</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N66442" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.clickCount2<br/>At InputState.java:[line 81]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66495');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.clickCount3</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66495" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.clickCount3<br/>At InputState.java:[line 82]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N66548');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.x1Pressed</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N66548" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.x1Pressed<br/>At InputState.java:[line 433]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66601');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.x1Released</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66601" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.x1Released<br/>At InputState.java:[line 464]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N66654');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.x2Pressed</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N66654" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.x2Pressed<br/>At InputState.java:[line 439]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66707');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.x2Released</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66707" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.x2Released<br/>At InputState.java:[line 471]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N66760');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.x3Pressed</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N66760" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.x3Pressed<br/>At InputState.java:[line 445]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66813');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.x3Released</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66813" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.x3Released<br/>At InputState.java:[line 477]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N66866');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.y1Pressed</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N66866" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.y1Pressed<br/>At InputState.java:[line 434]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N66919');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.y1Released</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N66919" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.y1Released<br/>At InputState.java:[line 465]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N66972');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.y2Pressed</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N66972" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.y2Pressed<br/>At InputState.java:[line 440]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N67025');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.y2Released</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N67025" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.y2Released<br/>At InputState.java:[line 472]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N67078');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.y3Pressed</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N67078" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.y3Pressed<br/>At InputState.java:[line 446]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N67131');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.InputState.y3Released</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N67131" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.InputState<br/>Field hmi.util.InputState.y3Released<br/>At InputState.java:[line 478]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N67361');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.SystemClock.framerateCounterEnabled</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N67361" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.SystemClock<br/>Field hmi.util.SystemClock.framerateCounterEnabled<br/>At SystemClock.java:[line 86]</p>
+</td>
+</tr>
+<tr class="tablerow1" onclick="toggleRow('N67414');">
+<td>
+<span class="priority-2">UrF</span>
+</td>
+<td>Unread field: hmi.util.SystemClock.initTick</td>
+</tr>
+<tr class="detailrow1">
+<td/>
+<td>
+<p id="N67414" style="display: none;">
+<a href="#URF_UNREAD_FIELD">Bug type URF_UNREAD_FIELD (click for details)</a>
+<br/>In class hmi.util.SystemClock<br/>Field hmi.util.SystemClock.initTick<br/>At SystemClock.java:[line 97]</p>
+</td>
+</tr>
+<tr class="tablerow0" onclick="toggleRow('N67467');">
+<td>
+<span class="priority-2">UuF</span>
+</td>
+<td>Unused field: hmi.util.SystemClock.tickSize</td>
+</tr>
+<tr class="detailrow0">
+<td/>
+<td>
+<p id="N67467" style="display: none;">
+<a href="#UUF_UNUSED_FIELD">Bug type UUF_UNUSED_FIELD (click for details)</a>
+<br/>In class hmi.util.SystemClock<br/>Field hmi.util.SystemClock.tickSize<br/>In SystemClock.java</p>
+</td>
+</tr>
+</table>
+<h1>
+<a name="Details">Details</a>
+</h1>
+<h2>
+<a name="CN_IMPLEMENTS_CLONE_BUT_NOT_CLONEABLE">CN_IMPLEMENTS_CLONE_BUT_NOT_CLONEABLE: Class defines clone() but doesn't implement Cloneable</a>
+</h2>
+
+<p> This class defines a clone() method but the class doesn't implement Cloneable.
+There are some situations in which this is OK (e.g., you want to control how subclasses 
+can clone themselves), but just make sure that this is what you intended.
+</p>
+
+    
+<h2>
+<a name="DE_MIGHT_IGNORE">DE_MIGHT_IGNORE: Method might ignore exception</a>
+</h2>
+
+  <p> This method might ignore an exception.&nbsp; In general, exceptions
+  should be handled or reported in some way, or they should be thrown
+  out of the method.</p>
+
+    
+<h2>
+<a name="DM_EXIT">DM_EXIT: Method invokes System.exit(...)</a>
+</h2>
+
+  <p> Invoking System.exit shuts down the entire Java virtual machine. This
+   should only been done when it is appropriate. Such calls make it
+   hard or impossible for your code to be invoked by other code.
+   Consider throwing a RuntimeException instead.</p>
+
+    
+<h2>
+<a name="IS2_INCONSISTENT_SYNC">IS2_INCONSISTENT_SYNC: Inconsistent synchronization</a>
+</h2>
+
+  <p> The fields of this class appear to be accessed inconsistently with respect
+  to synchronization.&nbsp; This bug report indicates that the bug pattern detector
+  judged that
+  </p>
+  <ul>
+  <li> The class contains a mix of locked and unlocked accesses,</li>
+  <li> At least one locked access was performed by one of the class's own methods, and</li>
+  <li> The number of unsynchronized field accesses (reads and writes) was no more than
+       one third of all accesses, with writes being weighed twice as high as reads</li>
+  </ul>
+
+  <p> A typical bug matching this bug pattern is forgetting to synchronize
+  one of the methods in a class that is intended to be thread-safe.</p>
+
+  <p> You can select the nodes labeled "Unsynchronized access" to show the
+  code locations where the detector believed that a field was accessed
+  without synchronization.</p>
+
+  <p> Note that there are various sources of inaccuracy in this detector;
+  for example, the detector cannot statically detect all situations in which
+  a lock is held.&nbsp; Also, even when the detector is accurate in
+  distinguishing locked vs. unlocked accesses, the code in question may still
+  be correct.</p>
+
+
+    
+<h2>
+<a name="LI_LAZY_INIT_STATIC">LI_LAZY_INIT_STATIC: Incorrect lazy initialization of static field</a>
+</h2>
+
+<p> This method contains an unsynchronized lazy initialization of a non-volatile static field.
+Because the compiler or processor may reorder instructions,
+threads are not guaranteed to see a completely initialized object,
+<em>if the method can be called by multiple threads</em>.
+You can make the field volatile to correct the problem.
+For more information, see the
+<a href="http://www.cs.umd.edu/~pugh/java/memoryModel/">Java Memory Model web site</a>.
+</p>
+
+    
+<h2>
+<a name="MS_SHOULD_BE_FINAL">MS_SHOULD_BE_FINAL: Field isn't final but should be</a>
+</h2>
+
+   <p>
+ A mutable static field could be changed by malicious code or
+        by accident from another package.
+        The field could be made final to avoid
+        this vulnerability.</p>
+
+    
+<h2>
+<a name="MS_FINAL_PKGPROTECT">MS_FINAL_PKGPROTECT: Field should be both final and package protected</a>
+</h2>
+
+ <p>
+   A mutable static field could be changed by malicious code or
+        by accident from another package.
+        The field could be made package protected and/or made final
+   to avoid
+        this vulnerability.</p>
+
+    
+<h2>
+<a name="OS_OPEN_STREAM">OS_OPEN_STREAM: Method may fail to close stream</a>
+</h2>
+
+<p> The method creates an IO stream object, does not assign it to any
+fields, pass it to other methods that might close it, 
+or return it, and does not appear to close
+the stream on all paths out of the method.&nbsp; This may result in
+a file descriptor leak.&nbsp; It is generally a good
+idea to use a <code>finally</code> block to ensure that streams are
+closed.</p>
+
+    
+<h2>
+<a name="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE">RV_RETURN_VALUE_IGNORED_BAD_PRACTICE: Method ignores exceptional return value</a>
+</h2>
+
+   <p> This method returns a value that is not checked. The return value should be checked
+since it can indicate an unusual or unexpected function execution. For
+example, the <code>File.delete()</code> method returns false
+if the file could not be successfully deleted (rather than 
+throwing an Exception).
+If you don't check the result, you won't notice if the method invocation
+signals unexpected behavior by returning an atypical return value.
+</p>
+
+    
+<h2>
+<a name="URF_UNREAD_FIELD">URF_UNREAD_FIELD: Unread field</a>
+</h2>
+
+  <p> This field is never read.&nbsp; Consider removing it from the class.</p>
+
+    
+<h2>
+<a name="UUF_UNUSED_FIELD">UUF_UNUSED_FIELD: Unused field</a>
+</h2>
+
+  <p> This field is never used.&nbsp; Consider removing it from the class.</p>
+
+    </body>
+</html>

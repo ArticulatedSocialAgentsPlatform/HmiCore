@@ -1,0 +1,238 @@
+/* 
+ * The render scene for the LightingShaders demo
+ */
+
+package hmi.graphics.colladatest;
+import javax.media.opengl.*;
+
+import java.awt.Component;
+import java.io.*;
+import java.util.ArrayList;
+import hmi.graphics.opengl.*;
+import hmi.util.ClockListener;
+import hmi.util.Resources;
+import hmi.xml.*;
+import hmi.graphics.collada.*;
+import hmi.graphics.collada.scenegraph.*;
+import hmi.graphics.scenegraph.*;
+import hmi.graphics.opengl.*;
+import hmi.graphics.opengl.state.*;
+import hmi.graphics.opengl.scenegraph.*;
+import hmi.animation.VJoint;
+import hmi.animation.SkeletonInterpolator;
+import hmi.math.*;
+import hmi.graphics.util.*;
+
+/**
+ * Scene is a render object that includes the complete &quot;scene&quot;
+ * with sphere mapping. It also includes a simple form of keyboard based
+ * NavigationScene: use the W/A/S/D keys for translation. 
+ * PgUp and PgDown move in the vertical direction
+ * The left/right/up/dn arrow keys are used for rotation of the light source.
+ */
+public class ColladaTestScene1  implements GLRenderObject, ClockListener {  
+   private VGLNode shadowScene;
+   private VGLNode nonShadowScene;
+   private VJoint sceneRoot;
+   private OpenGLState openglState;        // An object for some global OGL settings
+   private NavigationScene glNav;        // An object for keyboard based NavigationScene, of the camera viewpoint, and the position of the light
+   private Background background;  // Define the background for rendering
+   private Ground ground;      // A simple blue ground for the scene
+   private Torus torus;
+   
+   private FancyAnimator torusAnimator;
+   private FlyingOrb orb;
+   private RotationAnimator orbRotator;
+   
+   private Sphere sphere;
+   private GroundPlane groundplane;
+   
+   private PositionControl lightPositionControl;
+   
+   private SimpleLight light0;
+   
+   private ShadowState shadowState = new ShadowState(0.2f);
+   private RenderpassState renderpassState = new RenderpassState();
+   private float[] shadowMatrix = new float[16];
+   private float[] lightPos     = new float[] { -1.5f, 2.5f, 1.0f, 1.0f };  // Point source
+
+   private SkeletonInterpolator ski;
+   private VJoint avatarRootJoint;
+   
+  
+   /**
+    * Create a Scene object. The glDrawable will be linked
+    * to the key-based NavigationScene.
+    */
+   public ColladaTestScene1(Component canvas) {       
+      
+      sceneRoot = new VJoint("sceneRoot");
+      shadowScene = new VGLNode("ShadowScene", 8);
+      nonShadowScene = new VGLNode("NonShadowScene", 8);
+//      sceneRoot.addChild(shadowScene.getRoot());
+//      sceneRoot.addChild(nonShadowScene.getRoot());
+      
+      openglState = new OpenGLState();      
+      background = new Background(0.2f, 0.2f, 0.3f);  // Set a simple background color  
+      glNav = new  NavigationScene(canvas, sceneRoot);
+      glNav.setPosition(0.0f, 0.8f, 2.0f);   // The (initial) position of the camera.
+      light0 = new SimpleLight(GL.GL_LIGHT0, "Light0");    //Create a SimpleLight object, that encapsulates settings for OGL light GL_LIGHT0
+      //light0.setAmbientColor(0.3f, 0.3f, 0.3f);
+      SimpleLightState lightState = light0.getState();
+      lightState.setAmbientColor(0.0f, 0.0f, 0.0f);
+      
+      //light0.setSpecularColor(1.0f, 1.0f, 1.0f);
+      lightState.setSpecularColor(0.0001f, 0.00001f, 0.000001f);
+      //light0.setDiffuseColor(0.8f, 0.8f, 0.8f);
+      lightState.setDiffuseColor(0.7f, 0.7f, 0.7f);
+      light0.getRoot().setTranslation(lightPos);
+      SimpleLightGeometry lightGeom = light0.getGeometry();
+      lightGeom.setVisible(true);                   // Show the light object as a small sphere
+      lightState.setEnabled(true);
+
+//      sceneRoot.addChild(light0.getRoot());
+      
+                 
+      ground = new Ground("Ground");  
+      nonShadowScene.addChild(ground);
+      //ground.addAppearance(new FixedColor(0.0f, 0.0f, 1.0f));    
+
+      
+      torus = new Torus("Torus", "crate.bmp");
+      torus.getRoot().setTranslation(0.0f, 0.5f, -2.0f);
+
+//      shadowScene.addChild(torus);
+      torusAnimator = new FancyAnimator(torus);
+  
+      orb = new FlyingOrb(0.1f, 32, 32);
+      orb.getRoot().setTranslation(0.0f, 0.2f, -2.0f);
+//      shadowScene.addChild(orb);
+      orbRotator = new RotationAnimator(orb);
+      
+      
+      
+      sphere = new Sphere("Sphere", "orb.png",  0.6f, 32, 32);
+      sphere.getRoot().setTranslation(1.0f, 0.4f, -2.0f);
+//      shadowScene.addChild(sphere);
+  
+      groundplane = new GroundPlane("GroundPlane", 0.0f, -0.39f, 0.0f, 1.0f, 1.0f);  
+      nonShadowScene.addChild(groundplane);    
+      
+      lightPositionControl = new PositionControl(canvas);
+    
+      lightPositionControl.setVJoint(light0.getRoot());
+      light0.setShadowMatrix(shadowMatrix);
+      
+ 
+      
+      
+      String animFile = "animTest2.xml";
+   
+      try {       
+                       
+                       
+          //      String daeFile = "simplebox.dae";
+          //      String daeFile = "actor_wim_meters_3dsexport.dae";
+          //      String daeFile = "actor_wim_meters.dae";
+          //      String daeFile = "actor_phong.dae";   
+                String daeFile = "avatar.dae";              
+          VGLNode avatarNode = ColladaReader.read("dae", daeFile);
+          
+          
+//          avatarRootJoint = avatarNode.getRoot();
+//          avatarRootJoint.setName("AVATARROOTJOINT");
+//          GLShape noTexture = new GLShape();
+//          GLRenderObject noTexState = new NoTexture2DState();
+//          noTexture.addGLState(noTexState);
+//          avatarNode.getGLShapeList().prepend(noTexture);
+          
+//          GLShape scalingShape = new GLShape();
+//          GLRenderObject scalingState = new ScaleTransform(0.001f);
+//          scalingShape.addGLState(scalingState);
+//          //avatarNode.getGLShapeList().prepend(scalingShape);
+//          
+//          GLShape unscalingShape = new GLShape();
+//          GLRenderObject unscalingState = new UnScaleTransform();
+//          unscalingShape.addGLState(unscalingState);
+//          //avatarNode.getGLShapeList().add(unscalingShape);
+          
+//          avatarRootJoint.setScale(0.04f, 0.04f, 0.04f); // needed for avatar.dae
+//          avatarRootJoint.setTranslation(0f, 0.55f, -1.9f); // needed for avatar.dae
+       //   hmi.util.Console.println("Avatar " + daeFile + "\n" + avatarNode);
+          
+//          shadowScene.addChild(avatarNode);
+          
+          ski = SkeletonInterpolator.read("animations", animFile);
+         
+          ski.setTarget(avatarRootJoint);
+      } catch (IOException e) {
+           hmi.util.Console.println("Collada: " + e);  
+      }
+   }   
+   
+   /**
+    * The callback method that will be called by the clock, for every time tick.
+    */
+   public synchronized void time(double t) {   
+//      torusAnimator.time(t);
+//      orbRotator.time(t);
+//  
+//   
+//      glNav.time(t);  
+//      lightPositionControl.time(t);
+//      ski.time(t);
+  
+       sceneRoot.calculateMatrices();
+   }
+   
+   /**
+    * OpenGL/Jogl initialization, with "current" OpenGL context gl.
+    * Called when the OpenGL system is initialized, so, in principle, only once.
+    */
+   public synchronized void glInit(GL gl) {                   
+      openglState.glInit(gl);
+      background.glInit(gl);
+      light0.glInit(gl);
+//      shadowScene.glInit(gl);
+//      nonShadowScene.glInit(gl);
+   }
+   
+   
+   /**
+    * OpenGL/Jogl render pass, called for every frame that is being rendered.
+    */
+   public synchronized void glRender(GL gl) {  
+      openglState.glRender(gl);
+      background.glRender(gl);
+      
+      lightPositionControl.glRender(gl);
+      light0.glRender(gl);
+      
+//      nonShadowScene.glRender(gl);
+     
+      // First draw shadows
+      //gl.glScalef(0.01f, 0.01f, 0.01f);
+//      shadowState.glRender(gl);
+   
+       
+//      shadowScene.getRoot().setLocalMatrix(shadowMatrix); 
+//       
+//      sceneRoot.calculateMatrices();
+//      shadowScene.setPass(GLShape.SHADOWPASS);
+//      shadowScene.glRender(gl);
+//        
+//      renderpassState.glRender(gl);
+// 
+//      shadowScene.getRoot().setLocalMatrix(Mat4f.getIdentity()); 
+//      sceneRoot.calculateMatrices();
+
+      shadowScene.setPass(GLShape.RENDERPASS);
+//      shadowScene.glRender(gl);
+      hmi.graphics.opengl.GLUtil.reportGLErrors(gl);
+   }  
+      
+      
+}     
+
+
+

@@ -1,0 +1,13 @@
+
+package hmi.graphics.opengl;
+   
+   import java.nio.*;
+ 
+/** 
+ * Interface for wrapping generic Java OpenGL bindings (in particular Jogl and LWJGL)
+ * This interface includes only GL and  GLU, but no GLUT bindings.
+ * Implementations of GLBinding will use different OpenGL bindings.
+ * Known implementations: JOGLContext and LWJGLCOntext.
+ * @author generated file
+ */
+public interface GLBinding {

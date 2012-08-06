@@ -1,0 +1,123 @@
+
+\section{Scenegraphs}
+
+The hmi.graphics.scenegraph package defines classes for modeling generic
+scenegraphs, that are not tightly bound to either a graphics format like X3D or Collada,
+nor to some particular render technology, such as OpenGL/Jogl.
+This type of scenegraph objects is mainly used as an intermediary  between the readers
+for graphics formats and the graphics render engines, based on OpenGL.
+Within this section ``scenegraph'' refers to a hmi.graphics.scenegraph.
+
+
+Scenegraphs are simple compared to either Collada documents or OpenGL render structures.
+At the top-level we just have a \verb"GScene" element that holds a list of root nodes
+for the scene graph as a whole.
+The scene graph nodes are represented here by means of \verb"GNode" objects. Each of these
+defines a transformation, (optionally) a list of recursive \verb"GNode" child nodes, and (optionally)
+a list of \verb"GShape" nodes.
+A \verb"GShape" is basically just a combination of geometry, in the form of a \verb"GMesh" object,
+and ``appearance'', in the form of a \verb"GMaterial" object.
+
+\subsubsection{Scenegraph skeletons}
+
+ An important issue is how to represent ``skeletons'', or ``bone structures'', or whatever they are called
+ at various places. We distinguish two different strategies:
+ \begin{enumerate}
+ \item skeletons combined with \emph{segmented} geometry.
+ \item skeletons with deformable geometry.
+ \end{enumerate}
+
+The first alternative is not really special from the scenegraph point of view.
+It is just that there are some rather deeply nested \verb"GNode" structures, each \verb"GNode"
+representing one skeleton ``joint''. The geometry of an avatar is divided into
+different ``chunks'' or `` segments'', where each segment is attached to
+the appropriate \verb"GNode" joint. Each of these segments has its own transform, defined
+by the cumulative effect of all \verb"GNode" transforms from the scene graph root node up to and
+including the transform from the \verb"GNode" to which the segment is attached.
+Because of this rather simple transform strategy, the avatar might appear to consist
+of individual disconnected segments, and with certain positioning of the limbs, might show ``holes''
+in the avatar's body.
+
+The second alternative is more sophisticated, and assumes that the avatar is modeled as one seamless mesh,
+rather than being broken up into discrete segments. The individual vertices of the mesh are
+controlled by one or more skeleton joints, where the influence of a joint upon some
+particular vertex is specified by means of a \emph{weight}.
+In this case the deformation of the mesh can be calculated only when the transforms of all relevant skeleton joints
+are known. An extra complication here is that meshes are usually specified in what is called the ``bind pose'',
+which normally would differ from the neutral pose for animation purposes. To correct for this,
+the mesh defines a number of bind pose matrices. (actually it keeps the \emph{inverses} of these matrices).
+
+The scenegraph representation of the second alternative is as follows:
+The \emph{skeleton structure} as such is represented by a hierarchically nested set of
+\verb"GNode" objects. There is \emph{no} geometry attached to these \verb"GNode"s.
+The avatar mesh itself is represented by a special kind of \verb"GMesh"
+called a \verb"GSkinnedMesh", attached to some \verb"GShape" like any other geometry,
+and combined with appropriate \verb"GMaterial".
+The skinned \verb"GMesh" includes skinning information, like
+vertex weights and inverse bind matrices, and including the \verb"id" of a skeleton and the \verb"sid"'s of
+the joint names.
+%Within a complete \verb"GScene", a resolve operation
+%can be used to actually link these joint names to \verb"GNode" joints.
+
+\subsubsection{More detailed description of scenegraph classes}
+\begin{itemize}
+\item GMaterial: represents material settings for graphics objects.
+\item GMesh: neutral format for representing geometric mesh structures.
+A Gmesh defines a number of VertexAttribute elements, each representing some
+attribute like coordinates, normals, texture coordinates etcetera.
+Such vertex attributes can be \emph{indexed} data structures, where each attribute
+has its own index data, or all attributes can \emph{share} a single index structure,
+defined only at the level of a GMesh. A GMesh can convert from individual indices to
+a shared index. The latter is required for, for instance, OpenGL rendering.
+A Gmesh has a \emph{mesh type}, which is one of
+``Triangles'', ``Trifans'', ``Tristrips'', ``Polygons'', or ``Polylist''.
+For polygons, a vcount attribute defines the number of vertices for each polygon.
+A conversion from polygons to triangles is possible.
+The ``standard'' usage for a GMesh is as follows:
+\begin{enumerate}
+\item Allocate a new Gmesh
+\item Define the mesh data, by calling setIndexedVertexData for every named vertex attribute.
+\item Call unifyIndices(), in order to get rid of individual attribute indices which
+will be replaced by one global index.
+\item Call triangulate(), if necessary, in order to get a ``Triangles'' type, rather than
+``Polygons''.
+\item When necessary, a call to cleanupTriangles is useful to get rid
+of triangles which have a surface area below a specified threshold.
+Or you can just verify that all triangles do have a specified minimal size
+by calling checkTriangleIntegrity.
+\item When necessay, it is possible to apply transformations or non-uniform scaling
+to the mesh data.
+\item Finally, you can \emph{retrieve} the mesh data: use getIndexData() to get the unified index,
+and use (for instance) getVertexAttributeList() to get a Java List with all attributes.
+\item An alternative route would be to start out with a unified index, rather than attributes with individual indices.    In that case, the mesh data can be defined by calling setVertexData, (for every attribute),
+    and setIndexData, for the shared index data.
+\end{enumerate}
+A more advanced form of Gmesh defines ``special purpose'' attributes: joint names, inverse bind matrices,
+and vertex weights. These are not simple VertexAttribute elements, and therefore have
+their own getter/setter methods.
+\item VertexAttribute
+A VertexAttribute is a wrapper for data that corresponds to a single vertex data attribute, such as
+vertex coordinates, vertex normals, texture coordinates, etcetera. This data can be \emph{indexed} data.
+Basically, the vertex data is just a float array, and the index data is an int array.
+A parameter called attributeValueSize (typically with small value like 2, 3, or 4) defines
+the number of consecutive floats that define a single attribute value.
+
+\item VertexWeights: can be seen as a special kind of VertexAttribute, used to define
+the link from mesh vertices to ``joints'', used for animation purposes.
+For each vertex, a vcount value defines the number of joints associated with that vertex.
+The joint indices and joint weights define which joints, and with what blend weights, are to be used,
+for every vertex.
+
+\item GNode: A GNode is a generic scenegraph node. It can have (recursively) GNode types children.
+It also defines a List of GShapes, associated with the scene graph node.
+It also defines a local transformation, defined by a rotation, translation, scaling, and
+optionally a scale/skewing matrix.
+A GNode defines Collada like attributes like ``id'' (a globally unique id), ``sid'' (a scoped id, unique amongst a collection of children, and (friendly but not necessarily unique) ``name''.
+
+\item GShape: Just a wrapper for a GMesh and a GMaterial combination.
+\item GScene: The ``top level'' scenegraph element, representing a complete ``scene''.
+Basically just a List of GNode typed \emph{root nodes}. So we do not necessarily have a unique root
+for the complete scene, rather we have a ``forrest'' at the top level.
+
+
+\end{itemize} 

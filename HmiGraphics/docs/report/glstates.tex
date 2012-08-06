@@ -1,0 +1,71 @@
+\documentclass[10pt, fleqn]{report}
+\usepackage{a4wide}
+%\usepackage{pict2e}
+\title{OpenGL state manager}
+\date{}
+\begin{document}
+\maketitle
+
+\section{OpenGL states}
+OpenGL states are set programmatically, by means of commands like \verb#glEnable(GL_LIGHTING)#,
+or \verb#glPointSize(3.0)#.
+(In Jogl: \verb#gl.glEnable(GL.GL_LIGHTING)#, and \verb#gl.glPointSize(3.0f)#.)
+Such settings define the OpenGL state, that will be used by all OpenGl commands thereafter, until
+some other state settings are made.
+The basic cycle in OpenGL rendering alternates between setting state parameters and rendering geometry.
+Two facts are important here: a) there are many OpenGL state settings, and b) changing the
+OpenGL state during rendering is potential harmful for performance. Basically, whenever the
+state changes, the graphics pipeline must be emptied before the new settings are made, and them aftter the state change, the pipeline is restarted. OpenGL state managements tries to minimize such state changes, and tries to combine many changes in one.
+
+\section{Basic mathematical definitions}
+
+ We define a number of notions and notations:
+ \begin{itemize}
+ \item A state $s$ is defined by a set of parameters $\beta(s)$, called the base of the state,
+ and a valuation function $s: \beta(s) \rightarrow V$. Here we use $s$ both for the state as a whole, and for the valuation function. Note that $\beta(s)$ is just the normal domain of the $s$ function.
+  $V$ is some unified set of parameter values, containing booleans, floats, tuples of floats etcetera.
+  \item For a state $s$, $s(x) \in V$ if $x\in\beta(s)$, else we say that $s(x) = \perp$.
+  Informally, $s$ is defined for parameters $x$ within its base, and undefined elsewhere.
+  \item If $X$ is some set of parameters, then by $s|X$ we mean the state obtained from $s$ by restriction to parameters in $X$. That is, $\beta(s|X) = \beta(s)\cap X$, and for all
+      parameters $x\in \beta(s)\cap X$, we have $(s|X)(x) = s(x)$.
+  \item For states $s_1$, $s_2$ we define a state $s_1\oplus s_2$:
+  \begin{itemize}
+  \item $\beta(s_1\oplus s_2) = \beta(s_1) \cup \beta(s_2)$.
+  \item $(s_1\oplus s_2)(x) = s_2(x)$ if $x\in \beta(s_2)$.
+  \item $(s_1\oplus s_2)(x) = s_1(x)$ if $x\in \beta(s_1)\setminus \beta(s_2)$.
+  \end{itemize}
+  Informally, $s_1\oplus s_2$ is a new state, derived from $s_1$ by overwriting parameters
+  with values taken from $s_2$.
+  \item Two states $s_1$ and $s_2$ are called compatible if $s_1|\beta_{12} = s_2|\beta_{12}$,
+  where $\beta_{12} = \beta(s_1)\cap\beta(s_2)$. Notation: $C(s_1,s_2)$.
+  \item When we have two compatible states $s_1$, $s_2$,
+  then we use the notation $s_1\cup s_2$ instead of $s_1\oplus s_2$.
+  (A special case of this is when $\beta(s_1)\cap \beta(s_2) = \emptyset.$)
+  Note that, unlike the general $\oplus$ operation, this is a symmetric (i.e. commutative) operation.
+
+  \item for states $s_1$, $s_2$, we say that $s_1 \sqsubseteq s_2$ iff
+  $\beta(s_1) \subseteq \beta(s_2)$ and moreover $s_2|\beta(s_1) = s_1$.
+  Informally, $s_2$ is larger than $s_1$ if it is an extension, i.e. it has a larger base,
+  but it defines the same values on the shared base.
+  \item for states $s_1$, $s_2$ with $\beta(s_1)\subseteq \beta(s_2)$, we define:\\
+  $s_1\;\Delta\; s_2 = $ smallest set $s$ such that $s_1\oplus s = s_2$.\\
+  Clearly we have that $\beta(s_1\;\Delta\; s_2) = \{x\in \beta(s_2)\;|\; x\not\in \beta(s_1) \textrm{ or } s_1(x) \neq s_2(x) \}$, and $s_1\;\Delta\; s_2 = s_2|\beta(s_1\;\Delta\; s_2)$.
+ \end{itemize}
+
+
+
+\section{State specification by means of deltas}
+
+A state $s$ can be specified completely by specifying some base set $\beta(s)$,
+together with a map $s:\beta(s) \rightarrow V$.
+However, this can be tedious, especially if $\beta(s)$ is a large set.
+So it can be more efficient to specify states as being derived from other states by means
+of restriction or by means of so called delta's.
+The basic idea is that we start off with some given state $s_0$, and then derive a new state
+$s_1$ with base $\beta_1$, as follows:
+\[s_1 = (s_0|\beta_1)\oplus s_1' = s_0|(\beta(s_1)\setminus\beta(s_1')) \cup s_1'.\]
+
+Often we want to assume that $\beta(s_1)\subseteq \beta(s_0)$.
+
+
+\end{document}

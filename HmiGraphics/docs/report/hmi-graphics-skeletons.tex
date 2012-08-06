@@ -1,0 +1,534 @@
+\section{Skeleton Structures for avatars}
+An avatar that is to be used for (bodily) animation must
+posses a \emph{skeleton} or \emph{bones} structure.
+By this we do not mean a physical model or a visualization of
+a real skeleton, but rather a structure consisting \emph{joints} and
+\emph{segments} or \emph{bones} that is to be used for the purpose of animation.
+See the picture in \autoref{figure:skeleton} for an example skeleton.
+%\vspace{ex}
+A skeleton consists of \emph{joints}, like the Pelvis or Spine nodes in the picture,
+connected by means of \emph{segments} (or ``\emph{bones}''), shown here by means
+of arrows connecting the joints. It will be clear that a skeleton is a rooted tree.
+(For the example skeleton, the root node is the Pelvis node)
+
+
+
+\input{\hmigraphicsreportdir/hmi-graphics-skeletonpicture.tex}
+
+\def\Alocal{\mathstrut^L\!A}
+
+
+%\[
+%{}^{14}_{2}\mathbf{C}^{5+}_{2} \quad
+%\prescript{14}{2}{\mathbf{C}}^{5+}_{2} \quad
+%\prescript{4}{12}{\mathbf{C}}^{5+}_{2} \quad
+%\prescript{14}{}{\mathbf{C}}^{5+}_{2} \quad
+%\prescript{}{2}{\mathbf{C}}^{5+}_{2}
+%\]
+
+
+\subsection{Affine and linear transforms}
+Within this chapter by \emph{linear} transform we mean an ordinary linear mapping for 3D space, represented
+by a $3\times 3$ matrix $M$.
+A \emph{translation} $T$ is defined by a 3D translation vector $t$.
+When we want to make this vector it explicit, we write $T_t$ for a translation operation.
+As is well known, a translation operation $T$ is not linear, so cannot be represented by a $3\times 3$ matrix.
+We often need the combination $A$ of a linear transform $M$ followed by a translation $T$, so $A=T\circ M = T\,M$.
+Such a combination is called an \emph{affine} transform.
+The combination in the reverse order, i.e. $M\,T = M\, T_t$ is also affine, since it is equivalent
+to the affine transform $A = T_{t'} \, M$, where $t'=M(t)$.
+As a consequence, a composition of affine transforms $A_0$ and $A_1$ is itself also affine:
+%
+\begin{gather}\label{affinecomposition}
+A_0A_1 = T_{t_0}\,M_0\, T_{t_1}\, M_1 = T_{t_0}\,T_{M_0(t_1)}\,  M_0 \,M_1 =
+T_{t'}M',\\
+\text{where } t' = t_0 + M_0(t_1) \text{ and } M' = M_0\, M_1.\notag
+\end{gather}
+%
+
+\noindent
+A (non-degenerate) linear transformation can be an \emph{orthogonal} matrix $Q$
+which for 3D spaces is either a pure \emph{rotation} $R$, or else a rotation combined with a \emph{reflection}.
+(In the latter case it can represented, for instance, as $Q=R\,N$, where $R$ is a pure rotation,
+and where $N$ is a reflection. For instance, one may choose $N$ to be $-I$.
+Another important class of linear transforms is that of \emph{scaling}.
+In the simplest case, a scaling matrix $S$ is just the ($3\times 3$) identity matrix multiplied
+with a \emph{uniform scaling} factor $s$. A more complex case is when $S$ is a diagonal matrix
+with three different scaling factors $s_x$, $s_y$, and $s_z$ on the diagonal, which represents axis-aligned
+\emph{non-uniform scaling}. In the most complicated case, a scaling matrix $S$ is
+not even diagonal, but it would be diagonal in some rotated coordinate system.
+So it represents \emph{non-unform scaling along rotated axes}, a situation sometimes called \emph{skewing}.
+An important result here is that by means of so  called \emph{polar decomposition}
+any (non-degenerate) 3D matrix $M$ can be decomposed as $M=Q\, S$,
+where $Q$ is orthogonal, and where $S$ is a scaling matrix. A nice property of polar decomposition
+is that $Q$ is not just \emph{any} orthogonal matrix, but that among all orthogonal matrices it is the one
+that is \emph{closest} to $M$. We conclude that, for our purpose, we may assume that
+any linear 3D matrix $M$ has the form $R\,S$ where $R$ is a pure rotation and where $S$ is a scaling matrix,
+possibly combined with a reflection operation.
+Our affine transforms $A$ are therefore of the form $T\,R\,S$. Although $A$ is not a 3D linear transform
+it \emph{can} be represented by a $4\times 4$ \emph{homogeneous} transform matrix.
+So $A$ has a matrix with the $3\times 3$ matrix for $R\,S$ in the upper left part, the translation vector
+$t$ for the translation $T$ in the rightmost column, and a
+ bottom row of the form $(0,\;0,\;0,\; 1)$.
+
+
+
+\subsection{Skeleton transforms}
+\label{sect:skeletontransforms}
+
+The main use of skeletons is that they organize a collection of transforms, one transform for every skeleton joint $J_i$.
+Note: skeleton joints are sometimes called ``bones''. This terminology is slightly confusing since for others ``bones'' refer to
+the skeleton segments in between the joints.
+
+
+For joint transformations we must distinguish between a \emph{local transforms} $D_i$ versus the \emph{global transforms} $A_i$
+associated with each joint $J_i$.
+The local transform represents the transform caused by that single joint alone.
+The global transform $A_i$, is the combined effect of all joints
+on the path from the skeleton root up to and including the joint itself.
+For instance, for the joint called L\_Forearm in the example skeleton,
+the global matrix $A_\text{L\_Forearm}$ represent the rotations and translations
+from the Pelvis joint, the various Spine joints, the Neck joint, the
+L\_Clavicle joint, L\_UpperArm joint, and finally the L\_ForeArm joint itself.
+
+The \emph{local transform} $D_i$  for a joint represents just the rotation $R_i$ (and possibly scaling $S_i$)
+introduced by that joint alone, together with the translation that represents the vector $t$ from the parent
+of that joint to the joint itself.
+For instance, for the L\_ForeArm joint the local translation is represented by the vector from L\_UpperArm to L\_ForeArm.
+Note that each $D_i$ is an affine transform.
+
+
+ The idea of a skeleton is that joint transformations are build up hierarchically, following the tree
+ structure of the skeleton. So, when some joint $J_i$ has joint $J_p$ as its parent,
+ then $A_i = A_p \, D_i$, where $A_p$ is the transform associated with $J_p$,
+ and where $D_i$ is the \emph{local} transform associated with joint $J_i$.
+ For the special case of the root joint $J_0$, there is no parent, and we assume that in this case the
+ transform $A_0$ is simply equal to the local transform $D_0$.
+ For long chains of joint, we can thus factorize the transform $A$ of the end of the chain into
+ the local transforms of the joints on the chain. For instance, for the example skeleton
+ we can calculate the affine matrix of, say, the neck joint as follows:
+ %
+  \begin{equation}
+  A_\textit{Neck} = D_\textit{Pelvis} \: D_\textit{Spine} \: D_\textit{Spine1} \: D_\textit{Spine2} \: D_\textit{Spine3} \:D_\textit{Neck}
+  \end{equation}
+%
+\input{\hmigraphicsreportdir/hmi-graphics-skeletonfragment.tex}
+For the smaller scale example from \autoref{figure:skeletonfragment}, we have:
+%
+\begin{equation}\label{eq:a3}
+ A_3 = A_2\: D_3 = A_1 \: D_2\: D_3 = A_0\: D_1\:D_2\:D_3 = D_0\: D_1\:D_2\:D_3.
+ \end{equation}
+%
+% WinEDT bug triggered by this line??:
+%\input{\hmigraphicsreportdir/hmi-graphics-skeletonfragment.tex}
+
+
+%
+We can decompose each local affine transform $D_i$ into a linear transform $L_i$ followed by
+a translation $T_{t_i}$, thus: $D_i = T_{t_i}\: L_i$.
+Using \eqref{affinecomposition} we can rearrange equation \eqref{eq:a3}.
+%
+\begin{gather}
+A_3 = T_t \: L\\
+ \text{where } t = t_0 + L_0(t_1) + L_0\,L_1(t_2) + L_0\,L_1\,L_2(t_3)\notag\\
+ \text{and where } L= L_0\,L_1\,L_2\,L_3.\notag
+\end{gather}
+%
+So the net effect of a ``chain'' of local affine transforms, from skeleton root up to some skeleton joint,
+is equivalent to a single affine transform for that joint, which we have introduced before: it is the
+\emph{global} transform for a joint.
+
+\subsection{Weight blending}\label{sect:weightblending}
+
+
+
+Skeletons can be controlled and used by animation software; in those cases, we are only concerned
+with the local and global joint transforms. But skeletons are also used as an interface between
+animation engines and graphics rendering engines.
+In this case, the skeleton transforms are used
+to transform geometry that is used for rendering objects, in particular for rendering human avatars.
+The general idea is that there are one or more \emph{meshes}, each consisting of many polygons,
+that model the  geometric shape of body parts.
+There are two fundamentally different ways of doing this.
+One rather simple approach is to cut an animated object into parts, each of which is then animated independently,
+under the control of a single joint, dedicated to that part. For example, the ``blue guy'' avatar
+uses this approach, and uses separate meshes for limbs and other body part.
+The geometry associated with the elbow region of the body  is transformed exclusively
+by the global affine transform for the elbow joint.
+One of the advantages of this simple approach is that all mesh vertices inside a single body part
+are transformed by the same affine matrix; a situation that suits the classical render pipeline
+of graphics hardware, as well as the OpenGL and DirectX interfaces for that hardware.
+ Simple or not, an unavoidable problem with this approach is that an avatar body as a whole
+ shows seams at places where different body parts connect.
+
+ An improved form of animating objects like human avatars is to use only \emph{one seamless mesh},
+ and to use the skeleton transforms to deform by the following process:
+ Each mesh vertex $v$ is transformed under the influence of one or more joints $J_{i_0}, \ldots, J_{i_n}$,
+ with \emph{weights} $w_{i_0}, \ldots, w_{i_n}$ determining the relative influence of each joint.
+ The exact set of joints and weights is unique for every individual vertex. Of course, one expects
+ that most vertices will be controlled by a fairly low number of joints, typically one or two, and almost always less than four,
+ all located in the neighborhood of the vertex. We would like to write down the transformation for some vertex $v$.
+ We denote the global transform for joint $J_i$ by $A_i$ and, for simplicity, we assume that we have some vertex $v$
+ that is influenced by joints $J_0, \ldots J_n$.
+ The combined transform for $v$ using weight blending is defined as follows
+%
+\begin{equation}\label{eq:weightblending-simple}
+ v' = \sum_{i=0}^{n} w_i\, A_i(v)
+\end{equation}
+
+\subsection{Bind poses}
+Weight blending is an adequate animation method, but it requires both a suitable mesh as well
+as a skeleton that ``fits'' into the mesh. A problem here is that designers of meshes and designers
+of skeleton-based animations have slightly conflicting interests:
+An animation system would prefer a skeleton that is in some well defined neutral pose
+when all joint rotations are set to identity transforms. In that case all affine transforms
+reduce to mere translations. The HAnim standard for skeleton based animation, for instance,
+requires that in this situation the human avatar has a well defined pose where the body is upright,
+arms are pointing downwards, fingers are pointing downwards, the thumbs have a $45^\circ$ degree orientation
+relative to the fingers, etcetera.
+The advantage of such a neutral pose is that an animation engine can put the avatar in some pose by setting well defined
+rotations within joints.
+
+Designers of nice looking avatar meshes though, prefer a \emph{different} pose, usually with the arms
+horizontally stretched, also known as the ``T-pose''. The main reason here is that graphics designers
+need to work on detailed graphic detail, and some areas like arm pits are difficult to reach and problematic when
+the avatar is in the HAnim neutral pose, rather than the T-pose.
+There are some variations of this ``T-pose'', for instance with the arms in a straight line but in a slightly lowered
+position.
+
+The result is that meshes and skeleton structures usually do \emph{not} automatically ``match'', and we need some
+process called ``binding'' the mesh to the skeleton. One of the steps in the binding process is
+that the skeleton, starting initially in its neutral pose, is put into ``bind pose'', by applying suitable
+rotations for its joints. For example, for our HAnim style skeleton, the bind pose for a T-shape avatar
+would include a $90^\circ$ rotation for the shoulder joints, in order to get the arms into the T-pose.
+Other joints, for instance for arms and fingers, will likely have also non-identity
+rotations in the bind pose, although angles will not be as large as the $90^\circ$ degree rotations for the shoulders.
+In other situations for instance in the case of exporting a virtual character from a tool like 3DSMax, the
+tool itself might use rather complicated transformations internally for binding a mesh to a skeleton.
+Unfortunately such more or less ad hoc bind poses show up when you export the mesh to some external format,
+for instance in the FBX format or the Collada format
+The message here is that,even if you are willing to design your character in HAnim pose,
+you still might have to deal with non-trivial bind poses.
+
+After putting a skeleton in bind pose,
+the next step in the bind process is to assign blend weights to the vertices in the mesh.
+We won't discuss this (complicated) step here, and assume that you have used some tools to do this.
+For instance,  most 3D modeling tools have a process called ``weight painting'' that allow you to establish blend weights
+in a more or less intuitive way. In practice, assigning blend weight is a trial and error process.
+
+We continue with the problems for our animation engine,
+caused by the difference in the neutral skeleton pose and bind pose.
+Say we would like our avatar to be in our neutral pose when all joint rotations
+are set to identity.
+It is clear that we must adapt our equation \ref{eq:weightblending-simple}
+for weight blending.
+Somehow, we must take into account the joint transforms that were used to
+get the skeleton into the correct bind pose. Let's assume that we know the values for (global) affine joint matrices
+in the bind pose, and let's call these matrices the \emph{bind matrices} $B_i$.
+The intuitive idea is that we can use the \emph{inverse} bind matrices $B_i^{-1}$ to bring our mesh
+back into the neutral pose, and from that neutral pose, we bring it into the desired pose for some animation
+specified by (global) joint matrices $A_i$.
+This suggest our improved weight blending equation:
+%
+\begin{equation}\label{eq:weightblending}
+ v' = \sum_{i=0}^{n} w_i\, A_i\,B_i^{-1}(v)
+\end{equation}
+%
+One way of seeing that this must be the ``correct'' equation is to put the avatar in its bind pose again,
+ by choosing joint transformations $A_i$ equal to the bind matrices $B_i$:
+ for in that case the $A_i$ and $B_i^{-1}$ matrices cancel,
+and we have that for all vertices $v' = v$. Which is correct, since the mesh without transforms applied is,
+by definition, in the bind pose.
+
+Since bind matrices are \emph{fixed}, one might think that you can get rid of the inverse bind matrices
+in \autoref{eq:weightblending} by applying these inverse bind matrices just once to the mesh, and
+store the resulting transformed mesh, which would now be in the (by animators) desired neutral pose.
+
+\noindent
+This idea \emph{would} work if every vertex $v$ would be associated with just a single joint, so for the simple
+model from section \ref{sect:weightblending}, one could transform the various body parts by applying
+the unique $B_i^{-1}$ for that part. (Note that for the rather special case where the bind pose
+is actual the same as the neutral pose, the bind matrices would reduce to  pure translations of the
+form $T(C_i)$, where $C_i$ is the center position of joint $J_i$. So in this particular case,
+applying $B_i^{-1}$ boils down to a ``shifting back to the origin'' operation for the various body parts.)
+
+\noindent
+Unfortunately, the idea breaks down when more than one joint influences some vertex $v$.
+Why? let's try. So we store, in an offline process, the mesh transformed into its neutral pose.
+The result is that we have transformed vertex $v$ into a vertex $v'$ defined by:
+$ v' = \sum_{i=0}^{n} w_i\, B_i^{-1}(v)$.
+If we now apply \autoref{eq:weightblending-simple}, where we replace $v$ by our ``corrected'' vertices $v'$,
+then we get the following vertex $v''$ as the result of applying a pose defined by joint matrices $A_i$:
+%
+\begin{equation}\label{eq:weightblending-problem}
+ v'' = \sum_{i=0}^{n} w_i\, A_i(v') = \sum_{i=0}^{n} w_i\, A_i(\sum_{j=0}^{n} w_j\, B_j^{-1}(v))
+\end{equation}
+%
+This last equation \ref{eq:weightblending-problem} clearly does not yield the
+same results as equation \ref{eq:weightblending}.
+Fortunately, we can modify and simplify bind matrices if we are willing to adapt transformation matrices
+$A_i$ from animations. We discuss this below.
+
+% second time , but otherwise WinEdt will have problems:
+\input{\hmigraphicsreportdir/hmi-graphics-skeletonfragment.tex}
+
+\subsubsection{Adjusting bind matrices}
+
+We have seen the generic weight blending equation \ref{eq:weightblending} above.
+There are various situations where we would like to modify the (inverse) bind matrices $B_i^{-1}$,
+thereby redefining the ``neutral pose'' for a character.
+One reason could be that the neutral pose as defined by some 3D modeling tool is inconvenient.
+For instance, the neutral position for a Collada export from 3DSMax defines a rather strange looking ``neutral'' position.
+Moreover, in such modeling tools the character mesh is often aligned with the Z-axis, (called the ``up-axis'') and for our animation engine
+we prefer a world where the Y-axis is the ``up-axis''. A final reason would be
+that we want to switch to a \emph{new} neutral position like the one defined by the HAnim standard.
+In all such cases, three things have to happen:
+\begin{enumerate}
+\item The \emph{(inverse) bind matrices} must be changed. This can be done by multiplying $B_i^{-1}$
+by matrices $V_i$ that must be chosen in a suitable way for each of the situations mentioned above.
+\item The local \emph{rotations} for every joint to be used for various poses in animations must be adapted accordingly.
+This step is necessary only when existing animation data that was created for the ``old'' bind matrices.
+When new animation data has to be produced it might be much more convenient to work immediately with
+the ``new'' bind matrices. For instance, if we switch bind matrices that are suitable for HAnim then
+new animation data should use the HAnim pose as ``neutral'' pose. On the other hand, existing animation data,
+for instance, data exported from the 3D modeling tool, will be based upon the ``original'' bind matrices, and so
+we have to convert the rotations from that data.
+\item The local \emph{translations} for every joint must be adapted to the new bind matrix.
+This can be done once, since translations and (modified) bind matrices are not changed by animation data.
+The only exception here that we allow is the ``humanoid root translation'' $t_0$, for the root joint $J_0$:
+this translation is sometimes modified in animations.
+\end{enumerate}
+%
+We discuss here first the generic case, where we multiply $B_i^{-1}$ by arbitrary $V_i$.
+We assume here that $V_i$ is just a rotation, and contains no translation.
+That means that we replace an inverse bind matrix $B_i^{-1} = U_i^{-1}\,T_{-C_i}$
+by ${B'}_i^{-1} = V_i\,U_i^{-1}\,T_{-C_i}$.
+We consider some (arbitrary) pose based upon the original bind matrices,
+specified by a series of rotations $R_0, R_1, \ldots, R_n$.
+For this pose, joint $J_i$ has a global transformation $M_i$ of the form:
+%
+\[ M_i = T_{t_0}\, R_0\, T_{t_1}\, R_1 \cdots T_{t_i}\, R_i\, U_i^{-1}\, T_{-C_i}\]
+%
+When we multiply the $U_i^{-1}$ matrices with $V_i$, we must switch to a new set of translation
+vectors $t_i'$ and new rotation/scaling matrices $R_i'$, as follows:
+%
+\[ M_i' = T_{t_0'}\, R_0'\, T_{t_1'}\, R_1' \cdots T_{t_i'}\, R_i'\,  V_i U_i^{-1}\, T_{-C_i}\]
+%
+We require that $M_i' = M_i$ for all $i$, something we
+can realize by making the following choice for $t_i'$ and $R_i'$:
+%
+\begin{gather}
+t_i'= V_{i-1}(t_i)\notag\\
+ R_i' = V_{i-1}\,R_i\,V_i^{-1}\notag
+\end{gather}
+Here, we use the convention that $V_{-1} = Id$.
+Imagine some virtual joint $J_{-1}$ with identity transformations,
+as parent for the humanoid root node $J_0$.
+Note that because of this, the humanoid root translation $t_0$ need \emph{not} to be transformed,
+which is in particular convenient when this translation is modified in an animation.
+%
+\begin{gather}
+ M_i' = T_{t_0'}\, R_0'\, T_{t_1'}\, R_1' \cdots T_{t_i'}\, R_i'\, V_i U_i^{-1}T_{-C_i}\notag\\
+ = T_{t_0}\,R_0\,V_0^{-1}\,T_{V_0(t_1)}\,V_0\,R_1\,V_1^{-1} \cdots \notag \\
+ %   V_{i-1}^{-1}\,T_{V_{i-1}(t_i)}\,V_{i-1}\,R_i\,V_{i}^{-1}\, V_i U_i^{-1}T_{-C_i}\notag\\
+ = T_{t_0}\,R_0\,T_{V_0^{-1}(V_0(t_1))}\,V_0^{-1}\,\,V_0\,R_1 \,V_1^{-1}\cdots  \notag \\
+  % T_{V_{i-1}^{-1}(V_{i-1}(t_i))}\, V_{i-1}^{-1}\, V_{i-1}\,R_i\,V_{i}^{-1}\, V_i U_i^{-1}T_{-C_i}\notag\\
+  = T_{t_0}\,R_0\,T_{t_1}\,R_1 \,V_1^{-1} \,T_{V_1(t_2)} \, V_1\,R_2\,V_2^{-1}\cdots \notag = \cdots\notag \\
+  %T_{V_{i-1}^{-1}(V_{i-1}(t_i))}\, V_{i-1}^{-1}\, V_{i-1}\,R_i\,V_{i}^{-1}\, V_i U_i^{-1}T_{-C_i}\notag\\
+  = T_{t_0}\,R_0\,T_{t_1}\,R_1\,T_{t_2}\, R_2 \cdots T_{t_i}\,R_i\,V_i^{-1}\,V_i U_{i}^{-1}T_{-C_i}  =\notag\\
+   = T_{t_0}\,R_0\,T_{t_1}\,R_1\,T_{t_2}\, R_2 \cdots T_{t_i}\,R_i\,U_{i}^{-1}T_{-C_i}  = M_i\notag
+\end{gather}
+(This was to be shown.)
+
+
+\subsubsection{Simplifying bind poses}
+
+The first application of bind pose modification is to \emph{simplify} the bind matrices.
+The main reason for this step would be to get rid of overly complicated bind matrices introduced
+by tools like the Collada exported for 3DSMax: the original ``neutral'' pose looks incomprehensible.
+Before we start simplifying we have a more detailed look at bind poses and bind matrices.
+Let's assume that, in order to put the skeleton in the bind pose, we must apply
+\emph{local} joint transformations of the form $T_{t_i} L_i$, where $t_i$ is a local translation, and $L_i$ is a local
+rotation (and possibly scaling).
+We consider the concatenation of such transformations along a path within the skeleton, starting at
+the humanoid root, and ending in some joint $J_i$.
+For convenience we assume here that this chain consists of joints $J_0, J_1, J_2, \ldots, J_i$.
+The  global transform for  joint $i$ for the bind pose  must be equal to $B_i$.
+For in that case, it will be canceled by the inverse bind matrix $B_i^{-1}$, and effectively we have \emph{no}
+transformation of the mesh. And the pose where there is no transformation is (by definition) the bind pose.
+ Therefore, we see that
+ %
+ \[ T_{t_0} L_0 T_{t_1} L_1 \cdots T_{t_i} L_i = B_i = T_{C_i} U_i.\]
+%
+The left hand side of this equation can be rewritten as $T_t L$, where:
+\begin{gather}
+ L = L_0 L_1\cdots L_i = U_i. \notag \\
+ t = t_0 + L_0(t_1) + \cdots + L_0 L_1\cdots L_{i-1}(t_i) \notag\\
+  = t_0 + U_0(t_1) + \cdots + U_{i-1}(t_i) = C_i \notag
+\end{gather}
+%
+The easiest way to simplify bind matrices is
+to replace bind matricies of the form $B_i = T_{C_i} U_i$ by  new
+bind matrices ${B'}_i = T_{C_i}$. So, basically, we want to drop the rotation and scaling parts $U_i$ altogether,
+so that only a translations remains.
+Clearly, what must be done is to multiply $B_i^{-1}$ by $U_i$, for in that case we have that
+${B'}_i^{-1} = U_i U_i^{-1} T_{-C_i} = T_{-C_i}$, which is the desired inverse bind matrix.
+From the previous section we now see that we must adapt local translations $t_i$ and rotation $R_i$
+as follows:
+\begin{gather}
+t_i'= U_{i-1}(t_i)\notag\\
+R_i' = U_{i-1}\,R_i\,U_i^{-1}\notag
+\end{gather}
+%
+From the equation above for $t = \cdots = C_i$, we see that $t_i' = C_i - C_{i-1}$
+So the modified translation vector $t_i'$ is simply the translation vector from the center position
+of joint $J_{i-1}$ to the center position of joint $J_i$ within the bind pose.
+
+\subsubsection{Reorienting your avatar}
+The next step that we want to discuss is how to re-orient mesh data. What we want is an avatar
+with its mesh and skeleton aligned with the Y-axis, looking into the positive Z-axis direction.
+Slightly more general, we want to apply some (linear) coordinate transform $R$ to the mesh, skeleton,
+and animation poses. For example, if we have some avatar with mesh and skeleton aligned with the Z-axis,
+and some pose where the shoulder joint rotates $-45^\circ$ around the Y-axis,
+then after the coordinate transform we have a mesh and skeleton aligned with the Y-axis, and the same
+pose now has a shoulder joint rotation of $+45^\circ$ around the Z-axis.
+In this case, the coordinate transform $a$ is a rotation of $-90^\circ$ around the X-axis.
+
+Assume that we have some linear coordinate transform $R$. Usually, $R$ will be a rotation, but it
+could include scaling.
+We want to transform mesh coordinates $v$ into $v' =R(v)$, and then later on use our adapted skeleton
+to operate on this transformed mesh.
+The question now is: how to adapt the skeleton and animation poses.
+
+Assume that some pose is described by local affine joint transforms $D_i$ which
+describe local joint pose like the shoulder joint in the example above.
+Within the new coordinates, the effect of $D_i$ will be achieved
+by $D'_i = R\:D_i\:R^{-1}$.
+(Just examine the effect of $D'_i$ on some ``new'' coordinate of the form $v' = R(v)$. The result is that
+$D'_i(v') = R\:D_i\:R^{-1} (R(v)) = R\:D_i(v)$.)
+Of course this is to be expected: $R\:D_i\:R^{-1}$ is just the standard linear algebra result
+for how matrices change under coordinate transforms.
+Now we must take into account that the local transforms $D_i$ that describe some pose
+are affine transforms of the form $D_i = T_{t_i}\:L_i$ where $t_i$ is the (fixed) local skeleton translation
+from the parent of joint $J_i$ to $J_i$ itself, and where $L_i$ is the (changing) rotation matrix for joint $J_i$.
+We can rewrite the  $D'_i$:
+\begin{equation}
+D'_i = R\:D_i\:R^{-1} = R\:T_{t_i}\,L_i\:R^{-1}
+=R\,T_{t_i}\,R^{-1}\:R\,L_i\,R^{-1}.
+\end{equation}
+The rightmost three factors, i.e. $R,L_i\,R^{-1}$, are just the transformed rotations $L'_i$, adapted to
+the new coordinate system. For instance, if $L_i$ would be the $-45^\circ$ around the Y-axis from the example
+above, and $R$ would be the coordinate transform defined by a $-90^\circ$ rotation around the X-axis,
+then $R\:L_i\:R^{-1}$ is actually the $+45^\circ$ around the Z-axis, as expected.
+
+\noindent
+The left most factors, i.e. $R\,T_{t_i}\,R^{-1}$ are the modified translations.
+We can simplify this considerably:
+\begin{equation}\label{eq:transormedtranslation}
+R\:T_{t_i}\:R^{-1}
+=T_{R(t_i)}\:R\:R^{-1}
+=T_{R(t_i)}
+\end{equation}
+
+\noindent
+Finally, we can see how this all fits together, when we apply an linear transform $R$ to
+a mesh that is being deformed by means of weight blending, specified by \autoref{eq:weightblending}.
+We assume that  $A_i = T_{t_i}\,L_i$, that $B_i^{-1} = U_i\,T_{-C_i}$.
+We denote by $L'_i$ the transformed $L_i$, that is, $R\,L_i\,R^{-1}$.
+ Similarly  we define ${U'}_i^{-1} = R\,U_i^{-1}\,R^{-1}$.
+Then the result of applying $R$ yields the following transformed blend equation:
+%
+\begin{equation}
+ R \:\sum_{i=0}^{n} w_i\, A_i\,B_i^{-1} = \sum_{i=0}^{n} w_i\, R\,A_i\,B_i^{-1} \quad\text{, where}\notag
+ \end{equation}
+ %
+ \begin{gather}
+ R\,A_i\,B_i^{-1} = \notag\\
+ R\,T_{t_0}\,L_0\,T_{t_1}\,L_1\cdots T_{t_i}\,L_i,U_i^{-1}\,T_{-C_i}=\notag\\
+ R\,T_{t_0}\,R^{-1}\,R\,L_0\,R^{-1}\,R\,T_{t_1}\,L_1\cdots T_{t_i}\,L_i\,U_i^{-1}\,T_{-C_i} =\notag\\
+ T_{R(t_0)}\,L'_0\, R T_{t_1}\,L_1\cdots T_{t_i}\,L_i\,U_i\,T_{-C_i} =\cdots=\notag\\
+ T_{R(t_0)}\,L'_0\,T_{R(t_1)}\,L'_1\cdots T_{R(t_i)}\,L'_i\,U'_i\,T_{R(-C_i)}\,R\notag
+ \end{gather}
+ %
+ The remaining $R$ at the right end of this last formula is the transform to be applied on the mesh.
+
+ We conclude that, apart from transforming the mesh by means of applying $R$ to the vertices,
+ we need to adapt translation vectors $t_i$, rotation/scaling matrices $L_i$,
+ and the  as follows:
+\begin{gather}
+t_i'= R(t_i)\notag\\
+L_i' = R\,L_i\,R^{-1}\notag\\
+C_i' = R(C_i)\notag\\
+U_i' = R^{-1} U_i R
+\end{gather}
+
+ Since the translations, and the bind matrices are fixed, they can be calculated before we start rendering.
+ This is very similar to the transformations for simplifying the bind matrix.
+ What is different is that the translation part of the bind matrix is also modified
+
+
+
+\subsubsection{Redefining the avatar neutral pose}
+
+The result of the previous sections is an avatar where the original bind pose is also the neutral pose,
+that is, when all local rotation matrices are set to identity, the avatar will assume a pose equal to
+the bind pose. We would like to change this, and define some other pose, say the HAnim pose,
+to be the neutral pose.
+This problem can be split into two steps:
+\begin{enumerate}
+\item First, find out how to put the avatar in the HAnim pose,
+\item Second, define that pose as the neutral pose, by adapting transformations and bind matrices.
+\end{enumerate}
+%
+We start with the second step, so, we assume that we have a a pose defined by local rotations (and possibly scaling) $H_i$
+that define a pose that we would like to set as the neutral pose.
+Using the existing bind matrices and translation vectors, the global transform for joint $J_i$ for this new neutral pose is:
+%
+\begin{equation}
+T(t_0)\,H_0\,T(t_1)\,H_1\,T(t_2)\, L_2\cdots T(t_i)\,H_i\,B_i^{-1}\notag
+\end{equation}
+%
+
+We would like to modify the bind matrices in such a way that we can represent the same pose using \emph{identity}
+matrices replacing the $H_i$ matrices.
+This can be achieved by using new inverse bind matrices ${B'_i}^{-1}$ and new translation vectors $t_i'$ of the form
+\begin{gather}
+{B'_i}^{-1} = V_i B_i^{-1} \notag\\
+t_i' = V_{i-1}(t_i) \textrm{, where} \notag \\
+V_i = H_0 H_1 \cdots H_i\notag\\
+\end{gather}
+%
+Also, an existing (arbitrary) animation pose, defined by rotations/scalings \\
+$R_0, R_1, \ldots , R_n$, must be replaced by an adapted pose $R_0', R_1', \ldots, R_n'$ where:
+ \[R_i' = V_{i-1} R_i V_i^{-1} \notag.\]
+
+
+For the \emph{first} step, i.e. putting some skeleton in the HAnim pose, one can use various techniques;
+in the end, all that count is that our VH is in the desired pose.
+For a pose like the HAnim standard, it is often useful to have a method that aligns specified segments
+of the human body with direction vectors $\mathit{dir}$. For example, the HAnim standard requires that upper and lower arm
+are ``hanging downwards'', i.e. are aligned with the direction of the (negative) Y-axis.
+In this case, we would align those segments with a direction vector $(0, -1, 0)$.
+Let us assume that we have determined that the current situation of the body is such that we
+have two joints, a parent and a child, and that the segment in between those two joints is currently
+aligned with some vector $a$.
+It is easy to establish a quaternion that rotates $a$ into $\mathit{dir}$.
+(We assume that both $a$ and $\mathit{dir}$ are normalized vectors, i.e. $|a| = |\mathit{dir}| = 1$:
+Let $h = ( (a+\mathit{dir})/ |a+\mathit{dir}|)$. (That is, $h$ is the normalized half-vector in between $a$ and $\mathit{dir}$.)
+Now q is simply $(a\cdot h, a\times h)$. We are not done yet, since we now know how to rotate our segment \emph{after} that segment
+has been rotated by the skeleton transforms. Let us denote the latter rotation by a quaternion $r$.
+Then our construction delivers a quaternion $q$ as above, with the property that $q\,r$ is a rotation that puts our segment
+in the desired orientation. Here, $r$ itself is a product like $r = r_0 r_1, \cdots r_n$, where the quaternions $r_i$ are
+the current (local) rotations of the skeleton joints, starting at the root, up to and including the parent joint rotation.
+ What we want instead is a quaternion $s$ with the property $q\, r = r\, s$,
+for in that case, we can replace the local quaternion $r_n$ by $r_n\, s$, i.e. a post multiplication
+of the local parent joint rotation $r_n$  with the $s$ quaternion. From the equation it follows
+that $ s= r^{-1}\, q\,r$. (Basically, this is is $q$ rotated by $r^{-1}$.)
+
+
+
+
+
+
+
+

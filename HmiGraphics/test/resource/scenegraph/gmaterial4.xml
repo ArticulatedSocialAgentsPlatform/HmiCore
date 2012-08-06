@@ -1,0 +1,7 @@
+
+  <gmaterial name="coinoeil" shader="blinnTextured1">
+     <transparent>
+        <gtexture imageFile="visage_2008_trans.jpg" offsetS="0.5"/>
+     </transparent>
+  </gmaterial>
+   

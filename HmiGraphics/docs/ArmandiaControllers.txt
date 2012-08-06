@@ -1,0 +1,20 @@
+
+
+
+There are two controllers, one "skin" controller operating with "joints", using a mesh that uses the result of a "morph" controller.
+
+<controller id="Body_NG-mesh-morpher-skin">
+      <skin source="#Body_NG-mesh-morpher">    
+       <source id="Body_NG-mesh-morpher-skin-joints">
+          <Name_array id="Body_NG-mesh-morpher-skin-joints-array" count="100">Bone1 Bone2 Bone3 Bone4 Bone5 Bone6 Bone7 Bone8 Bone9 Bone10 Bone11 Bone12 Bone13 Bone14 Bone15 Bone16 Bone17 Bone18 Bone19 Bone20 Bone21 Bone22 Bone23 Bone24 Bone25 Bone26 Bone27 Bone28 Bone29 Bone30 Bone31 Bone32 Bone33 Bone34 Bone35 Bone36 Bone37 Bone38 Bone39 Bone40 Bone41 Bone42 Bone43 Bone44 Bone45 Bone46 Bone47 Bone48 Bone49 Bone50 Bone51 Bone52 Bone53 Bone54 Bone55 Bone56 Bone57 Bone58 Bone59 Bone60 Bone61 Bone62 Bone63 Bone64 Bone65 Bone66 Bone67 Bone68 Bone69 Bone70 Bone71 Bone72 Bone73 Bone74 Bone75 Bone76 Bone77 Bone78 Bone79 Bone80 Bone81 Bone82 Bone83 Bone84 Bone85 Bone86 Bone87 Bone88 Bone89 Bone90 Bone91 Bone92 Bone93 Bone94 Bone95 Bone96 Bone97 Bone98 Bone99 Bone100</Name_array>
+      
+      
+      
+   <controller id="Body_NG-mesh-morpher">
+      <!--morph method="NORMALIZED" source="#Body_NG-mesh"-->
+      <morph method="NORMALIZED" source="#Body_NG-mesh-morpher-Body_chest_L-0">
+        <source id="Body_NG-mesh-morpher-targets">
+          <IDREF_array id="Body_NG-mesh-morpher-targets-array" count="21">Body_NG-mesh-morpher-Body_chest_L-0 Body_NG-mesh-morpher-yeux_NG01-1 Body_NG-mesh-morpher-A-2 Body_NG-mesh-morpher-O-3 Body_NG-mesh-morpher-U-4 Body_NG-mesh-morpher-E-5 Body_NG-mesh-morpher-I-6 Body_NG-mesh-morpher-F-7 Body_NG-mesh-morpher-P_B-8 Body_NG-mesh-morpher-Smile01-9 Body_NG-mesh-morpher-Pff-10 Body_NG-mesh-morpher-T_severe-11 Body_NG-mesh-morpher-T_severe02-12 Body_NG-mesh-morpher-T_dent-13 Body_NG-mesh-morpher-T_trist-14 Body_NG-mesh-morpher-T_trist02-15 Body_NG-mesh-morpher-HAA-16 Body_NG-mesh-morpher-Face01-17 Body_NG-mesh-morpher-Face02-18 Body_NG-mesh-morpher-Hum-19 Body_NG-mesh-morpher-Wink-20</IDREF_array>
+     
+     
+          

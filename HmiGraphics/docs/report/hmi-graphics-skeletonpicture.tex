@@ -1,0 +1,69 @@
+
+\begin{figure}
+
+\begin{tikzpicture}
+  [joint/.style={shape=ellipse,draw=blue!50,fill=blue!20, thick,
+         inner sep=0pt, minimum width=12mm, minimum height=12mm}
+  ]
+
+ \path
+   (0, 0) node (pelvis)            [joint, double] {Pelvis}
+   {[current point is local] % start upper body branch, from pelvis
+      ++(0, 1.5)   node (spine)      [joint]         {\footnotesize Spine}
+      ++(0, 1.5)   node (spine1)     [joint]         {\footnotesize Spine1}
+      ++(0, 1.5)   node (spine2)     [joint]         {\footnotesize Spine2}
+      ++(0, 1.5)   node (spine3)     [joint]         {\footnotesize Spine3}
+      ++(0, 1.5)   node (neck)       [joint]         {\footnotesize Neck}
+      {[current point is local] % start head branch, from neck
+         ++(0, 2.0) node (head)       [joint, minimum size=20mm] {\small Head}
+      }
+      {[current point is local] % start left arm branch, from neck
+         ++(1.7, -0.1)   node (lclavicle)  [joint] {\scriptsize L\_Clavicle}
+         ++(2.0, -0.4)   node (lupperarm)  [joint, text width=10mm] {\scriptsize L\_Upper\-Arm}
+         ++(1.0, -2.8)   node (lforearm)   [joint,  text width=10mm] {\scriptsize L\_Fore\-Arm}
+         ++(0.0, -3.0)   node (lhand)      [joint] {\scriptsize L\_Hand}
+      }
+      {[current point is local] % start right arm branch, from neck
+         ++(-1.7, -0.1)  node (rclavicle)  [joint] {\scriptsize R\_Clavicle}
+         ++(-2.0, -0.4)  node (rupperarm)  [joint, text width=10mm] {\scriptsize R\_Upper\-Arm}
+         ++(-1.0, -2.8)  node (rforearm)   [joint,  text width=10mm] {\scriptsize R\_Fore\-Arm}
+         ++(0.0,  -3.0)    node (rhand)    [joint] {\scriptsize R\_Hand}
+      }
+   }
+      {[current point is local] % start left leg branch, from pelvis
+         ++(2.2, -1.5) node (lthigh)  [joint] {\small L\_Thigh}
+         ++(0.6, -3) node (lcalf)   [joint] {\small L\_Calf}
+         ++(0, -3)   node (lfoot)   [joint] {\small L\_Foot}
+      }
+      {[current point is local] % start right leg branch, from pelvis
+         ++(-2.2, -1.5) node (rthigh)  [joint] {\small R\_Thigh}
+         ++(-0.6, -3) node (rcalf)   [joint] {\small R\_Calf}
+         ++(0, -3)    node (rfoot)   [joint] {\small R\_Foot}
+      }
+   ;
+   \begin{scope}[line width=2pt]
+   \draw [->] (pelvis) -- (spine);
+   \draw [->] (spine) -- (spine1);
+   \draw [->] (spine1) -- (spine2);
+   \draw [->] (spine2) -- (spine3);
+   \draw [->] (spine3) -- (neck);
+   \draw [->] (neck) -- (head);
+   \draw [->] (neck) -- (lclavicle);
+   \draw [->] (lclavicle) -- (lupperarm);
+   \draw [->] (lupperarm) -- (lforearm);
+   \draw [->] (lforearm) -- (lhand);
+   \draw [->] (neck) -- (rclavicle);
+   \draw [->] (rclavicle) -- (rupperarm);
+   \draw [->] (rupperarm) -- (rforearm);
+   \draw [->] (rforearm) -- (rhand);
+   \draw [->] (pelvis) -- (lthigh);
+   \draw [->] (lthigh) -- (lcalf);
+   \draw [->] (lcalf) -- (lfoot);
+   \draw [->] (pelvis) -- (rthigh);
+   \draw [->] (rthigh) -- (rcalf);
+   \draw [->] (rcalf) -- (rfoot);
+   \end{scope}
+
+\end{tikzpicture}
+\caption{Example of a skeleton structure}\label{figure:skeleton}
+\end{figure} 

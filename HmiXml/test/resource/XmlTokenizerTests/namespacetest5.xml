@@ -1,0 +1,9 @@
+<test>
+   <innertag xmlns="default-namespace"> 
+      <sometag />
+      <!--sometag xmlns:some="some-namespace"/-->
+   </innertag>
+   <nonamespace> 
+      <sometag />
+   </nonamespace>
+</test>

@@ -1,0 +1,10 @@
+<ivy-module version="2.0">
+   <info organisation="HMI" module="HmiFaceAnimation"/>
+   <dependencies>
+      <dependency org="HMI"     name="HmiAnimation"        rev="latest.${resolve.status}"  />
+      <dependency org="jcip"    name="jcip-annotations"    rev="latest.release"  /> 
+      <dependency org="slf4j"   name="slf4j-api"           rev="latest.release"  />
+      <dependency org="google"  name="guava"               rev="latest.release"  />
+      <dependency org="findbugs"   name="annotations"         rev="latest.release"  />
+   </dependencies>
+</ivy-module>

@@ -1,0 +1,18 @@
+<antlib>
+    
+    <taskdef name="getversion"         classname="hmi.ant.GetJarVersion" onerror="ignore"  />
+    
+    <taskdef name="getmanifestversion" classname="hmi.ant.GetManifestVersion" onerror="ignore" />
+    
+    <taskdef name="newversion"         classname="hmi.ant.NewVersion" onerror="ignore"  />
+    
+    <taskdef name="findmain"           classname="hmi.ant.FindMain" onerror="ignore"  />
+    
+    <taskdef name="listresources"      classname="hmi.ant.ListResources" onerror="ignore"  /> 
+    
+    <taskdef name="copyversionedresources"  classname="hmi.ant.CopyVersionedResources" onerror="ignore"  /> 
+    
+    <taskdef name="unpackresources"    classname="hmi.ant.UnpackResources" onerror="ignore"  />
+    
+    
+</antlib>

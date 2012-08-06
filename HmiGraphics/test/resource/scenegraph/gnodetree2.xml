@@ -1,0 +1,29 @@
+<gnode id="gnod"  >
+   <gnode id="gnod1" >
+      <gnode id="gnod11" sid="a"/>
+      <gnode id="gnod12" sid="b"/>
+      <gnode id="gnod13" sid="c"/>
+   </gnode>
+   <gnode id = "gnod2" >
+      <gnode id="gnod21" sid="a">
+         <gshape name="shape21"/>
+      </gnode>
+      <gnode id="gnod22" sid="b">
+         <gshape name="shape22">
+            <gmaterial  name="coinoeil" shader="blinnTextured1" emission="0.0 0.0 0.0 1.0" ambient="0.588 0.588 0.588 1.0" diffuse="0.0 0.0 0.0 1.0" specular="0.9 0.9 0.9 1.0" shininess="79.0">
+               <diffuse>
+                  <gtexture imageFile="texFile1" repeatS="3.0" />
+               </diffuse>
+               <transparent>
+                  <gtexture imageFile="transFile1" repeatS="3.0" offsetS="0.5" />
+               </transparent>
+            </gmaterial>
+         </gshape>
+      </gnode>
+   </gnode>
+   <gnode id = "gnod3"/>   
+   <gshape name="shape1">
+      <gmaterial name="mat1" diffuse="0.33 0.2 0.88" ambient="0 0 0"/>
+   </gshape>
+</gnode>
+   

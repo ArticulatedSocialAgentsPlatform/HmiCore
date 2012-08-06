@@ -1,0 +1,53 @@
+\section{Package overview}
+The current contents of HmiGraphics and HmiAnimation is as follows:
+
+\begin{itemize}
+\item hmi.animation:
+Deals with virtual objects, in particular animation of such objects. It defines a simple hierarchy of
+virtual objects, by means of VJoints, primarily used for skeleton based animation of human avatars.
+a virtual environment. Of course it is intended to be used in combination with the hmi.graphics packages,
+but in principle it can be build and used independently.
+\item hmi.graphics.collada:
+Deals with reading (and to some extent writing) graphics files according to the Collada standard.
+Apart from reading, it includes a sub package hmi.graphics.collada.scenegraph, for translating Collada descriptions into
+hmi.graphics.scenegraph descriptions.
+\item hmi.graphics.geometry:
+Utility class, dealing with some purely geometric algorithms.
+\item hmi.graphics.opengl:
+Deals with actual rendering OpenGL based 3D graphics.
+%It defines counterparts of some classes of the
+%scenegraph package. For instance, we have the GLBasicMesh class which is sort of the hmi.graphics.opengl counterpart
+%for the hmi.graphics.scenegraph GMesh class.
+Although hmi.graphics.opengl is OpenGL based, it is still independent
+of the  particular Java OpenGL binding or implementation. Currently there are two such OpenGL bindings: Jogl and LWJGL.
+Each of these has its own package (hmi.graphics.jogl, hmi.graphics.lwjgl), and one of them must be used in combination with hmi.graphics.opengl.
+hmi.graphics.opengl itself has a few sub packages:
+\begin{itemize}
+\item hmi.graphics.opengl.state: Contains classes for dealing with the OpenGL state management.
+\item hmi.graphics.opengl.geometry: Defines a few utility classes for rendering simple geometry, like spheres, boxes, and lines.
+\item hmi.graphics.opengl.scenegraph: Defines the translation from hmi.graphics.scengraph structures to hmi.graphics.opengl structures.
+\end{itemize}
+
+\item hmi.graphics.jogl and hmi.graphics.lwjgl are two packages that provide
+actual OpenGL bindings, relying on native code in the form of windows dll files or Linux so files.
+Both packages implement the GLRenderContext interface from hmi.graphics.opengl, and define
+a simple Renderer.
+Most of the JOGLContext and LWJGLContext code is generated, by means of a utility package hmi.graphics.gen.
+
+
+\item hmi.graphics.scenegraph:
+Defines scenegraph like structures for representing graphics data in a format independent of the external file format,
+but also independent of the actual render technology being used.
+\item hmi.graphics.util:
+The usual package of our favorite ``utilities''.
+
+\end{itemize}
+
+Currently, there are a few more ``deprecated'' and/or temporary packages:
+\begin{itemize}
+\item hmi.graphics.colladatest:
+Just for testing packages like collada, opengl, etcetera.
+\item hmi.graphics.gen: used for generating files within  jogl and lwjgl implementations.
+\item hmi.graphics.render
+An attempt to create a platform neutral 3D renderer.
+\end{itemize} 

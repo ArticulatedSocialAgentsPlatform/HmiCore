@@ -1,0 +1,29 @@
+\section{Package dependencies}
+We list the dependencies packages on our own hmi packages, as well as dependencies on non-standard
+packages like Jogl or Ode.
+Most packages depend on hmi.util and hmi.xml, and so we will not mention these for the sake of brevity.
+\begin{itemize}
+\item hmi.animation depends heavily on hmi.math. Otherwise it is quite independent, and it
+ does explicitly \emph{not} depend on hmi.graphics packages,
+nor on Jogl, LWJGL, or ODE.
+
+\item hmi.graphics.scenegraph depends on hmi.math, hmi.graphics.geometry, and hmi.animation. It was designed to be independent of all other packages, in particular file format dependend packages like Collada, or render technology dependend packages like opengl, jogl, or lwjgl.
+
+\item hmi.graphics.collada itself does not depend on other graphics packages. But it has a sub package hmi.graphics.collada.scenegraph that depends on hmi.graphics.scenegraph, hmi.graphics.collada, and hmi.math.
+
+\item hmi.graphics.geometry does not depend on other packages
+
+\item hmi.graphics.opengl depends on hmi.math, hmi.graphics.scenegraph, hmi.animation,
+but \emph{not} on the Jogl or LWJGL.
+The reference to hmi.animation is somewhat special:
+the opengl package relies on VJoints for animation purposes. It is (only) here that the link between hmi.animation and
+hmi.graphics is made.
+
+\item hmi.graphics.jogl and hmi.graphics.lwjgl depend on hmi.graphics.opengl, as well as
+on platform dependent dll files or so files, that reside inside the HmiGraphics/lib directory.
+Inside the ant build files, the Jogl and LWJGL  dependencies can be denoted on
+the ``dependencies'' line of \verb"build.properties", by means of the  \verb"Sun/jogl" or  \verb"LWJGL" tokens.
+\item hmi.graphics.util, although small, combines various tools  and depends therefore on most other packages:
+hmi.graphics.collada, hmi.graphics.opengl, and hmi.graphics.scenegraph.
+
+\end{itemize}

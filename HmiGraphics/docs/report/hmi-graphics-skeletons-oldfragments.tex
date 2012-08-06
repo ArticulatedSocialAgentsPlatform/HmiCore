@@ -1,0 +1,295 @@
+OLD:
+
+
+\subsubsection{Adjusting bind poses OLD}
+
+
+Mesh data is available in various formats, usually exported from some modeling tool
+in some graphics format like 3DS,  SMD, FBX, or Collada.
+Here we will focus on the Collada representation.
+One of the potential problems with exported mesh data is that it often mimics the
+internal representation of some modeling tool. In particular, skeletons and (inverse-) bind matrices
+that are present within Collada files are not necessarily the most logical ones.
+Moreover, tools usually do not take the HAnim pose as the neutral pose for determining their bind matrices.
+Another annoyance is that skeletons and meshes often have various conventions concerning
+the so called `up axis'', and often use \emph{different} conventions for the mesh and skeleton
+within the same data file.
+The result is often that bind poses and/or animations include something like a ninety-degree rotation
+around the X-axis for the humanoid root joint. This type of mismatch between the two coordinate systems
+for the mesh and for the skeleton can be quite confusing at times.
+We discuss here how to get rid of such problems by adjusting
+and simplifying skeleton data and mesh data.
+Our goal will be reached in a few steps:
+%
+\begin{enumerate}
+\item First, we want to ``normalize'' the data somewhat by setting the bind pose to be the neutral pose.
+ The advantage is that we can simplify our bind matrices very much,
+ in that they assume that there is \emph{no} rotation or scaling at all,
+and only non-trivial joint translations remain.
+The latter are in fact just the vectors pointing from the
+origin to the (center positions of the joints.
+The main reason for this step is to get rid of complicated bind matrices introduced by design tools like 3DMax.
+\item The next step is to adjust the orientation of mesh data and skeleton. We prefer an orientation
+where ``Y is up''. Sticking to this convention is necessary for animation purposes, where we must assume that
+poses are defined within a well defined coordinate system.
+As a consequence, we apply a transform (typically something like ninety degree rotation) to the mesh data,
+in order to adjust the up axis for the mesh.
+\item Finally, we want to adjust the bind matrices once more.
+The goal this time is to introduce a \emph{new} neutral pose, like for instance the HAnim neutral pose.
+The latter is defined by a set of constraints, all formulated in a coordinate system where Y is up.
+Its advantage is that it is the same pose for all virtual characters, independent of the various
+bind poses that might have been used for different virtual humans.
+Usually, the bind pose is something called the T-pose. But unlike the HAnim pose, this is
+not a precisely defined pose, and there are subtle differences between various T-poses.
+For this reason, a T-pose is less suitable as standard neutral pose.
+\end{enumerate}
+%
+\subsubsection{Simplifying bind matrices (old version)}
+For the first step we first want to justify that it is possible to switch to a set of alternate bind matrices
+$B'_i$ that are simpler, while retaining the same animation capabilities.
+(That is, we will have to use different $A_i$ matrices as well).
+Let's assume that we have some existing bind matrices $B_i$ of the form $B_i = T_{C_i}\:U_i$, where
+$C_i$ is the translation vector, and where $U_i$ is the rotation and scaling part.
+A certain animation pose is defined by a set of joint matrices $A_i= T_{t_i}\: R_i$ and
+an equation like \autoref{eq:weightblending} for weight blending:
+\begin{equation}\label{eq:animationpose}
+ \sum_{i=0}^{n} w_i\, A_i\,B_i^{-1}
+ = \sum_{i=0}^{n} w_i\, T_{t_i}\:R_i\;U_i^{-1}\: T_{-C_i}
+ = \sum_{i=0}^{n} w_i\, T_{t_i}\:R'_i\; T_{-C_i}
+ = \sum_{i=0}^{n} w_i\, A'_i\:{B'}_i^{-1}
+\end{equation}
+In the last step, we have introduced new pose matrices $A'_i = T_{t_i}\,R'_i$, where the new rotation/scale matrix is $R'_i =R_i\,U_i^{-1}$,
+and where we have new bind matrices $B'_i = T_{C_i}$. Clearly these bind matrices have just a translation part,
+and an identity transform for the rotation and scaling part.
+From this formula it is also clear that the joint center locations are defined by the $C_i$ vectors
+from the bind matrices.
+The conclusion is that we can switch from $B_i$ type to $B'_i$ type bind matrices by simply dropping
+ the rotation and scaling part of the $B_i$  matrices.
+Since it is custom to specify the $B_i$ matrices by means of \emph{inverse} bind matrices $B_i^{-1}$,
+we must invert the latter  in order to get the right
+translation vectors $C_i$. So  if $B_i = T_{C_i}\:U_i$ then $B_i^{-1} = U_i^{-1}\: T_{-C_i} = T_{C'_i}\:U_i^{-1}$,
+where vector $C'_i$ is defined by $B_i = U_i^{-1}(-C_i)$.
+(So we cannot obtain vector $C_i$ immediately from the inverse bind matrix $B_i^{-1}$ and we must invert the latter)
+Now that we have our bind matrices, we ask what are the local joint matrices that will put
+the avatar in its bind pose. This is simple: we know that the \emph{global} joint matrix $A_i$
+must cancel the inverse bind matrix $B_i^{-1} = T_{-C_i}$, so we conclude that $A_i = T_{C_i}$.
+Then the \emph{local} joint transform must be $T_{C_i - C_{\textit{parent(i)}}}$,
+where $C_{\textit{parent(i)}}$ denotes the center position for the parent of joint $i$ within
+the skeleton tree. (For the skeleton root joint we assume a virtual ``parent''  at the origin)
+Remark: if the original inverse bind matrices include a scaling component, then this scaling
+component ends up in the new pose matrices, which would be inconvenient.
+If we assume that the raw mesh data, i.e without any transforms applied, is the correct
+bind pose shape, including scaling of body parts, then it is no problem to omit this scaling in the
+new bind matrices since the calculated joint centers $C_i$ will take the skeleton scaling into account.
+
+
+\subsubsection{Bind poses}
+Before we start simplifying we have a more detailed look at bind poses and bind matrices.
+Let's assume that, in order to put the skeleton in the bind pose, we must apply
+local joint transformations of the form $T_{t_i} L_i$, where $t_i$ is a local translation, and $L_i$ is a local
+rotation (and scaling).
+We consider the concatenation of such transformations along a path within the skeleton, starting at
+the humanoid root, and ending in some joint $J_i$.
+For convenience we assume that this chain consists of joints $J_0, J_1, J_2, \ldots, L_i$.
+The  global transform for  joint $i$ for the bind pose  must be equal to $B_i$, for in that case it will be canceled by the inverse bind matrix $B_i^{-1}$.
+ Therefore, we see that
+ \[ T_{t_0} L_0 T_{t_1} L_1 \cdots T_{t_i} L_i = B_i = T_{C_i} U_i.\]
+
+ With this joint pose, we have that the combination $T_{C_i} U_i U_i^{-1} T_{-C_i}$
+ will cancel, as desired. If we replace the $U_i$ by something else, say by $R_i$,
+ we have a transform of the form $T_{C_i} R_i U_i^{-1} T_{-C_i} = T_{C_i} R_i' T_{-C_i}$,
+ which amounts to a $R_i'$ rotation around the rotation center $C_i$.
+ Clearly, the translation from the bind matrix determines the joint center $C_i$.
+
+%
+The left hand side of this equation can be rewritten as $T_t L$, and from this we see that:
+\begin{gather}
+ L = L_0 L_1\cdots L_i = U_i. \notag \\
+ t = t_0 + L_0(t_1) + \cdots + L_0 L_1\cdots L_{i-1}(t_i) \notag\\
+  = t_0 + U_0(t_1) + \cdots + U_{i-1}(t_i) = C_i \notag
+\end{gather}
+%
+Now assume that we have some arbitrary pose for the original skeleton,
+based upon the original bind matrices,
+specified by a series of rotations $R_0, R_1, \ldots, R_n$.
+(Such data occurs in keyframe data like, for instance, in our SkeletonInterpolators)
+
+For this pose joint $J_i$ has a matrix $M_i$ of the form:
+%
+\[ M_i = T_{t_0}\, R_0\, T_{t_1}\, R_1 \cdots T_{t_i}\, R_i\, U_i^{-1}\, T_{-C_i}\]
+%
+We would like to get rid of the rotation and scaling components $U_i$ in the bind matrices,
+only leaving the translation parts $T_{-C_i}$.
+Of course, the consequence is that existing pose data must be adapted.
+(New pose data can of course be made according to the new bind matrices).
+So we suppose that we have modified local transformation, specified by local translation vectors
+$t_j'$ and local rotation/scaling matrices $R_j'$, resulting in a global matrix $M_i'$:
+%
+\[ M_i' = T_{t_0'}\, R_0'\, T_{t_1'}\, R_1' \cdots T_{t_i'}\, R_i'\, T_{-C_i}\]
+%
+We require that $M_i' = M_i$, something we
+can this by making the following choice for $t_i'$ and $R_i'$:
+%
+\begin{gather}
+t_i'= U_{i-1}(t_i)\notag\\
+ R_i' = U_{i-1}\,R_i\,U_i^{-1}\notag
+\end{gather}
+Here, we use the convention that $U_{-1} = Id$, so $t_0' = t_0$.
+In essence, we claim that the translation $t_0$ for the humanoid root need no change,
+and we model this by a ``virtual'' node at level $-1$ with a bind matrix equal to the identity matrix.
+Note that from the equation for $C_i$ above, we also have the equation:
+\[ t_i' = U_{i-1}(t_i) = C_i - C_{i-1}\]
+%
+So, the modified translation vector $t_i'$ is simply the translation vector from joint $J_{i-1}$ to joint $J_i$,
+within the bind pose, which seems reasonable.
+But we will give a proof here:
+%
+\begin{gather}
+ M_i' = T_{t_0'}\, R_0'\, T_{t_1'}\, R_1' \cdots T_{t_i'}\, R_i'\, T_{-C_i}\notag\\
+ = T_{t_0}\,R_0\,U_0^{-1}\,T_{U_0(t_1)}\,U_0\,R_1\,U_1^{-1} \cdots U_{i-1}^{-1}\,T_{U_{i-1}(t_i)}\,U_{i-1}\,R_i\,U_{i}^{-1}T_{-C_i}\notag\\
+ = T_{t_0}\,R_0\,T_{U_0^{-1}(U_0(t_1))}\,U_0^{-1}\,\,U_0\,R_1 \,U_1^{-1}
+  \cdots T_{U_{i-1}^{-1}(U_{i-1}(t_i))}\, U_{i-1}^{-1}\, U_{i-1}\,R_i\,U_{i}^{-1}T_{-C_i}\notag\\
+  = T_{t_0}\,R_0\,T_{t_1}\,R_1 \,U_1^{-1} \cdots T_{U_{i-1}^{-1}(U_{i-1}(t_i))}\, U_{i-1}^{-1}\, U_{i-1}\,R_i\,U_{i}^{-1}T_{-C_i}\notag\\
+  = \cdots = T_{t_0}\,R_0\,T_{t_1}\,R_1 \cdots T_{t_i}\,R_i\,U_{i}^{-1}T_{-C_i}  = M_i\notag
+\end{gather}
+(This was to be shown.)
+
+It is clear that the revised translations $t_i'$ are independent of the the pose, and can be
+calculated from the original bind matrices.
+
+\subsubsection{Simplifying bind matrices}
+For the first step we aim at simplifying bind matrices $B_i$ such that they consist of a translation only,
+i.e. without rotation or scaling.
+As a consequence, existing animation data, that works in conjunction
+with the original bind matrices, must be adapted.
+(New animation data can of course simply ignore the old bind matrices)
+
+
+Our new bind matrices are then simply the matrices $B_i' = T_{C_i}$, that is, the original bind matrices
+without the rotation and scaling.
+
+We now ask what are the local joint transformations will put
+the avatar in its bind pose.
+This is simple: we know that the \emph{global} joint matrix $A_i$
+must cancel the inverse bind matrix $B_i^{-1} = T_{-C_i}$, so we conclude that $A_i = T_{C_i}$.
+Then the \emph{local} joint transform must be $T_{t_i}$ where $t_i = C_i - C_{\textit{parent(i)}}$,
+and where $C_{\textit{parent(i)}}$ denotes the center position for the parent of joint $i$ within
+the skeleton tree. For the skeleton root joint we assume a virtual ``parent'', located at the origin.
+
+
+
+
+\subsubsection{Transforming animations}
+
+An extra complication arises when we have a skeleton where we have simplified the bind matrices, but where we
+also have some skeleton pose (possibly part of some animation) that was constructed relative to the original
+bind poses. In this section we figure out how to adapt such poses.
+We assume the following:
+\begin{itemize}
+\item
+\end{itemize}
+
+
+
+\subsubsection{Reorienting your avatar}
+The next step that we want to discuss is how to re-orient mesh data. What we want is an avatar
+with its mesh and skeleton aligned with the Y-axis, looking into the positive Z-axis direction.
+Slightly more general, we want to apply some affine coordinate transform $A$ to the mesh, skeleton,
+and animation poses. For example, if we have some avatar with mesh and skeleton aligned with the Z-axis,
+and some pose where the shoulder joint rotates $-45^\circ$ around the Y-axis,
+then after the coordinate transform we have a mesh and skeleton aligned with the Y-axis, and the same
+pose now has a shoulder joint rotation of $+45^\circ$ around the Z-axis.
+In this case, the coordinate transform $a$ is a rotation of $-90^\circ$ around the X-axis.
+
+Assume that we have some affine coordinate transform $A$ of the form $A=T_{t_A}\:U$, where $U$ is linear.
+Informally it is already clear that we want to transform mesh coordinates $v$ into $v' =A(v)$.
+The question now is: how to adapt the skeleton and animation poses.
+Assume that some pose is described by local affine joint transforms $D_i$ which
+describe local joint pose like the shoulder joint in the example above.
+Within the new coordinates, the effect of $D_i$ will be achieved
+by $D'_i = A\:D_i\:A^{-1}$.
+(Just examine the effect of $D'_i$ on some ``new'' coordinate of the form $v' = A(v)$. The result is that
+$D'_i(v') = A\:D_i\:A^{-1} (A(v)) = A\:D_i(v)$.)
+Of course this is to be expected: $A\:D_i\:A^{-1}$ is just the standard linear algebra result
+for how matrices change under coordinate transforms.
+Now we must take into account that the local transforms $D_i$ that describe some pose
+are affine transforms of the form $D_i = T_{t_i}\:L_i$ where $t_i$ is the (fixed) local skeleton translation
+from the parent of joint $J_i$ to $J_i$ itself, and where $L_i$ is the (changing) rotation matrix for joint $J_i$.
+We can rewrite the  $D'_i$:
+\begin{equation}
+D'_i = A\:D_i\:A^{-1} = A\:T_{t_i}\,L_i\:A^{-1}
+=A\,T_{t_i}\,A^{-1}\:A\,L_i\,A^{-1}.
+\end{equation}
+The rightmost three factors, i.e. $A\,L_i\,A^{-1}$, are just the transformed rotations $L'_i$, adapted to
+the new coordinate system. For instance, if $L_i$ would be the $-45^\circ$ around the Y-axis from the example
+above, and $A$ would be the coordinate transform defined by a $-90^\circ$ rotation around the X-axis,
+then $A\:L_i\:A^{-1}$ is actually the $+45^\circ$ around the Z-axis, as expected.
+
+\noindent
+The left most factors, i.e. $A\,T_{t_i}\,A^{-1}$ are the modified translations.
+Because $A=T_{t_A}\:U$, we can simplify this considerably:
+\begin{equation}\label{eq:transormedtranslation}
+T_{t_A}\:U\:T_{t_i}\:U^{-1}\:T_{-t_A}
+=T_{t_A}\:T_{U(t_i)}\:U\:U^{-1}\:T_{-t_A}
+=T_{U(t_i)}
+\end{equation}
+
+\noindent
+Finally, we can see how this all fits together, when we apply an affine transform $A$ to
+a mesh that is being deformed by means of weight blending, specified by \autoref{eq:weightblending}.
+We assume that $A = T_{t_A}\,U$, that $A_i = T_{t_i}\,L_i$, that $B_i^{-1} = C_i\,T_{-c_i}$.
+We denote by $L'_i$ the transformed $L_i$, that is, $A\,L_i\,A_i^{-1}$, and we define $C'_i = A\,C_i\,A_i^{-1}$.
+Then the result of applying $A$ yields the following transformed blend equation:
+%
+\begin{equation}
+ A \:\sum_{i=0}^{n} w_i\, A_i\,B_i^{-1} = \sum_{i=0}^{n} w_i\, A\,A_i\,B_i^{-1} \quad\text{, where}\notag
+ \end{equation}
+ %
+ \begin{gather}
+ A\,A_i\,B_i^{-1} = \notag\\
+ A\, T_{t_0}\,L_0\,T_{t_1}\,L_1\cdots T_{t_i}\,L_i,C_i\,T_{-c_i}=\notag\\
+ A\,T_{t_0}\,A^{-1}\,A\,L_0\,A^{-1}\,A\,T_{t_1}\,L_1\cdots T_{t_i}\,L_i\,C_i\,T_{-c_i} =\notag\\
+ T_{U(t_0)}\,L'_0\, A T_{t_1}\,L_1\cdots T_{t_i}\,L_i\,C_i\,T_{-c_i} =\cdots=\notag\\
+ T_{U(t_0)}\,L'_0\,T_{U(t_1)}\,L'_1\cdots T_{U(t_i)}\,L'_i\,C'_i\,T_{U(-c_i)}\,A\notag
+ \end{gather}
+ %
+ The remaining $A$ at the right of this last formula is the transform to be applied on the mesh.
+ Since the translations, and the bind matrices are fixed, they can be calculated before we start rendering.
+ Finally, the transformed joint rotations are most easily obtained by creating animations
+ in the ``new'' coordinate system right away, rather than by  transforming
+ animations that were created using the ``old'' coordinates.
+ Note that $L_i'$ will be an affine transform, unless $A$ itself is a simple linear transform.
+ In that case, $T_a=0$, and $L'_i = U\,L_i\,U^{-1}$.
+
+\subsubsection{Redefining the avatar neutral pose}
+
+The result of the previous sections is an avatar where the original bind pose is also the neutral pose,
+that is, when all local rotation matrices are set to identity, the avatar will assume a pose equal to
+the bind pose. We would like to change this, and define some other pose, say the HAnim pose,
+to be the neutral pose.
+This problem can be split into two steps:
+\begin{enumerate}
+\item First, find out how to put the avatar in the HAnim pose,
+\item Second, define that pose as the neutral pose, by adapting transformations and bind matrices.
+\end{enumerate}
+%
+We start with the second step, so, we assume that we have a a pose defined by local transforms $L_i$
+that define a pose that we would like to set as the neutral pose.
+The (current) transform for joint $J_i$ for this pose is:
+%
+\begin{equation}
+T(t_0)\,L_0\,T(t_1)\,L_1\,T(t_2)\, L_2\cdots T(t_i)\,L_i\,B_i^{-1}\notag
+\end{equation}
+%
+This we would like to rewrite such that the $L_i$ rotations become \emph{identities}:
+\begin{gather}
+T(t_0)\,T(L_0(t_1))\,L_0\,L_1\,T(t_2)\, L_2\cdots T(t_i)\,L_i\,B_i^{-1} =\notag\\
+T(t_0)\,T(L_0(t_1))\,T(L_0 L_1(t_2))\,L_0\,L_1\, L_2\cdots T(t_i)\,L_i\,B_i^{-1} =\notag\\
+T(t_0)\,T(L_0(t_1))\,T(L_0 L_1(t_2))\cdots T(L_0 L_1\cdots L_{i-1}(t_i) \:L_0\,L_1\,L_2\cdots L_i\,B_i^{-1} =\notag
+\end{gather}
+%
+From this equation it is clear how to proceed:
+\begin{enumerate}
+\item The local translation vectors $t_i$ have to be replaced by $L_0 L_1\cdots L_{i-1}(t_i)$,
+\item The inverse bind matrix $B_i^{-1}$ must be replaced by $L_0\,L_1\,L_2\cdots L_i\,B_i^{-1}$.
+\end{enumerate}

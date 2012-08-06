@@ -1,0 +1,73 @@
+Even de guidelines van ons gesprek van woensdag:
+
+
+Jullie gaan uit van het H-anim model. Ik heb even gekeken, en SUIT gaat
+uit van de volgende bone definities:
+
+In SUIT a pose is defined with 23 bones which are:
+
+static const char* BONE_NAMES[] = 
+{
+  // Name        -    LocationID
+  "Pelvis",        // 1
+     "L5",            // 2
+        "L3",            // 3
+           "T12",           // 4
+              "T8",            // 5
+                 "Neck",          // 6
+                    "Head",          // 7
+               "RightShoulder", // 8            
+                    "RightUpperArm", // 9
+                       "RightForeArm",  // 10
+                          "RightHand",     // 11
+               "LeftShoulder",  // 12
+                    "LeftUpperArm",  // 13
+                       "LeftForeArm",   // 14
+                          "LeftHand",      // 15
+     "RightUpperLeg", // 16                                
+     "RightLowerLeg", // 17
+        "RightFoot",     // 18
+           "RightToe",      // 19
+     "LeftUpperLeg",  // 20
+     "LeftLowerLeg",  // 21
+        "LeftFoot",      // 22
+           "LeftToe",       // 23
+};
+
+Ik heb ook de PDF nog even bijgevoegd die beschrijft hoe onze modellen
+verder worden opgebouwd, al is die meer gefocust op het grafische dan
+op de details van het animeren.
+
+We waren het erover eens dat jullie via het protocol aan ons moeten
+kunnen opvragen:
+ - bone structuur
+ - bone dimensies
+ - joint namen
+ - framerate
+ - evt. quaternion volgorde (w,x,y,z of x,y,z,w)
+
+Wat nog geïmplementeerd zal moeten worden aan onze kant is een
+translatie voor de pelvis, om te voorkomen dat alle loopjes er erg raar
+uit zien (de pelvis moet kunnen meebewegen als onderdeel van de
+gestuurde animatie)
+
+Verder waren we het wel eens over de volgende zaken:
+ * Protocol zou een simpele xml wrapper moeten zijn, waarin gewoon
+   lijsten van joint-rotaties zitten
+ * Guaranteed delivery, TCP
+ * Vrij veel logging naar de console, zodat aan beide kanten makkelijk
+   te debuggen is.
+ * Er moet een versie van onze software bij jullie komen te draaien en
+   liefst andersom ook.
+ * Bij het aanmaken van een pop moet een ID meegestuurd worden, zodat
+   deze bij de joint-rotaties ook weer gebruikt kan worden om
+   onderscheid te maken tussen verschillende poppen.
+
+Jij (jullie?) zult kijken naar een protocol-voorbeeld voor bovenstaande,
+zodat we binnenkort een volgende stap kunnen maken. Ook als je al een
+tijdelijke eerste versie hebt zie ik dat graag, dan kan ik aanvullingen
+doen.
+
+HG,
+
+Steven Wijgerse

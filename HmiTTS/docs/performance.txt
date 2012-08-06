@@ -1,0 +1,76 @@
+Spoken long sentence:
+<sync id=\"deicticheart1\"/> Welcome! I am Griet, I am 16 year old and I would like to tell you something about my life. People know me as the girl with the pearl ear ring. My father can no longer work since he was blinded. <sync id=\"beat1b1\"/>Because we still need to eat, I took service with a local painter. His name is Johannes Vermeer."
+
+Spoken short sentence:
+People know me as the girl with the pearl ear ring.
+
+voicename: Microsoft Mary
+Dummy speak duration 148
+Dummy speak duration split sentences 134
+Timing of 11 word sentence: 20
+Timing of speak to file: 130
+Time between calling speak and first spoken phoneme: 12
+
+voicename: LH Michelle
+Dummy speak duration 128
+Dummy speak duration split sentences 73
+Timing of 11 word sentence: 10
+Timing of speak to file: 59
+Time between calling speak and first spoken phoneme: 18
+
+voicename: Kate
+Dummy speak duration 812
+Dummy speak duration split sentences 777
+Timing of 11 word sentence: 116
+Timing of speak to file: 784
+Time between calling speak and first spoken phoneme: 28
+
+voicename: Ludoviko
+Dummy speak duration 108
+Dummy speak duration split sentences 64
+Timing of 11 word sentence: 10
+Timing of speak to file: 65
+Time between calling speak and first spoken phoneme: 14
+
+voicename: Saskia
+Dummy speak duration 953
+Dummy speak duration split sentences 919
+Timing of 11 word sentence: 156
+Timing of speak to file: 930
+Time between calling speak and first spoken phoneme: 42
+
+voicename: Simon
+Dummy speak duration 744
+Dummy speak duration split sentences 723
+Timing of 11 word sentence: 103
+Timing of speak to file: 731
+Time between calling speak and first spoken phoneme: 28
+
+voicename: Willem
+Dummy speak duration 674
+Dummy speak duration split sentences 648
+Timing of 11 word sentence: 105
+Timing of speak to file: 648
+Time between calling speak and first spoken phoneme: 25
+
+voicename: LH Michael
+Dummy speak duration 90
+Dummy speak duration split sentences 48
+Timing of 11 word sentence: 7
+Timing of speak to file: 43
+Time between calling speak and first spoken phoneme: 13
+
+voicename: Microsoft Mike
+Dummy speak duration 134
+Dummy speak duration split sentences 121
+Timing of 11 word sentence: 18
+Timing of speak to file: 122
+Time between calling speak and first spoken phoneme: 12
+
+voicename: Microsoft Sam
+Dummy speak duration 119
+Dummy speak duration split sentences 102
+Timing of 11 word sentence: 16
+Timing of speak to file: 104
+Time between calling speak and first spoken phoneme: 11
+

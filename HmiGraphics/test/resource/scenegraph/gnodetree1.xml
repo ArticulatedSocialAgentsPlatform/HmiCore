@@ -1,0 +1,13 @@
+<gnode id="gnod"  >
+   <gnode id="gnod1" >
+       <gnode id="gnod11" sid="a"/>
+       <gnode id="gnod12" sid="b"/>
+       <gnode id="gnod13" sid="c"/>
+   </gnode>
+   <gnode id = "gnod2" >
+       <gnode id="gnod21" sid="a"/>
+       <gnode id="gnod22" sid="b"/>
+   </gnode>
+   <gnode id = "gnod3"/>   
+</gnode>
+   

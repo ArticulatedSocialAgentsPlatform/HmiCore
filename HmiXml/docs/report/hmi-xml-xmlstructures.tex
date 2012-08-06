@@ -1,0 +1,89 @@
+\section{XMLStructures}
+
+\verb#XMLStructure# is an Interface, defining methods for storing Objects into XML format, and retrieving them from
+such XML formats. The main methods required by this interface are:
+
+\begin{itemize}
+\item \verb#toXMLString#: produces an XML representation in String format
+\item \verb#getXMLTag#: returns the XML ``tag'' used to represent an XMLStructure. (The ``myxml'' String in \verb#<myxml>...</myxml>#)
+\item \verb#writeXML#: writes the \verb#toXMLString# String representation to some Java printWriter.
+\item \verb#appendXML#: Like \verb#writeXML#, but appends the output to some Java StringBuilder
+\item \verb#readXML#: The complement of the methods above, reconstructing the Object from the XML representation
+\end{itemize}
+
+There are a number of variations of each method, dealing with formatting, or the IO used. In practice it is easiest to implement
+\verb#XMLStructure# by extending the \verb#XMLStrucrureAdapter# class, so you have to implement only a few of these methods.
+
+The \verb#XMLForrmatting# class is used for to \verb#XMLStructures#, for formatting the XML text for \verb#appendXML#methods like
+\verb#toXMLString# and \verb#appendXML#. The most basic usage is where an \verb#XMLForrmatting# object keeps track of nested indentation levels
+for the xml text. For more complicated examples, the \verb#XMLForrmatting# object keeps track of nested namespace regions.
+ For example, consider an XML fragment like the following:
+\begin{verbatim}
+<test xmlns ="http://hmi.ns.test">
+   <preamble>
+      data
+      <nested></nested>
+   </preamble>
+   <ns:skippedtag attr="val" xmlns:ns="http://ns">
+      <innertag> chardata
+         <nestedtag> chardata
+             <ns:skippedtag>
+                 more data
+             </ns:skippedtag>
+         </nestedtag>
+      </innertag>
+      <sometag xmlns:some="some-namespace"/>
+      <ns:extratag > moredata </ns:extratag>
+   </ns:skippedtag>
+   <moretags>
+      data
+   </moretags>
+</test>
+\end{verbatim}
+It is clear that here formatting uses indentation to show the nesting structure.
+The treatment of namespaces is more complicated. For instance, there is a namespace declaration like \verb#xmlns:ns="http://ns"#.
+Such declarations introduce namespace prefixes, in this case the String \verb"ns", that will be used as prefix for tags
+whenever some bested XML structure belongs to the declared namespace. The \verb#XMLForrmatting# object keeps track of such declarations,
+and uses a stack in order to deal with nested declarations. 
+
+\section{XMLStructureAdapter}
+
+The implementation of classes that implement the \verb#XMLStructure# interface has many commonalities. The \verb#XMLStructureAdapter# class
+is a useful base class that can be used to implement such \verb#XMLStructure# implementations, and that takes care of the common methods.
+There are two aspects: the simple baseline is that \verb#XMLStructureAdapter# implements all methods required by \verb#XMLStructure#,
+and simply requires you to overwrite or implement a few methods, as is usual with ``adapter'' classes. The more sophisticated aspect is
+that \verb#XMLStructureAdapter# offers a large number of ``utility'' methods that ease the implementation of XML parsers. 
+Think of things like parsing a String that encodes a number of float numbers, that must be converted into a Java array or List of floats.
+Or vice versa, if you have such an array or List, how to convert it to a String, with some elementary formatting applied.
+
+\noindent
+The \emph{first}, most basic though not the most versatile, way of using \verb#XMLStructureAdapter# is to extend it and to re-implement the following methods:
+%
+\begin{itemize}
+\item \verb#readXML(XMLTokenizer)#
+\item \verb#appendXML(StringBuilder buf, XMLFormatting fmt)#
+\item \verb#getXMLTag()#
+\end{itemize}
+%
+All other \verb#XMLStructure# methods are then defined in terms of these three methods, in the obvious way.
+This still leaves you with the sometimes complicated task how to parse XML structures in the \verb#readXML# method,
+or how to produce it in the \verb#appendXML# method.  
+
+\noindent
+The \emph{second} approach, usually the preferred one, is to re-implement
+the following set of \verb#XMLStructureAdapter# methods:
+%
+\begin{itemize}
+\item \verb#public String getXMLTag()#
+\item \verb#public StringBuilder appendAttributeString(StringBuilder buf)#
+\item \verb#public boolean decodeAttribute(String attrName, String valCode)#
+\item \verb#public StringBuilder appendContent(StringBuilder buf, XMLFormatting fmt)#
+\item \verb#hasContent()#
+\item \verb#public void decodeContent(XMLTokenizer tok)#
+\end{itemize}
+%
+
+
+
+
+

@@ -1,0 +1,38 @@
+\documentclass[10pt]{report}
+%\documentclass[10pt]{amsbook}
+%\usepackage{a4}
+%\frenchspacing
+%\setlength{\parskip}{1ex plus0.5ex minus0.5ex}
+%\setlength{\parindent}{0cm}
+\title{HmiGraphics}
+\date{}
+
+\makeatletter
+\renewcommand{\@makechapterhead}[1]{%
+\vspace*{50 pt}%
+{\setlength{\parindent}{0pt} \raggedright \normalfont
+\bfseries\Huge#1
+\par\nobreak\vspace{40 pt}}}
+\makeatother
+\begin{document}
+
+%\maketitle
+%\begin{titlepage}
+%\begin{center}
+%\
+%\vspace{10ex}
+%
+%{\Huge The HMIGraphics packages}
+%\vspace{3ex}
+%
+%{\large Design and documentation for the HmiGraphics Java packages.}
+%\end{center}
+%\end{titlepage}
+
+\setcounter{chapter}{0}
+
+\input{hmi-util-chapters.tex}
+
+
+\end{document}
+

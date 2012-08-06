@@ -1,0 +1,5 @@
+<SkeletonInterpolator rotationEncoding="quaternions" parts="r_shoulder l_shoulder" encoding="R">
+   <!-- frame 0: arms up, frame 5: arms down -->
+0.000000  0.800645 -0.012365 0.588912 -0.109533  0.804529 0.012702 -0.583708 -0.108892
+5.000000  0.776472 -0.053160 -0.624253 0.067624  0.774062 0.053164 0.627185 0.068122
+</SkeletonInterpolator>

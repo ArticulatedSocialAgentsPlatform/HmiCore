@@ -1,0 +1,51 @@
+
+
+
+\section{Interpolators}
+%VisualObjects are object with a defined \emph{translation},i.e its 3D ``position'', and a \emph{rotation}
+%, i.e. its ``3D orientation''. (Note we use ``translation'' and ``rotation'' as this is the
+%common terminology used by  VRML, X3D, and Java3D.)
+%Sometimes the 3D information might be visualized in 2D form, or might not be visualized at all,
+%but conceptually everything takes place in 3D space. Therefore a translation is always a 3D vector,
+%whereas a rotation is determined by a 4-tuple, either in the form of a quaternion, or else in the form
+%of an axis of rotation and a rotation angle, a so called ``AxisAngle''.
+%Optionally, one can define scale factors in addition to translation and rotation, but at this moment
+%this is not fully integrated.
+%VisualObjects can be combined in the form of hierarchical structures, via
+%the parent-child relationship, inherited from the VirtualObject interface.
+%A given node in this hierarchy can be seen as a root node, that has ``offspring'', in the form
+%of children, children of children etc.
+%The translations and rotations from a root node to one of its offspring nodes can be combined
+%into resulting translation and rotation, the so called ``pathTranslation'' and ``pathRotation''.
+%(Note: this works also when \emph{uniform} scaling is used, but it works no longer
+%for non-uniform scaling)
+%It is possible to set the translations and rotations along the
+%VisualObject nodes along a path, and then to obtain the resulting pathTranslation and pathRotation.
+%It is also possible to set the translation and rotation of a child node \emph{indirectly}, by
+%specifying the desired pathTranslation and pathRotation of that child node.
+%In general, translations and rotations (and sometimes also scaling) are specified at the same time.
+%In such cases, it is sometimes easier to work with so called Configurations.
+%There is a class \verb"Config3D" which is in essence a wrapper for a translation and a rotation.
+%The VisualObjectAdapter class has setConfiguration methods that accept either
+%a Config3D Object, or a translation and a rotation (and optionally a uniform scaling).
+%
+%\emph{Interpolation} is going one step further than just setting translations and rotations.
+%In essence an \emph{interpolator} is a mapping from time stamps to interpolated values,
+%that can be used as the basis for an animation, for instance.
+%VRML/X3D/Java3D have a rather limited idea of interpolators: each interpolator controls
+%one transform(group). This is also possible with VisualObjects, which can be seen as equivalent
+%to the X3D/Java3D transform(group)s, as far as animation possibilities are concerned
+%However, many VisualObjects have a more complicated, hierarchical structure.
+%An example is the bone structure of an avatar, which can be seen as a structured VisualObject, where
+%each joint in the bone structure corresponds to one (recursive) child element of the VisualObjet
+%that describes the bone structure as a whole.
+%In this case, the translation and rotation of the top level VisualObject describe the
+%position and orientation of the avatar as a whole, within the virtual environment, whereas
+%the rotations of the joints would describe the orientation of the body segments.
+%In such cases, one needs an interpolator that controls many VisualObject(parts) at the same time.
+%The basic (minimal) interface for interpolators is \verb"VisualObjectInterpolator".
+%A VisualObjectInterpolator must have a defined start time, a defined ``target'' VisualObject, and
+%methods for time interpolation.
+
+
+

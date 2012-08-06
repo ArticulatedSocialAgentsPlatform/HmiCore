@@ -1,0 +1,73 @@
+/*******************************************************************************
+ * Copyright (C) 2009 Human Media Interaction, University of Twente, the Netherlands
+ * 
+ * This file is part of the Elckerlyc BML realizer.
+ * 
+ * Elckerlyc is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Elckerlyc is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Elckerlyc.  If not, see http://www.gnu.org/licenses/.
+ ******************************************************************************/
+ 
+package hmi.graphics.jogl;
+
+import java.nio.*;
+
+import hmi.graphics.opengl.GLRenderContext;
+import javax.media.opengl.*;
+import javax.media.opengl.glu.*;
+import com.sun.opengl.util.GLUT;
+
+
+/**
+ * Generated file for Jogl based opengl rendering
+ * @author generated file
+ */
+public final class JOGLContext implements GLRenderContext {
+
+   public JOGLContext() {
+        glu = new GLU();
+        glut = new GLUT();
+   }
+
+   private GL gl;
+   private GLU glu;
+   private GLUT glut;
+   private int pass;
+   
+   public void setGL(GL gl) {
+      this.gl = gl;
+   }
+ 
+   public GLU getGlu() {
+      return glu;
+   }
+ 
+   public GLUT getGlut() {
+      return glut;
+   }
+ 
+   public void setPass(int pass) {
+      this.pass = pass;
+   }
+   
+   public int getPass() {
+      return pass;
+   }
+ 
+   /**
+    * returns the Jogl GL object, representing the OpenGL context.
+    * Can be used to circumvent the GLRenderContext limitations, and offers ALL Jogl
+    * functionality. 
+    */
+   public GL getGL() {
+      return gl;
+   }

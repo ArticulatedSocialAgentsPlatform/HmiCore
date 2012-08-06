@@ -1,0 +1,235 @@
+    GL11  int glGetError();
+     
+    GLU   String gluErrorString(int err);
+    GLU   void gluGetString(int name);
+    GLU   boolean gluCheckExtension(String extName, String extString);
+    GLU   void gluLookAt(double eyeX, double eyeY, double eyeZ, double centerX, double centerY, double centerZ, double upX, double upY, double upZ); 
+    GLU   void gluPerspective(float fovy, float aspect, float zNear, float zFar);
+    GLU   void gluOrtho2D(float left, float right, float bottom, float top);
+    GL11  void glOrtho(float left, float right, float bottom, float top, float near, float far);
+    GL11  void glViewport(int x, int y, int w, int h);
+    GL11  void glScissor(int x, int y, int w, int h);
+  
+  
+    GL11  void glClear(int mask);
+    GL11  void glClearStencil(int s);
+    GL11  void glClearDepth(double depth);
+    GL11  void glClearAccum(float red, float green, float blue, float alpha);
+  
+    GL11  void glCullFace(int mode);
+    GL11  void glFrontFace(int mode);
+    GL11  void glDepthMask(boolean mask);
+
+    GL11  void glClearColor(float r, float b, float g, float a);
+
+    GL11  void glEnable(int prop);
+    GL11  void glDisable(int prop);
+    GL11  void glEnableClientState(int cap);
+    GL11  void glDisableClientState(int cap);
+  
+    GL11  void glPushAttrib(int mask);
+    GL11  void glPopAttrib();
+    GL11  void glPushClientAttrib(int mask);
+    GL11  void glPopClientAttrib();
+    GL11  void glPushName(int name);
+    GL11  void glPopName();
+   
+    GL11  void glGetIntegerv(int pname, IntBuffer params);
+    GL11  void glGetIntegerv(int pname, int[] params);
+    
+    GL11  void glGetFloatv(int pname, FloatBuffer params);
+    GL11  void glGetFloatv(int pname, float[] params);
+    
+    
+    GL11  void glShadeModel(int mode);
+    GL11  void glHint(int target, int mode);
+    GL11  void glPointSize(float size);
+    GL11  void glLineWidth(float width);
+    
+    GL11  void glLightModelf( int pname, float param);
+    GL11  void glLightModelfv(int pname, FloatBuffer params);
+    GL11  void glLightModelfv(int pname, float[] params);
+    GL11  void glLightModeli (int pname, int param);
+    GL11  void glLightModeliv(int pname, IntBuffer params);
+    GL11  void glLightModeliv(int pname, int[] params);
+    
+    GL11  void glLightf(int light, int pname, float param);
+    GL11  void glLightfv(int light, int pname, FloatBuffer params);
+    GL11  void glLightfv(int light, int pname, float[] params);
+
+    GL11  void glMaterialf(int face, int pname, float param);
+    GL11  void glMaterialfv(int face, int pname, FloatBuffer params);
+    GL11  void glMaterialfv(int face, int pname, float[] params);
+    GL11  void glColorMaterial(int face, int mode);
+  
+    GL13  void glActiveTexture(int mode);
+    GL13  void glClientActiveTexture(int mode);
+    GL11  void glGenTextures(int bufcount, IntBuffer textures);
+    GL11  void glGenTextures(int bufcount, int[] textures);
+    GL11  void glDeleteTextures(int bufcount, int[] textures);
+    GL11  void glCopyTexImage2D(int target, int level, int internalformat, int x, int y, int width, int height, int border);
+   
+    GL11  void glBindTexture(int target, int texture);
+    GL11  void glTexEnvf(int target, int pname, float param);
+    GL11  void glTexEnvi(int target, int pname, int param);
+    GL11  void glTexParameterf(int target, int pname, float param);
+    GL11  void glTexParameterfv(int target, int pname, FloatBuffer params);
+    GL11  void glTexParameterfv(int target, int pname, float[] params);
+    GL11  void glTexParameteri(int target, int pname, int param);
+    GL11  void glTexParameteriv(int target, int pname, IntBuffer params);
+    GL11  void glTexParameteriv(int target, int pname, int[] params);
+    GL11  void glTexImage2D(int target, int level, int internalFormat, int width, int height, int border, int format, int type, Buffer pixels);
+    GL11  void glTexImage2D(int target, int level, int internalFormat, int width, int height, int border, int format, int type, long pixels_buffer_offset);
+    GL11  void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, int type, Buffer pixels);
+    GL11  void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format, int type, long pixels_buffer_offset);
+    
+    GL11  void glStencilFunc(int func, int ref, int mask);
+    GL20  void glStencilFuncSeparate(int frontfunc, int backfunc, int ref, int mask);
+    GL11  void glStencilMask(int mask);
+    GL20  void glStencilMaskSeparate(int target, int id);
+    GL11  void glStencilOp(int fail, int zfail, int zpass);
+    GL20  void glStencilOpSeparate(int sfactorRGB, int dfactorRGB, int sfactorAlpha, int dfactorAlpha);
+   
+    GL14  void glBlendColor(float red, float green, float blue, float alpha);
+    GL14  void glBlendEquation(int mode);
+    GL20  void glBlendEquationSeparate(int target, int id);
+    GL11  void glBlendFunc(int sfactor, int dfactor);
+    GL14  void glBlendFuncSeparate(int sfactorRGB, int dfactorRGB, int sfactorAlpha, int dfactorAlpha);
+     
+    GL11  void glColor3f(float red, float green, float blue);
+    //GL11  void glColor3fv(FloatBuffer v);
+    //GL11  void glColor3fv(float[] v);
+    GL11  void glColor4f(float red, float green, float blue, float alpha);
+    //GL11  void glColor4fv(FloatBuffer v);
+    //GL11  void glColor4fv(float[] v);
+     
+    GL11  void glPolygonMode(int face, int mode);
+    GL11  void glPolygonOffset(float factor, float units);
+     
+    GL11  void glPushMatrix();
+    GL11  void glPopMatrix();
+    GL11  void glMatrixMode(int mode);
+    GL11  void glLoadIdentity();
+    GL11  void glMultMatrixf(FloatBuffer m);
+    GL11  void glMultMatrixf(float[] m);
+    GL13  void glMultTransposeMatrixf(FloatBuffer m);
+    GL13  void glMultTransposeMatrixf(float[] m);
+  
+    GL11  void glRotatef(float angle, float x, float y, float z);
+    GL11  void glTranslatef(float x, float y, float z);
+    GL11  void glScalef(float x, float y, float z);
+   
+    GL11  int  glGenLists(int range);
+    GL11  void glDeleteLists(int list, int range);
+    GL11  void glNewList(int list, int mode);
+    GL11  void glEndList();
+    GL11  void glCallList(int list);
+   
+    GL11  void glBegin(int mode);
+    GL11  void glEnd();
+   
+    GL11  void glVertex2f(float x, float y);
+    GL11  void glVertex2fv(float[] v);
+    GL11  void glVertex3f(float x, float y, float z);
+    GL11  void glVertex3fv(float[] v);
+    GL11  void glVertex4f(float x, float y, float z, float w);
+    GL11  void glVertex4fv(float[] v);
+  
+    GL11  void glNormal3f(float nx, float ny, float nz);
+    GL11  void glNormal3fv(float[] v);
+     
+    GL11  void glTexCoord2f(float s, float t);
+    GL11  void glTexCoord2fv(float[] v);
+     
+    GL20  void glVertexAttrib1f(int target, float s);
+    
+    GL20  void glVertexAttrib2f(int target, float s, float t);
+    GL20  void glVertexAttrib2fv(int target, float[] v); 
+     
+    GL20  void glVertexAttrib3f(int target, float s, float t, float r);
+    GL20  void glVertexAttrib3fv(int target, float[] v);
+    
+    GL20  void glVertexAttrib4f(int target, float s, float t, float r, float q);
+    GL20  void glVertexAttrib4fv(int target, float[] v);
+      
+    GL11  void glDrawArrays(int mode, int first, int count);
+    GL11  void glDrawElements(int mode, int bufcount, int buftype, IntBuffer indices);
+    GL11  void glDrawElements(int mode, int count, int buftype, long indices_buffer_offset);
+    GL12  void glDrawRangeElements(int mode, int start, int end, int bufcount, int buftype, IntBuffer indices);
+    GL12  void glDrawRangeElements(int mode, int start, int end, int bufcount, int buftype, long indices_buffer_offset);
+   
+    GL11  void glVertexPointer(int size, int buftype, int stride, FloatBuffer pointer);
+    GL11  void glVertexPointer(int size, int buftype, int stride, long pointer_buffer_offset);
+    
+    GL11  void glNormalPointer(int buftype, int stride, FloatBuffer ptr);
+    GL11  void glNormalPointer(int buftype, int stride, long ptr_buffer_offset);
+    
+    GL11  void glColorPointer(int size, int buftype, int stride, FloatBuffer ptr);
+    GL11  void glColorPointer(int size, int buftype, int stride, long ptr_buffer_offset);
+     
+    GL14  void glSecondaryColorPointer(int size, int buftype, int stride, FloatBuffer pointer);
+    GL14  void glSecondaryColorPointer(int size, int buftype, int stride, long ptr_buffer_offset);
+      
+    GL11  void glTexCoordPointer(int size, int buftype, int stride, FloatBuffer ptr);
+    GL11  void glTexCoordPointer(int size, int buftype, int stride, long ptr_buffer_offset);
+     
+    GL20  void glVertexAttribPointer(int index, int size, int buftype, boolean normalized, int stride, FloatBuffer pointer);
+    GL20  void glVertexAttribPointer(int index, int size, int buftype, boolean normalized, int stride, long pointer_buffer_offset);
+   
+    GL20  void glEnableVertexAttribArray(int mode);
+  
+    GL11  void glInterleavedArrays(int format, int stride, FloatBuffer pointer);
+    GL11  void glInterleavedArrays(int format, int stride, long pointer_buffer_offset);
+     
+    GL15  void glGenBuffers(int bufcount, IntBuffer ids);
+    GL15  void glGenBuffers(int bufcount, int[] ids);
+    GL15  void glBindBuffer(int target, int id);
+    
+    GL15  void glBufferData(int target, int bufcount, IntBuffer data, int usage);
+    GL15  void glBufferSubData(int target, int offset, int bufcount, IntBuffer data);
+    
+    GL15  void glBufferData(int target, int bufcount, FloatBuffer data, int usage);
+    GL15  void glBufferSubData(int target, int offset, int bufcount, FloatBuffer data);
+     
+    GL20  int glCreateProgram();
+    GL20  void glDeleteProgram(int program);
+    GL20  boolean glIsProgram(int program);
+    GL20  void glValidateProgram(int program);
+    GL20  void glLinkProgram(int mode);
+    GL20  void glUseProgram(int mode);
+    GL20  int glCreateShader(int type);
+    GL20  void glDeleteShader(int shader);
+    GL20  boolean glIsShader(int shader);
+   
+    GL20  void glShaderSource(int shader, int count, String[] prog, int[] length);
+    GL20  void glCompileShader(int mode);
+    GL20  void glAttachShader(int target, int id);
+    GL20  void glDetachShader(int target, int id);
+      
+    GL20  void glGetProgramiv(int target, int pname, IntBuffer params);
+    GL20  void glGetProgramiv(int target, int pname, int[] params);
+    GL20  void glGetShaderiv(int target, int pname, IntBuffer params);
+    GL20  void glGetShaderiv(int target, int pname, int[] params);
+    GL20  void glGetShaderInfoLog(int program, int bufcount, IntBuffer length, ByteBuffer infoLog);
+    GL20  void glGetShaderInfoLog(int program, int bufcount, int[] length, byte[] infoLog);
+    GL20  void glGetProgramInfoLog(int program, int bufcount, IntBuffer length, ByteBuffer infoLog);
+    GL20  void glGetProgramInfoLog(int program, int bufcount, int[] length, byte[] infoLog);
+    GL20  int glGetAttribLocation(int program, String name);
+    GL20  int glGetUniformLocation(int program, String name);
+    
+    GL20  void glUniform1f(int location, float v0);
+    GL20  void glUniform2f(int location, float v0, float v1);
+    GL20  void glUniform3f(int location, float v0, float v1, float v2);
+    GL20  void glUniform4f(int location, float v0, float v1, float v2, float v3);
+    
+    GL20  void glUniform4fv(int location, int bufcount, float[] values);
+    GL20  void glUniform4fv(int location, int bufcount, FloatBuffer values);
+    
+    
+    GL20  void glUniform1i(int location, int v0);
+    GL20  void glUniform2i(int location, int v0, int v1);
+    GL20  void glUniform3i(int location, int v0, int v1, int v2);
+    GL20  void glUniform4i(int location, int v0, int v1, int v2, int v3);
+    
+    GL20  void glUniform4iv(int location, int bufcount, int[] values);
+    GL20  void glUniform4iv(int location, int bufcount, IntBuffer values);

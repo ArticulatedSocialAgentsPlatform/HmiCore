@@ -1,0 +1,125 @@
+
+Bip01-node  (topmost node)
+rotation matrix M0
+ 0 1 0 
+-1 0 0 
+ 0 0 1 
+ This is R_Z(-90) 
+ Translation ( 0,  0.7999,  94.701 )
+ 
+ 
+ Bip01_Bassin-node (Humanoid root) child of Bip01-node
+ rotation matrix M1
+ 0 1 0  
+ 0 0 1 
+ 1 0 0 
+ This is R_(1,1,1)(-120) :  swap y -> x -> z -> y
+ 
+  Translation (0, 0, 0)
+ 
+ 
+ Combined: M01 = M0M1 =
+ 
+  0 1 0      0 1 0     0  0  1
+(-1 0 0) *  (0 0 1) = (0 -1  0)
+  0 0 1      1 0 0     1  0  0
+  
+  This is R_(1,0,1)(180)
+  
+  Notations for body orientation: B A L = body, right arm, looking directions.
+  For instance, BAL = +Z-X-Y means: body along positive Z, right arm along negative X, looking into negative Y direction
+  
+  BAL Orientations for various combinations of M0, M1, adjustBindPoses(Adj)
+  
+  
+  The effect on the avatar depends on many factors:
+  1) do we include the Bip01_node and/or the Bip01_Bassin-node (=HumanoidRoot) nodes and transforms?
+     Note that we can apply calculateMatrices at the Bip01 level or the Bip01_Bassin level. Moreover,
+     we can choose to have the original Collada matrices for these two nodes/joints, or to cancel them by
+     setting them (in the Collada file) to identity matrices. 
+  2) do we enable operations like gscne.adjustBindposes, gscene rotate/scale,  and glscene.deform()
+ 
+ A) The only secure way of seeing the untransformed body mesh (except for scaling) is to do this:
+  a) in hmi.graphics.collada.scenegraph.ColladaTranslator
+     disable the gscene rotate and gscene.adjustBindPoses operations. 
+     (disabling the scaling is difficult to avoid, since the model becomes 100 times too large)
+  b) in the test scne, like hmi.graphics.colladatest2.ColladaAnimationTestScene, disable the glScene.deform(); operation(s).
+  
+  What you see:  Armandia in +Z-X-Y position (Lying on the ground in +Z direction, lookingwards in -Y direction, hands in T pose.)
+  With joint markers enabled, you see that the "neutral pose" of the Collada skeleton almost matches this position, execpt that for the
+  truly non-deformed body the arms are slightly more "backwards", i.e. in the +y direction. 
+  So you cannot use the joint matrices from the Collada file to determine the bind matrices!
+  Note: enabling the deform() operation in ColladaTranslator corrects this misalignment, because the mesh is deformed so as to match the skeleton.
+  
+B)   Enabling the adjustBindposes now shifts the skeleton in the +Z direction. This is due to the (non-Id) matrices in Bip01/Bip01_Bassin: 
+  when setting these matrices to Id, there is alignment again, with or without the deform enabled.
+  
+C) with no adjustBindposes and the two Bip01(_Bassin) matrices set to Id, the mesh is in the +X-Z+Z orientation: lying along the +X axis.
+  This seems consistent: the two matrices together are a rotation around (1, 0, 1) over 180 degrees, which moves from the +Z position to the +X position.
+  
+D) The (non-adapted, original) conduct animation includes a HumanoidRoot rotation that results in a  +X+Y+Z orientation: along the X axis,
+looking forward along +Z.  With the conducttest2 animation where  HumanoidRoot has been eliminated, the animation looks ok and is in line
+with the +Z-X-Y orientation. Of course the (rather small) variations in HumanoidRoot rotation are lost.
+
+E) with Bip01 rotation removed, the conduct animation (including the HumanoidRoot animation) looks ok, and the body
+is in the desired +Y-X+Z orientation: standing upright (along +Y), looking along +Z.
+Note that the Bip01_Bassin rotation is cancelled by the animation. With the original Bip01_Bassin rotation (but no Bip01 rotation), 
+the avatar is in +Z-Y+X orientation: along Z, looking in +X direction. With no BVip01/Bip01_Bassin rotations at all is along +X,
+but in both cases the conduct animation is OK. 
+
+F) There are 100 bones in Armandia: Bone1 .. Bone100. Bone1 = Bip01_Bassin = HumanoidRoot
+  
+  Bip01 is a "Joint" in Collada terminology (I.e. not a "Node"), but it has no sid, and does not correspond to any of the bones.
+  
+  
+G) Global rotation A (around X-axis for instance) of the avatar does not work with original animation data like conduct. 
+Reason: local joint rotations L should be transformed like A o L o A^-1. This should be done whenever L changes, not just once, during loadtime.
+It does work with the original mesh/original joint matrices, including the Bip01 transform. 
+
+H) adaptation of bind matrices will not work in combination with original animation data either. Basically same reason as for G)
+
+I) Applying only adjustBindposes results in a slightly different avatar than the original picture. explanation: the original is NOT exactly
+in the bind pose, but has a slight correction for the arms (less backwards)
+J) The translation of Bip01_Bassin in the Collada file disappears after the adjustBindPoses
+  
+Adaptation of animation data:
+
+- adjustBindposes ...
+- rotate ..
+- set HAmin pose:
+GScene.setSkeletonHAnimPoses calls Skeletons.setHAnimPose and Skeletons.setNeutralPoses
+Skeletons.setNeutralPoses  calls prepareBindPose and GSkinnedMesh.setBindPose
+GSkinnedMesh.setBindPose puts the GlobalMatrix from the new neutral pose for joint i into the rotation part of inverseBindMatrices[i],
+assuming that the existing inverse bind matrix had an identity rotation part. (translation is NOT zero, but is preserved)
+
+So the (non-inverse) bind matrix of  joint i must be post-multiplied with the rotation matrix for joint i from a animation pose
+in the "original"  (i.e. non-HAnim) format.  (If the inverse bind matrix for joint i is, say, L0 L1 L2, then we must use (L0 L1 L2)^-1
+to correct the bind rotation R for joint i: R' = R (L0 L1 L2)^-1
+  
+  ======old:
+  
+  No transforms at all: (disabled in GLSkinnedMesh): BAL = +Z-X-Y
+  0) M0, M1        BAL= +Z-X-Y  equivalent to no transforms.
+  1) M0, M1, Adj   BAL= +Z+Y-X 
+  2) M0            BAL= -Y-Z-X
+  3) M0, Adj       BAL= +Z+Y-X 
+  4) M1            BAL= +Z-Y+X
+  5) M1, Adj       BAL= +Z-X-Y
+  6)               BAL= +X-Z+Y
+  7) Adj           BAL= +Z-X-Y
+  
+  0 -> 1: R_Z(-90) (This is M0!)
+  2 -> 3: Not a rotation!mirror operation
+  4 -> 5: R_Z(-90) (Again M0)
+  6 -> 7: R_(1,0,1)(180)   This is M0M1
+  
+  ===============================
+  Top level Armandia (nodes_Bip01-node.xml)
+  <node id="Bip01-node" name="Bip01" type="JOINT">
+     <matrix>0 1 0 0   -1 0 0 0.7999   0 0 1 94.701   0 0 0 1</matrix>
+        <node id="Bip01_Bassin-node" name="Bip01_Bassin" sid="Bone1" type="JOINT">
+          <matrix>0 1 0 0   0 0 1 0   1 0 0 0   0 0 0 1</matrix>
+          <node id="Bip01_Colonne-node" name="Bip01_Colonne" sid="Bone2" type="JOINT">
+            <matrix>0.99219 -0.124737 -0.000001 14.1866   0.124737 0.99219 0.000004 -0.007481   0.000001 -0.000004 1 0.000019   0 0 0 1</matrix>
+     
+  ( ``Pivot nodes'' have been eliminated.  )     

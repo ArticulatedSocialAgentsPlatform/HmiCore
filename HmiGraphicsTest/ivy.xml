@@ -1,0 +1,8 @@
+<ivy-module version="2.0">
+   <info organisation="HMI" module="HmiGraphicsTest"/>
+   <dependencies>
+      <dependency org="HMI"       name="HmiGraphics"                rev="latest.release"  />
+      <dependency org="logback"   name="logback-classic"            rev="latest.release"  />   
+      <dependency org="logback"   name="logback-core"               rev="latest.release"  />   
+   </dependencies>
+</ivy-module>

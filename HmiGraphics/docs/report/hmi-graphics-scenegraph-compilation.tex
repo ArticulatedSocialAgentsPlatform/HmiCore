@@ -1,0 +1,267 @@
+
+\section{Compilation}
+
+Compilation (currently) is relevant for the following stages:
+\begin{enumerate}
+\item From the hmi.graphics.collada format to hmi.graphics.scenegraph format.
+This step is carried out by classes inside the hmi.graphics.collada.scenegraph package.
+The idea is that after the compilation, we end up with a ``neutral'', graphics format independant description of a graphics scene.
+This stage is independant from the opengl related classes.
+\item From the hmi.graphics.scenegraph format to hmi.graphics.opengl format.
+This stage is carried out by the hmi.graphics.opengl.scenegraph package. Since it compiles
+from scenegraph format, it is independent from graphics file formats.
+\end{enumerate}
+
+The first step deals with compiling a subset of the very general Collada format into
+the more regular scenegraph format. The second step compiles into a low-level OpenGL format.
+As can be seen, the two steps follow logically one after another, yet, the intermediate scenegraph format
+is \emph{not} dependent on either the Collada format or the OpenGL related packages.
+The (future) idea is to extend the approach, in particular to allow more graphic formats,
+all to be compiled into the scenegraph format. In principle, the second step could also be replaced by compiling
+into something else, like Java3D, OpenGL ES etcetera.
+
+In this section we discuss both compilation steps \emph{together}, without all of the details,
+in order to see how a Collada scene ends up eventually as data structures for the Jogl renderer.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{hmi.graphics.opengl ``controllers'' and hmi.animation ``skeletons''}
+
+The counterpart of Collada's skin controllers at the OpenGL/Jogl level is the combination
+of GLSkinnedMesh objects combined with skeleton structures in the form of trees of VJoint objects.
+It is important here that skeletons and VJoints are part of the hmi.animation package, \emph{not} part of any of
+the hmi.graphics packages. The rationale here was to keep ``animation'' as such independent from OpenGL implementation
+issues. (The hmi.animation package can even be compiled without hmi.graphics available)
+
+The most important points:
+\begin{itemize}
+\item A \verb"GLBasicmesh" defines vertex attributes like vertex coordinates, texture coordinates, normals, colors,
+or more general GLSL shader attributes. It does \emph{not} deal with bone structures, skeletons, skin weights etcetera.
+\item A \verb"GLSkinnedMesh" is an extension of a \verb"GLBasicMesh", and adds skinning information.
+\item More in particular, a \verb"GLSkinnedMesh" defines: joint indices and joint weights per vertex, vcounts,
+for the number of joint/weights per vertex, joint matrices, inverse bind matrices, joint names and skeleton id.
+\item The joint matrices for a \verb"GLSkinnedMesh" are \emph{references} to matrices kept elsewhere.
+Typically, each joint matrix will be a reference to a (global) matrix exported by a \verb"VJoint" object.
+The rules of the game are that a \verb"GLSkinnedMesh" will read but not modify its joint matrices.
+Moreover, it is expected that updates to these matrices will be performed in a way that avoids concurrency problems.
+In practice this means that the thread \emph{setting} the values of VJoint matrices must
+synchronize by means ofa common lock or common monitor with the thread being used for mesh deformation and rendering.
+\item Inverse bind matrices are part of a \verb"GLSkinnedMesh". They are multiplied with the joint matrices
+by  calling the \verb"calculateMatrices" method of a \verb"GLSkinnedMesh" object. This should be done
+before the \verb"deform" method is being called on such a \verb"GLSkinnedMesh" object.
+Note that inverse bind matrices are always needed, even when the bind pose involves only ``trivial'' rotations.
+In that case all 3X3 rotation matrices would be identity matrices, but the \emph{translation} from one joint to the next
+is still part of the 4X4 (inverse) bind matrix.
+
+\subsection {hmi.graphics.scenegraph ``controllers''}
+
+A (hmi.grapics.)scenegraph defines \verb"GMesh" as the counterpart of Collada's skinned meshes, and opengl's deformable meshes.
+A \verb"GMesh" defines normal vertex attributes like vertex coordinates etcetera, but also a special purpose
+\verb"VertexWeights" attribute, joint names, s skeleton id, and inverse bind matrices.
+The skeleton id is the id of some \verb"GNode" within the scenegraph, that still has to be resolved.
+Once this skeleton ``root'' node has been determined, it is assumed that joint \verb"GNode"s can be located
+as (recursive) children, by means of their \verb"sid" attribute, that should correspond to the joint names
+from the \verb"GMesh".
+
+
+\subsection{Compiling ``Controllers''}
+
+A Collada \verb"instance_controller"  is compiled into a \verb"GMesh".
+All controller information, like joint names, skeleton id, inverse bind matrices, skin mesh, and
+skinning information like weights are put into the \verb"Gmesh" object. (We assume here only one skeleton per
+\verb"instance_controller")
+At the same time, the scene graph's \verb"GNode"s can be compiled into a similar \verb"VJoint" structure.
+It has not yet been decided what to do with potential ``sharing'' within scenegraphs, that is, for the moment
+we assume tree-like structures, no ``dag'' like scene graphs.
+Checking and resolving the skeleton \verb"id" or the joint name \verb"sid"'s can then be done.
+In the next compilation step, a \verb"GMesh" can be compiled into a \verb"GLSkinnedMesh"
+\end{itemize}
+
+
+\subsection{Detailed steps for compiling skinned meshes}
+
+A Collada skinned mesh is created by means of an \verb"instance_controller", specifying an url to the geometric mesh
+as well as specifying a skeleton node. The mesh geometry itself is a child of the \verb"instance_controller" node,
+which is quite independent from the skeleton node. In studio-max exports the skeleton typically resides in a completely separate scenegraph branch, and is the (only) child of some ``Bip'' root node.
+Example of an instance controller, referring to the \verb"CWom0023-Pelvis-node" skeleton, and
+using a geometric mesh, referenced here as \verb"CWom0023-Mesh".
+\begin{verbatim}
+<node id="CWom0023-Mesh-node" name="CWom0023-Mesh" type="NODE">
+  <instance_controller url="#CWom0023-Mesh-mesh-skin">
+    <skeleton>#CWom0023-Pelvis-node</skeleton-->
+      ... (instance_material)
+  </instance_controller>
+</node>
+\end{verbatim}
+
+The skeleton, starting at the \verb"CWom0023-Pelvis-node" node, resides in the second secengraph branch,
+with root node \verb"CWom0023-Bip-node". 
+\begin{verbatim}
+  
+<node id="CWom0023-Bip-node" name="CWom0023-Bip" type="JOINT">
+  <matrix>
+     0 1 0 -0.000068 
+    -1 0 0  0.016062 
+     0 0 1  0.905944 
+     0 0 0  1
+  </matrix>
+  <node id="CWom0023-Pelvis-node" name="CWom0023-Pelvis" sid="Bone1" type="JOINT">
+    <matrix>
+      0 1 0 -0.007917 
+      0 0 1  0 
+      1 0 0  0 
+      0 0 0  1
+   </matrix>
+    <node id="CWom0023-Spine-node" name="CWom0023-Spine" sid="Bone2" type="JOINT">
+      ... (remainder of skeleton graph)
+\end{verbatim}
+
+Note that the skeleton is rotated (and translated as a whole), by means of the pelvis node matrix. 
+
+The mesh itself has (in this example) no inherent transformation, but the Collada idea is that the 
+\verb"CWom0023-Mesh-node" could be moved around, affecting the position and orientation of the mesh as a whole. 
+So the mesh deformation process, using the skeleton joint nodes, is decoupled from the mesh transformation
+as a whole. Still the translation and rotation of the skeleton root or the ``Bip'' node will also
+affect this ``global'' position and orientation. 
+The skeleton structure specifies a hierarchical tree of joint nodes, each with a local translation, local rotation, and possibly, local scaling. In addition the mesh defines ``inverse bind matrices'', 
+and even a \verb"bind_shape_matrix" element. The latter is rather simple: it specifies
+a single matrix, to be applied to the mesh geometry in order to get it into 
+the so-called ``bind pose''. 
+The inverse bind matrices (one per joint) are more complex. 
+In essence, they specify the matrices that where needed to get the skeleton structure
+into the bind pose as well. For example, consider a skeleton that would have its arms 
+hanging downwards, but, on the other hand, a mesh that in the bind pose has the avatar
+in the ``T-shape'' pose, with the arms stretched horizontally. 
+Then the bind pose for the skeleton would rotate the arms such that they would also be in
+a T-shape pose, matching the mesh bind pose. Note that the bind matrix for some joint specifies
+the \emph{global} transformation for that joint in order to be in the bind pose, not just
+its \emph{local} translation and rotation. 
+
+\subsubsection{ translation steps (``under revision'') }
+
+\begin{enumerate}
+\item The Collada package includes classa that mimic the Collada structures quite closely.
+The relevant classes here (from \verb"hmi.graphics.collada") are: 
+\begin{itemize}
+\item \verb"Instance_Controller" : defines the mesh url, and the skeleton ids, via the associated \verb"Skeleton"
+\item \verb"Skeleton" : just the url of some skeleton id
+\item \verb"Controller" : just a link to the \verb"Skin"
+\item \verb"Skin" : the \verb"Joints", \verb"Vertex_Weights", the \verb"Bind_Shape_Matrix"
+\item \verb"Joints" : defines the SID's of the joints, as well as the associated inverse bind matrices.
+\end{itemize}
+
+\item The hmi.graphics.scenegraph package represents skinned meshes using the following classes:
+\begin{itemize}
+\item \verb"GNode" : the basic scenegraph node, used used here to represent skeleton joint nodes.
+\item \verb"GSkinnedMesh" : keeps track of skeleton ids, joint names, joint sid's, inverse bind matrices,
+vertex weights, and links to the skeleton GNode nodes that represent skeleton nodes. 
+A \verb"GSkinnedMesh" is an extension of a \verb"GMesh"
+\item \verb"GMesh" : represents the mesh geometry, by means of vertex attributes, and vertex index data.
+\item \verb"VertexAttribute" : a generic vertex attribute, like position, normal, texture coordinate, color
+\item \verb"VertexWeights" : somewhat like a complicated \verb"VertexAttribute", keeping track
+of vertex weights for a \verb"GSkinnedMesh". 
+\end{itemize}
+
+
+
+
+\item The scenegraph structures are not directly fit for rendering in an OpenGL context.
+The \verb"hmi.graphics.opengl" package contains OpenGL based counterparts for scenegraph structures.
+The relevant classes for skinned meshes are:
+\begin{itemize}
+\item \verb"GLSkinnedMesh" : defines OpenGL vertex attributes and index data, joint matrices,
+inverse bind matrices. (For debugging purposes it also keeps track of joint names etc.)
+\verb"GLSkinnedMesh" is an extension of \verb"GLBasicmesh" 
+It knows how to \emph{deform} the mesh data from the underlying \verb"GLBasicMesh", based upon the
+current joint matrices, inverse bind matrices, and vertex weights.
+\item \verb"GLBasicMesh" : keeps track of vertex attributes and vertex index data.
+In particular it knows how to render the mesh, using this data.
+\item \verb"GLVertexAttribute" : auxiliary class, used by \verb"GLBasicMesh" to deal
+with vertex attribute data.
+\end{itemize}
+
+
+\item The translation from Collada structures to scenegraph structures:\\
+The translation methods are located within the \verb"hmi.graphics.collada.scenegraph" subpackage.
+The translation here boils down down to collecting information that is spread around within the Collada
+structures, and combining it into  \verb"GSkinnedMesh" objects, together
+with \verb"GNode" based skeleton graphs. The transformation part of a Collada node is transformed into
+a \verb"VJoint" that is kept inside a scenegraph  \verb"GNode". 
+Since both \verb"VJoint" structures and \verb"GNode" structures
+are hierarchical trees, we have some (unfortunate) hierarchy duplication here. 
+A slight advantage is that the \verb"VJoint" based structure is based solely upon
+the \verb"hmi.animation" package, and is quite independant from the \verb"hmi.graphics" packages.
+
+Note that a single Collada mesh can consist of more than one ``primitive'', where a primitive in this context 
+is a part of the mesh geometry together with a material. Such primitives are currently translate
+into separate \verb"GSkinnedMesh" objects, that typically share a single skeleton structure.
+
+
+The translation at the highest level compiles a complete Collada document into a \verb"GScene" object.
+The latter collects global information like the root nodes of the scenegraph, but also keeps track of 
+all \verb"GSkinnedMesh" es that occur within the scene.
+In a second translation step these \verb"GSkinnedMesh"es are worked on in order to
+get them prepare them for rendering in the OpenGL framwork, and in order to simplify animation.
+For instance, exported skinned meshes are often in the wrong orientation (lying on the ground),
+are not based upon the default HAnim skeleton structure and poses, might include scaling operations
+which complicate matters etcetera. The \verb"GScene" methods are meant to deal with all this. 
+
+Here is what we would like:
+\begin{enumerate}
+\item The avatar is standing at the origin, upright, where ``up'' means in the positive Y-direction
+\item All joints have been resolved in the sense that they are coupled to the appropriate \verb"GNode".
+\item the joint names are the standardized HAnim joint names, and the joint structure conforms to the
+HAnim standard. 
+\item The default pose, that is, the pose where all local joint rotations have been set to 
+the identity matrix, is the default HAnim pose, where for instance arms are pointing downwards,
+and are aligned with the Y-axis. 
+\item There is no scaling. In particular, we don't like non-uniform scaling, but other forms of scaling are also
+not convenient.
+
+\end{enumerate}
+
+In order to achieve this, the following steps are taken:
+
+\begin{enumerate}
+\item joints are resolved: skeleton ids are used to find corresponding skeleton root nodes inside
+the scenegraph \verb"GNode" branches, then joint \verb"GNode"s are searched for by sid 
+within the sub tree(s) defined by these root node(s).
+When found the GSkinned mesh is linked to the global matrix of the VJoint of the skeleton GNode.
+This direct coupling means that during rendering the GNode structure is no longer needed: the 
+mesh will use the global matrix of the joint directly. 
+For convenience, we copy the joint names from the skeleton nodes to the GSkinned mesh, mainly for debugging purposes.
+\item In the second step, joint sids (and joint names) are \emph{renamed}, based upon a user specified
+renaming list. The renaming is carried out both on the GSkinnedMeshes as well as the GNodes from the skeletons.
+This ``early renaming' guarantees that later stages can assume, for instance, that HAnim joint sids/names
+are being used. The original joint ids are \emph{not} renamed. 
+
+\item the next step is to rotate and scale the mesh as a whole. Say, your mesh is specified with centimeters,
+rather than with meters. Then you want to scale by a factor $1/100$. If the avatar
+is lying on its nose, in the direction of the Z-axis, you want to rotate it such that the Y-axis is the ``up-axis''.
+This step actually modifies the geometric attributes of the mesh
+\end{enumerate}
+
+\item The translation from scenegraph structures to opengl structures:\\
+
+Here we translate  \verb"GSkinnedMesh" objects into  \verb"GLSkinnedMesh" objects,
+\verb"GNode" objects into a \verb"GShape" objects.
+The \verb"VJoint" object that represents
+the transformation aspect of a \verb"GNode" are kept, and form the transformation scenegraph during rendering.
+
+
+
+\end{enumerate}
+

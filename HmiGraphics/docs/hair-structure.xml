@@ -1,0 +1,268 @@
+Overview: hair is modelled by 5 triangle meshes,(one Collada mesh) each with its own material/texture
+
+
+file: library_visual_scenes.xml   (DIT IS VOLDOENDE OM ALLEEN HAAR (+necklace + ogen/tanden) te tonen
+   <library_visual_scenes>
+       <visual_scene id="_Armandia_2008_MR.max" name="_Armandia_2008_MR_max">
+        ....
+       <include file="nodes_Bip01-node.xml" />
+       <include file="nodes_necklace_hair.xml" />
+   </library_visual_scenes>
+
+==========================================================================================================
+file: nodes_necklace_hair.xml
+      <node id="hair_C_-node" name="hair_C_" type="NODE">
+        <instance_controller url="#hair_C_-mesh-skin">
+          <skeleton>#Bip01_Bassin-node</skeleton>
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="chev02" target="#chev02">
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="1"/>
+              </instance_material>
+              <instance_material symbol="orig_Standard_1" target="#orig_Standard_1">
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="1"/>
+              </instance_material>
+              <instance_material symbol="Standard_2" target="#Standard_2">
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="1"/>
+                <bind_vertex_input semantic="CHANNEL2" input_semantic="TEXCOORD" input_set="2"/>
+              </instance_material>
+              <instance_material symbol="Standard_3" target="#Standard_3">
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="1"/>
+                <bind_vertex_input semantic="CHANNEL2" input_semantic="TEXCOORD" input_set="2"/>
+              </instance_material>
+              <instance_material symbol="chev05" target="#chev05">
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="1"/>
+                <bind_vertex_input semantic="CHANNEL2" input_semantic="TEXCOORD" input_set="2"/>
+              </instance_material>
+            </technique_common>
+          </bind_material>
+        </instance_controller>
+      </node>
+
+==========================================================================================================
+file: library_controllers.xml
+  <library_controllers>
+     ....
+     <include file="controller/hair_C_-mesh-skin.xml" />
+  </library_controllers>
+
+==========================================================================================================
+file: controller/hair_C_-mesh-skin.xml
+<controller id="hair_C_-mesh-skin">
+      <skin source="#hair_C_-mesh">
+        <bind_shape_matrix>1 0 0 0.001197 0 1 -0.00084 2.0966 0 0.00084 1 116.926 0 0 0 1</bind_shape_matrix>
+        <source id="hair_C_-mesh-skin-joints">
+          <Name_array id="hair_C_-mesh-skin-joints-array" count="100">Bone1 Bone2 Bone3 Bone4 Bone5 ......  Bone98 Bone99 Bone100</Name_array>
+          <technique_common>
+            <accessor source="#hair_C_-mesh-skin-joints-array" count="100" stride="1">
+              <param name="JOINT" type="Name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="hair_C_-mesh-skin-bind_poses">
+          <float_array id="hair_C_-mesh-skin-bind_poses-array" count="1600">-0.000001 -0.00084 1 -14.3808 -0.97722 .......... 0 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#hair_C_-mesh-skin-bind_poses-array" count="100" stride="16">
+              <param name="TRANSFORM" type="float4x4"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="hair_C_-mesh-skin-weights">
+          <float_array id="hair_C_-mesh-skin-weights-array" count="1757">1 0.338144 0.33814 0.3237163 2 0.584494 ..... 0.846047 0.153953</float_array>
+          <technique_common>
+            <accessor source="#hair_C_-mesh-skin-weights-array" count="1757" stride="1">
+              <param name="WEIGHT" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <joints>
+          <input semantic="JOINT" source="#hair_C_-mesh-skin-joints"/>
+          <input semantic="INV_BIND_MATRIX" source="#hair_C_-mesh-skin-bind_poses"/>
+        </joints>
+        <vertex_weights count="1145">
+          <input semantic="JOINT" source="#hair_C_-mesh-skin-joints" offset="0"/>
+          <input semantic="WEIGHT" source="#hair_C_-mesh-skin-weights" offset="1"/>
+          <vcount>3 3 3 3 3 2 2 3 3 3 2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 2 2 1....2 2 2 </vcount>
+          <v>6 1 6 2 5 3 6 4 6 5 5 6 6 7 6 8 5 9 6 10 6 11 5 12 6 13 6 14 5 15 6 16 5 17 6 18 5 19 6 20 5 .... 6 1754 6 1755 6 1756</v>
+        </vertex_weights>
+      </skin>
+    </controller>
+    
+    ==========================================================================================================================================
+    file: hair_C_mesh.xml
+    
+    <geometry id="hair_C_-mesh" name="hair_C_">
+      <mesh>
+        <source id="hair_C_-mesh-positions">
+          <float_array id="hair_C_-mesh-positions-array" count="3435">.......
+          <accessor source="#hair_C_-mesh-positions-array" count="1145" stride="3">
+            ...
+        <source id="hair_C_-mesh-normals">
+         <accessor source="#hair_C_-mesh-normals-array" count="1145" stride="3">  
+           ...
+        <source id="hair_C_-mesh-map-channel1">
+         <accessor source="#hair_C_-mesh-map-channel1-array" count="1507" stride="3">
+            <param name="S" type="float"/>   <param name="T" type="float"/>    <param name="P" type="float"/>
+            ...
+        <source id="hair_C_-mesh-map-channel2">
+         <accessor source="#hair_C_-mesh-map-channel2-array" count="1553" stride="3">
+            
+        <source id="hair_C_-mesh-map-channel3">
+         <accessor source="#hair_C_-mesh-map-channel3-array" count="1511" stride="3">
+            
+        <source id="hair_C_-mesh-map-channel4">
+         <accessor source="#hair_C_-mesh-map-channel4-array" count="1561" stride="3">
+           
+        .....
+        
+      <vertices id="hair_C_-mesh-vertices">
+          <input semantic="POSITION" source="#hair_C_-mesh-positions"/>
+        </vertices>
+        <triangles material="chev02" count="446">
+          <input semantic="VERTEX" source="#hair_C_-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#hair_C_-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#hair_C_-mesh-map-channel1" offset="2" set="1"/>
+          <input semantic="TEXCOORD" source="#hair_C_-mesh-map-channel2" offset="3" set="2"/>
+          <input semantic="TEXCOORD" source="#hair_C_-mesh-map-channel3" offset="4" set="3"/>
+          <input semantic="TEXCOORD" source="#hair_C_-mesh-map-channel4" offset="5" set="4"/>
+          <p>10 0 10 0 0 0 16 1 16 4 6 4 17 2 17 5 7 5 16 1 16 4 6 4 10 0 10 0 0 0 11.....</p>
+        </triangles>
+        
+        <triangles material="orig_Standard_1" count="446">
+          <input semantic="VERTEX" source="#hair_C_-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#hair_C_-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#hair_C_-mesh-map-channel1" offset="2" set="1"/>
+          <input semantic="TEXCOORD" source="#hair_C_-mesh-map-channel2" offset="3" set="2"/>
+          <input semantic="TEXCOORD" source="#hair_C_-mesh-map-channel3" offset="4" set="3"/>
+          <input semantic="TEXCOORD" source="#hair_C_-mesh-map-channel4" offset="5" set="4"/>
+          <p>229 219 251 255 241 255 235 220 257 259 247 259 23....
+            
+       <triangles material="Standard_2" count="162">
+         ....
+       <triangles material="Standard_3" count="264">
+          ....
+       <triangles material="chev05" count="176">
+          ....
+      </mesh>
+    </geometry>
+    
+    ==========================================================================================================
+    file: library_materials.xml
+    <material id="chev02" name="chev02">    <instance_effect url="#chev02-fx"/>   </material>
+    <material id="orig_Standard_1" name="orig_Standard_1">      <instance_effect url="#orig_Standard_1-fx"/>    </material>
+    <material id="Standard_2" name="Standard_2">      <instance_effect url="#Standard_2-fx"/>    </material>
+    <material id="Standard_3" name="Standard_3">      <instance_effect url="#Standard_3-fx"/>    </material>
+    <material id="chev05" name="chev05">      <instance_effect url="#chev05-fx"/>    </material>
+    ===========================================================================================================
+    
+    
+    
+    file: library_effects.xml
+    
+    <effect id="chev02-fx" name="chev02">
+      <profile_COMMON>
+        <newparam sid="chev3_chatun__jpg-surface">
+          <surface type="2D">
+            <init_from>chev3_chatun_.jpg</init_from>
+            <format>A8R8G8B8</format>
+          </surface>
+        </newparam>
+        <newparam sid="chev3_chatun__jpg-sampler">
+          <sampler2D>
+            <source>chev3_chatun__jpg-surface</source>
+            <wrap_s>WRAP</wrap_s>
+            <wrap_t>WRAP</wrap_t>
+            <minfilter>NONE</minfilter>
+            <magfilter>NONE</magfilter>
+            <mipfilter>NONE</mipfilter>
+          </sampler2D>
+        </newparam>
+        <newparam sid="chev_03opa02__jpg-surface">
+          <surface type="2D">
+            <init_from>chev_03opa02_.jpg</init_from>
+            <format>A8R8G8B8</format>
+          </surface>
+        </newparam>
+        <newparam sid="chev_03opa02__jpg-sampler">
+          <sampler2D>
+            <source>chev_03opa02__jpg-surface</source>
+            <wrap_s>WRAP</wrap_s>
+            <wrap_t>WRAP</wrap_t>
+            <minfilter>NONE</minfilter>
+            <magfilter>NONE</magfilter>
+            <mipfilter>NONE</mipfilter>
+          </sampler2D>
+        </newparam>
+        <newparam sid="chev3_bump_jpg-surface">
+          <surface type="2D">
+            <init_from>chev3_bump.jpg</init_from>
+            <format>A8R8G8B8</format>
+          </surface>
+        </newparam>
+        <newparam sid="chev3_bump_jpg-sampler">
+          <sampler2D>
+            <source>chev3_bump_jpg-surface</source>
+            <wrap_s>WRAP</wrap_s>
+            <wrap_t>WRAP</wrap_t>
+            <minfilter>NONE</minfilter>
+            <magfilter>NONE</magfilter>
+            <mipfilter>NONE</mipfilter>
+          </sampler2D>
+        </newparam>
+        <technique sid="common">
+          <blinn>
+            <ambient>
+              <color>0.588 0.588 0.588 1</color>
+            </ambient>
+            <diffuse>
+              <texture texture="chev3_chatun__jpg-sampler" texcoord="CHANNEL1"/>
+            </diffuse>
+            <specular>
+              <color>0.9 0.9 0.9 1</color>
+            </specular>
+            <shininess>
+              <float>0.044099</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <reflectivity>
+              <float>1</float>
+            </reflectivity>
+            <transparent opaque="RGB_ZERO">
+              <texture texture="chev_03opa02__jpg-sampler" texcoord="CHANNEL1"/>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </blinn>
+          <extra>
+            <technique profile="FCOLLADA">
+              <spec_level>
+                <float>0.2</float>
+              </spec_level>
+              <bump>
+                <texture texture="chev3_bump_jpg-sampler" texcoord="CHANNEL1">
+                  <extra>
+                    <technique profile="MAX3D">
+                      <amount>0.3</amount>
+                    </technique>
+                  </extra>
+                </texture>
+              </bump>
+              <emission_level>
+                <float>0</float>
+              </emission_level>
+            </technique>
+          </extra>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="MAX3D">
+          <faceted>0</faceted>
+          <double_sided>1</double_sided>
+          <wireframe>0</wireframe>
+          <face_map>0</face_map>
+        </technique>
+      </extra>
+    </effect>

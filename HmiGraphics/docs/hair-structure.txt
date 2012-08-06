@@ -1,0 +1,90 @@
+
+
+Some remarks on Armandia hair structure.
+
+Basically, Armandia's hair is a single Collada mesh, subdivided into 5 triangle sub-meshes, each
+with its own material. (See screenshots, where just one tri mesh is enabled: hair_chev02.png, hair_orig_Standard_1.png, hair_Standard_2.png, hair_Standard_3.png, hair_chev05.png)
+Note that chev02 and orig_Standard_1 look identical (but their opacity maps are different)
+
+
+textures for "chev02"triangles:
+
+<diffuse>
+     <texture texture="chev3_chatun__jpg-sampler" texcoord="CHANNEL1"/>       file: chev3_chatun.jpg      texture: hair strucure
+</diffuse>
+
+<transparent opaque="RGB_ZERO">
+      <texture texture="chev_03opa02__jpg-sampler" texcoord="CHANNEL1"/>       file: chev_03opa02.jpg     texture opacity map black/white/grey, hair = white, background = black
+</transparent>
+
+<bump>
+    <texture texture="chev3_bump_jpg-sampler" texcoord="CHANNEL1">             file: chev3_bump.jpg
+    
+
+NB. texture Channel 2 is also used (although not for chev02), for the transparency texture.    
+    <texture texture="chev005_trans_jpg-sampler" texcoord="CHANNEL2">
+    
+    
+    
+    ================
+     triangle meshes, in order of appearance in hair_C_mesh.xml AFTER we put orig_Standard_1 triangles at the start of the list:
+    orig_Standard_1 triangles: effect: orig_Standard_1-fx     files:    chev3_chatun.jpg,     chev_03opa01.jpg,     chev3_bump.jpg
+    chev02 triangles:          effect: chev02-fx              files:    chev3_chatun.jpg,     chev_03opa02.jpg,     chev3_bump.jpg
+    
+    Standard_2 triangles:      effect: Standard_2-fx          files:    chev_T01_chatun.jpg,  chev003_trans.jpg,    chev_T01_Bump.jpg
+    Standard_3 triangles:      effect: Standard_3-fx          files:    chev_T01_chatun.jpg,  chev004_trans.jpg,    chev_T01_Bump.jpg
+    chev05 triangles:          effect: chev05-fx              files:    chev_T01_chatun.jpg,  chev005_trans.jpg,    chev_T01_Bump_jpg-surface
+    
+    
+    orig_Standard_1 and chev02 cover most of the skull, and look similar, (both shape and diffuse texture) except for the opacity maps (chev_03opa01.jpg and chev_03opa02.jpg)
+           chev_03opa01.jpg is almost completely white (where the texture applies), so seems to be an opaque layer that should be the deepest hair?
+           chev_03opa02.jpg show "hair strands", but otherwise, it covers the same area as chev_03opa01.jpg. The "strands" are black, so are hairs strands
+           using the opaque="RGB_ZERO" setting, where black is opque.
+           In fact the diffuse texture chev3_chatun.jpg shows the real hair strands, and the opacity maps are used for "whimps"? 
+           The geometry for the orig_Standard_1 triangles is slighly smaller than that of chev02 (checked by putting a different diffuse texture on the first)
+           So this is the deepest  opaque "background" layer shielding the head skin. chev02 is the layer with "whimps" on top of that.
+                       
+   Standard_2 triangles: horizontal band    mostly, but not completely, on top of chev02
+   
+   Standard_3 and chev05 are smaller bands/whisps, both horizontally and vertically
+                                
+   The hair effects use: <transparent opaque="RGB_ZERO">
+   together with: <transparency>      <float>1</float>     </transparency>
+   So the alpha blending equation for rgb, and for this case (where transparency==1) becomes:
+   
+   result =  F*framebuffer + (1-F)*diffuse_texture,
+   where F = opacity_texture value.
+   
+   So, if the opacity map is black, it is opaque, when it is white, i.e. ==1.0, then it is completely transparant.
+   
+   (Note: this is more or less the opposite of the standard alpha blending, where white would be opaque).
+   
+   
+   From Collada specs:
+ ---------------------------------------------------------------------------------------------
+   If either <transparent> or <transparency> exists then transparency rendering is activated, the
+renderer needs to turn on alpha blending mode, and the following equations define how to combine the
+two values. Use these equations to get the correct results based on the opaque setting of
+<transparent>, where fb is the frame buffer (that is, the image behind what is being rendered) and mat
+is the material color before the transparency calculation.
+• In A_ONE opaque mode:
+result.r = fb.r * (1.0f - transparent.a * transparency) + mat.r *
+(transparent.a * transparency)
+result.g = fb.g * (1.0f - transparent.a * transparency) + mat.g *
+(transparent.a * transparency)
+result.b = fb.b * (1.0f - transparent.a * transparency) + mat.b *
+(transparent.a * transparency)
+result.a = fb.a * (1.0f - transparent.a * transparency) + mat.a *
+(transparent.a * transparency)
+
+• In RGB_ZERO opaque mode:
+result.r = fb.r * (transparent.r * transparency) + mat.r *
+(1.0f -transparent.r * transparency)
+result.g = fb.g * (transparent.g * transparency) + mat.g *
+(1.0f -transparent.g * transparency)
+result.b = fb.b * (transparent.b * transparency) + mat.b *
+(1.0f -transparent.b * transparency)
+result.a = fb.a * (luminance(transparent.rgb) * transparency) + mat.a *
+(1.0f - luminance(transparent.rgb) * transparency)
+        
+--------------------------------------------------------------------------

@@ -1,0 +1,156 @@
+http://hmisvn.ewi.utwente.nl/trac/hmi/wiki/IssuesForNewVersionsOfArmandia
+
+armandia-toplevel.dae:
+<? include file="library_lights.xml"     ?>
+<? include file="library_images.xml"     ?>
+<? include file="library_materials.xml"  ?>
+<? include file="library_effects.xml"    ?>
+<? include file="library_geometries.xml" ?>
+<? include file="library_controllers.xml"?>
+<? include file="library_visual_scenes.xml" ?>
+  <scene>
+    <instance_visual_scene url="#_Armandia_2008_MR.max"/>
+  </scene>
+--------------------------------------------
+  <library_visual_scenes>
+    <visual_scene id="_Armandia_2008_MR.max" name="_Armandia_2008_MR_max">
+    <!--include file="nodes_helper.xml" /-->
+    <? include file="nodes_skin.xml" ?>
+    <? include file="nodes_Bip01-node.xml" ?>
+    <? include file="nodes_necklace_hair.xml" ?>
+    </visual_scene>
+  </library_visual_scenes>
+  ---------------------------------------------------------
+
+The top level  GLScene is derived from the visual_scene nodes, resulting in a number of  VJoint "scene roots":
+nodes_skin.xml:
+   ey02, ey01, Stiletto_Heels_01-node, Stiletto_Heels_02-node, Body_NG-node, pull_B_-node, Skirt_B_-node
+
+nodes_Bip01-node.xml:
+   Bip01-node  (with the HumanoidRoot, called Bip01_Bassin-node in the Collada file, as its child)
+
+nodes_necklace_hair.xml:
+   Necklace-node, hair_C_-node
+
+
+
+The Bip01-node is the only one with a (nontrivial) scenegraph structure, and describes the skeleton.
+ The other root nodes are just single nodes, with a controller and geometry attached.
+Each of these collada nodes, except for the Bip01 tree, contains just an instance_controller, like for instance:
+
+<node id="Stiletto_Heels_01-node" name="Stiletto_Heels_01" type="NODE">
+        <instance_controller url="#Stiletto_Heels_01-mesh-skin">
+          <skeleton>#Bip01_Bassin-node</skeleton>
+          <bind_material>....
+
+The skeleton is always the tree starting at the Bip01_Bassin-node, found within the Bip01 tree, ( and that we renamed into HumanoidRoot)
+
+<node id="Bip01-node" name="Bip01" type="JOINT">
+   <matrix>0 1 0 0  -1 0 0 0.7999  0 0 1 94.701  0 0 0 1</matrix>
+   <node id="Bip01_Bassin-node" name="Bip01_Bassin" sid="Bone1" type="JOINT">          <!-- our HumanoidRoot ->
+      <matrix>0 1 0 0  0 0 1 0  1 0 0 0  0 0 0 1</matrix>
+      <node id="Bip01_Colonne-node" name="Bip01_Colonne" sid="Bone2" type="JOINT">
+   ..... (deeply nested skeleton structure)...
+
+
+
+
+
+The file "geometry/Stiletto_Heels_01-mesh.xml" contains geometry:
+<geometry id="Stiletto_Heels_01-mesh" name="Stiletto_Heels_01">
+
+There are four sections with triangles:
+<triangles material="Standard_13" count="382">
+<triangles material="Standard_14" count="63">
+<triangles material="Standard_15" count="186">
+<triangles material="Standard_16" count="23">
+
+They end up as four GLShapes/GLSkinnedMesh inside the GLScene, one for each Material (all blinnBasic)
+ GLShape
+       glStateList= GLRenderList (    GLMaterial[shader=blinnBasic)]       )
+       glGeometryList= GLRenderList (  GLSkinnedMesh "Stiletto_Heels_01-mesh-0"    )
+             ..............           GLSkinnedMesh "Stiletto_Heels_01-mesh-1"
+              ..............          GLSkinnedMesh "Stiletto_Heels_01-mesh-2"
+               ..............         GLSkinnedMesh "Stiletto_Heels_01-mesh-3"
+      
+There is one top-level VJoint for Stiletto_Heels_01 inside the GLScene:
+  VJoint[  id="Stiletto_Heels_01-node"  sid="null"  name="Stiletto_Heels_01" ]
+  This is the reult from a controller in the Collada files:
+  inside library_controllers:
+  <? include file="controller/Stiletto_Heels_01-mesh-skin.xml" ?>
+  Inside the includes file:
+  
+    <controller id="Stiletto_Heels_01-mesh-skin">
+      <skin source="#Stiletto_Heels_01-mesh">
+        <bind_shape_matrix>1 0 0 -2.23612 0 1 0 2.02595 0 0 1 116.925 0 0 0 1</bind_shape_matrix>
+        <source id="Stiletto_Heels_01-mesh-skin-joints">
+          <Name_array id="Stiletto_Heels_01-mesh-skin-joints-array" count="100">Bone1 Bone2 Bone3 Bone4 Bone5 Bone6 Bone7 ...
+          .... (joints/weights binding)
+  The Stiletto_Heels_01 controllers seems to bind to joints with indices 88, 89, 90, 91, 92, 
+  tha means Bone 89, Bone90... Bone93 (zero based?)
+  Cuisse = thigh
+  Mollet == Calf
+  Orteil = toe
+
+ <node id="Bip01_D_Cuisse-node" name="Bip01_D_Cuisse" sid="Bone88" type="JOINT">
+ 
+   <node id="Bip01_D_Mollet-node" name="Bip01_D_Mollet" sid="Bone89" type="JOINT">
+      <node id="Bip01_D_Pied-node" name="Bip01_D_Pied" sid="Bone90" type="JOINT">
+         <node id="Bip01_Orteil_D0-node" name="Bip01_Orteil_D0" sid="Bone91" type="JOINT">
+            <node id="Bip01_Orteil_D01-node" name="Bip01_Orteil_D01" sid="Bone92" type="JOINT">
+               <node id="Bip01_Orteil_D02-node" name="Bip01_Orteil_D02" sid="Bone93" type="JOINT">
+               
+                   <node id="Bip01_Orteil_D0Morceau-node" name="Bip01_Orteil_D0Morceau" sid="Bone94" type="JOINT">
+                         
+
+Because of this controller, which binds to the skeleton, the Stilleto_Heels mesh moves together with the "rest".
+
+
+==> VGLNode avatarNode = new VGLNode(stilletoRoot, shapeList); //  This will provide control via the stilletoRoot for
+the position/orientation of the stiletto heel only. 
+
+Thus far we had:
+VGLNode avatarNode = new VGLNode(avatarRootJoint, shapeList);
+with control over the "naked body". 
+
+Then there is 
+skelbranchRoot = avatarRenderStruct.getVJoint("Bip01-node"); // the renderstruct root that contains the skeleton (as a child)
+
+This moves the "whole", since everything (all controlleres) attach to the Bip01 skeleton tree!!!
+
+
+
+There is a list of "GLSkinnedMeshes" in the Armandia GLScene, each coupled to the Bip01 skeleton structure.
+The combined geometry is present in the long GLShape list. The presence of the GLSkinnedMeshes is not needed
+for rendering the geometry per se, but the deform operations, executed for all of the GLSkinnedMeshes,
+takes care of the positioning and orientation of the various parts. (Without any deforms, the avatar is visible, but
+very small, from long distance, in the T pose. 
+
+
+The individual controllers are attached to a VJoint. animating that joint has effect via the deform methods.
+A few body parts (dents, factice ... ) are directly coupled to the Bip tree, i.e. without controllers.
+
+bipRootJoint = glScene.getVJoint("Bip01-node")
+
+
+
+==================================
+
+There are two controllers for the body, one "skin" controller operating with "joints", using a mesh that uses the result of a "morph" controller.
+
+<controller id="Body_NG-mesh-morpher-skin">
+      <skin source="#Body_NG-mesh-morpher">    
+       <source id="Body_NG-mesh-morpher-skin-joints">
+          <Name_array id="Body_NG-mesh-morpher-skin-joints-array" count="100">Bone1 Bone2 Bone3 Bone4 Bone5 Bone6 Bone7 Bone8 Bone9 Bone10 Bone11 Bone12 Bone13 Bone14 Bone15 Bone16 Bone17 Bone18 Bone19 Bone20 Bone21 Bone22 Bone23 Bone24 Bone25 Bone26 Bone27 Bone28 Bone29 Bone30 Bone31 Bone32 Bone33 Bone34 Bone35 Bone36 Bone37 Bone38 Bone39 Bone40 Bone41 Bone42 Bone43 Bone44 Bone45 Bone46 Bone47 Bone48 Bone49 Bone50 Bone51 Bone52 Bone53 Bone54 Bone55 Bone56 Bone57 Bone58 Bone59 Bone60 Bone61 Bone62 Bone63 Bone64 Bone65 Bone66 Bone67 Bone68 Bone69 Bone70 Bone71 Bone72 Bone73 Bone74 Bone75 Bone76 Bone77 Bone78 Bone79 Bone80 Bone81 Bone82 Bone83 Bone84 Bone85 Bone86 Bone87 Bone88 Bone89 Bone90 Bone91 Bone92 Bone93 Bone94 Bone95 Bone96 Bone97 Bone98 Bone99 Bone100</Name_array>
+      
+      
+      
+   <controller id="Body_NG-mesh-morpher">
+      <!--morph method="NORMALIZED" source="#Body_NG-mesh"-->
+      <morph method="NORMALIZED" source="#Body_NG-mesh-morpher-Body_chest_L-0">
+        <source id="Body_NG-mesh-morpher-targets">
+          <IDREF_array id="Body_NG-mesh-morpher-targets-array" count="21">Body_NG-mesh-morpher-Body_chest_L-0 Body_NG-mesh-morpher-yeux_NG01-1 Body_NG-mesh-morpher-A-2 Body_NG-mesh-morpher-O-3 Body_NG-mesh-morpher-U-4 Body_NG-mesh-morpher-E-5 Body_NG-mesh-morpher-I-6 Body_NG-mesh-morpher-F-7 Body_NG-mesh-morpher-P_B-8 Body_NG-mesh-morpher-Smile01-9 Body_NG-mesh-morpher-Pff-10 Body_NG-mesh-morpher-T_severe-11 Body_NG-mesh-morpher-T_severe02-12 Body_NG-mesh-morpher-T_dent-13 Body_NG-mesh-morpher-T_trist-14 Body_NG-mesh-morpher-T_trist02-15 Body_NG-mesh-morpher-HAA-16 Body_NG-mesh-morpher-Face01-17 Body_NG-mesh-morpher-Face02-18 Body_NG-mesh-morpher-Hum-19 Body_NG-mesh-morpher-Wink-20</IDREF_array>
+     
+     
+     
+          

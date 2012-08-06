@@ -1,0 +1,167 @@
+
+(multi-)texturing is somewhat messy, especially in Collada files.
+
+We distinguish the following entities:
+
+
+1) Collada  TEXCOORD inputs, inside geometry, for example:
+<input semantic="TEXCOORD" source="#hair_C_-mesh-map-channel1" offset="2" set="1"/>
+The offset" is just an internal Collada offset in the encoding of the attribute data; it is removed when compiling the Collada data into scenegraph data.
+At first sight the "set" attribute looks like a "texture unit" number, but that isn't true in general. 
+It happen to be (more or less) true when every texture for some material has its*own* TEXCOORD input, therefore it own "set". 
+But when two different textures of the same material use the same TEXCOORD, then they will have the same "set", although they will have to use different OpenGL texture units.
+From the Collada web forum:
+
+| The set attribute distinguishes between multiple inputs that have the same semantic. 
+| The <bind_vertex_input> element will then describe how to bind the two inputs to the associated materials. 
+| The typical use-case is multi-texturing where there are two TEXCOORD semantics (i.e. set=1 and set=2).
+
+
+2) Collada Effect "CHANNELS" , within "effects"
+
+For example:
+<texture texture="chev3_chatun__jpg-sampler" texcoord="CHANNEL1">
+
+This states that the texture coordinates for this texture should come from CHANNEL1.
+
+
+3) The linking between "CHANNELS" and TEXCOORD/set combinations is done within instance_controller/...bind_material.../instance_material/bind_vertex_input:
+
+For instance:
+
+<instance_controller url="#hair_C_-mesh-skin">
+          <skeleton>#Bip01_Bassin-node</skeleton>
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="chev02" target="#chev02">
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="1"/>
+                
+This links effect CHANNEL1 to the TEXCOORD input set 1, from the geometry.
+
+4) Translation/Presentation of texture sets, texture channels, texture units etc>
+
+a) In hmi.graphics.collada
+
+   - texture units are NOT explicitly represented
+   - effect/texture CHANNELS are present (in CommonTexture)
+   - input "sets" are present (in Input)
+
+b) in hmi.graphics.scenegraph
+
+  - texture units         present in GTexture (just the Collada set attribute)
+  - texture channels      present in GTexture ( basically just the Collada channel)
+  - input sets            NOT represented
+  
+  
+c) in hmi.grpahics.opengl
+
+  - texture units         represented in GLTexture, but also in GLVertexAttribute. the latter seems to be a "set" attribute copy.
+  - texture channels      not directly represented, but based upon conventions in shaders: 
+                          example: textured.vs:
+                          gl_TexCoord[0] = gl_MultiTexCoord1;   //use CHANNEL1
+                          gl_TexCoord[2] = gl_MultiTexCoord2;   //use CHANNEL2
+                          
+                          then , in glVertexAttribute.glRender: 
+                          gl.glClientActiveTexture(GLC.GL_TEXTURE0 + texUnit);
+                          gl.glEnableClientState(GLC.GL_TEXTURE_COORD_ARRAY);
+                          gl.glTexCoordPointer(TEXCOORDSIZE, GLC.GL_FLOAT, 0, bufferOffset);  
+                          
+  - input sets            see above, represented in GLVertexAttribute
+  
+  
+  ----------------------------------
+  
+  
+  hypothetical situation:
+  (For the moment we assume that material and effect are synonymous. For Armandia this is the case, as you can see in the "library_materials")
+  
+     Materials                                                        Meshes
+  
+  material-0,
+  using CHANNEL1                                                     Mesh-1, TEXCOORD set 1, TEXCOORD set 2, TEXCOORD set 3, TEXCOORD set4
+  (diffuse texture0 and opacitymap0)
+  
+  
+  material-1,
+  using CHANNEL1, CHANNEL2                                           
+  (diffuse texture1 and opacitymap1)
+  
+  
+  
+  
+  
+  
+  material-2,                                                        Mesh-2, TEXCOORD set 1, TEXCOORD set 2, TEXCOORD set 3
+  using CHANNELS1, CHANNEL2, CHANNEL3                         
+  (diffuse texture2, opacitymap2, bumpmap2)
+  
+  
+  The following combinations could happen, in instance_controller:
+  
+      mesh-1 using Material-0    CHANNEL1 -> TEXCOORD set 1
+  
+      mesh-1 using Material-1    CHANNEL1 -> TEXCOORD set 1, CHANNEL2 -> TEXCOORD set 2
+      
+      mesh-1 using Material-2    CHANNEL1 -> TEXCOORD set 1, CHANNEL2 -> TEXCOORD set 2 CHANNEL3 -> TEXCOORD set 3
+      
+      mesh-2 using Material-1    CHANNEL1 -> TEXCOORD set 1, CHANNEL2 -> TEXCOORD set 2
+      
+      mesh-2 using Material-2    CHANNEL1 -> TEXCOORD set 1, CHANNEL2 -> TEXCOORD set 2 CHANNEL3 -> TEXCOORD set 3
+      
+ So you could render the same mesh with different materials, and/or you could render several meshes with the same material.
+ 
+      
+ In theory, weird combinations would be allowed (by Collada) like:
+ 
+    mesh-1 using Material-1    CHANNEL1 -> TEXCOORD set 2, CHANNEL2 -> TEXCOORD set 1 
+    
+    This seems unlikely; usually some TEXCOORD set will have been designed/modeled with some specific purpose in mind,
+    like tex coords for a diffure texture, or tex coords for a opacity map or a bumpmap.
+    
+    what can happen is that the same TEXCOORD set is used for two different CHANNELS, like
+    mesh-1 using Material-1    CHANNEL1 -> TEXCOORD set 1, CHANNEL2 -> TEXCOORD set 1
+    although the Armandia effects use just one CHANNEL in these cases. 
+    
+    In Armandia, the link is always simple:
+    
+    CHANNEL1 -> set 1  (diffuse texture, sometimes opacity map, sometimes bumpmap)
+    CHANNEL2 -> set 2   opacity map
+    
+    ----
+    
+    solution:
+    
+    1) We assume that a material/effect has an associated GLSL shader.
+    Assuming certain shader properties/naming conventions, we assume that there is a fixed mapping
+    from semantic attributes like "diffuse map", "opacity map", "bump map" to GLSL attribute names,
+    like texCoord0, texCoord1, texCoord2. So we can map Collada effect CHANNEL-X to texCoord-Y if we know
+    the shader naming scheme, and we see the link between CHANNELS and certain types of textures inside the Collada shader
+    For instance, we can see that some Collada texture is inside a blinn/diffuse section, and has CHANNEL1 assigned.
+    Then we see that the semantic category "diffuse texture" is linked to CHANNEL1. 
+    This can be done while processing a Collada Effect 
+    
+    2) If we know the Collada CHANNEL (re)mapping to texCoord attribute names, and we process the bind_vertex_input elements
+    from an instance_controller, we can also assign texCoord names to VertexAttributes of Collada geometry
+    
+    3) This might (in theory) lead to conflicts, if we have "weird" mesh/material combinations. 
+    
+    
+    ------
+    
+    Translation Collada Material/Effect -> GMaterial -> GLMaterial
+    
+    1) At the moment we have just one GMaterial, one GLMaterial. This might be enlarged:
+    GMaterialType1, GMaterialType 2 etc,
+    2) GMaterial or GLMaterial means bisically a Shader plus uniform settings for that shader.
+    3) A Gmaterial can have diffreent shaders, for instance, a basic texturing shader, a shader with a diffuse and an opacity texture
+    using one texCoord set, or a similar shader using seprate texCoord sets for diffuse texture and opacity texture, or even a shader
+    using diffuse, opacity and bumpmap textures. On top of that, we have "Blinn" type or "Phong" type or ... type lighting equations,
+    plus "uniform" settings for those lighting equations like "specular" color etc., and a setting for alpha blending.
+    For the same GMaterial class, we assume a fixed order for those possible textures, and it depends on the actual shader which texture
+    and texCoords will be "enabled". Still we have a fixed texCoord-n name for every semantic category: diffuse texture -> texCoord1,
+    opacity texture -> texCoord2, bumpmap -> texCoord1, for example, where we woukld have a shader that expects texCoord1 
+    for the diffuse texture as well as for the bumpmap, and expects texCoord2 for the opacity map. 
+    
+    4) This shader choice can be made as soon as we know the particular Collada material/effect for some InstanceController sub-mesh.
+    
+    
