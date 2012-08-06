@@ -792,10 +792,19 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
         configs.decodeContent(xmlTokenizer);
         if (rotationEncoding != null)
         {
-            if (rotationEncoding.equals("axisangles"))
+            if (rotationEncoding.equals("axisangles") || rotationEncoding.equals("Axisangles") || rotationEncoding.equals("AxisAngles"))
             {
                 convertFromAxisAngles();
             }
+            else if(rotationEncoding.equals("quat") || rotationEncoding.equals("Quat"))
+            {// do nothing
+            }
+            else if(rotationEncoding.equals("xyzw") || rotationEncoding.equals("XYZW") || rotationEncoding.equals("reversedQuat"))
+            {
+                reverseQuats();
+            }
+            
+           
 
         }
     }
@@ -826,6 +835,20 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
             }
         }
     }
+    
+    private void reverseQuats()
+    {
+        for (int i = 0; i < configs.size(); i++)
+        {
+            float[] conf = configs.getConfig(i);
+            int startIndex = (hasRootTranslation) ? 3 : 0;
+            for (int ri = startIndex; ri < configSize; ri += stride)
+            {
+                Quat4f.setFromXYZW(conf, ri, conf, ri);
+            }
+        }
+    }
+
 
     /**
      * Creates a new SkeletonInterpolator from an XML encoded file. The first argument must be a
