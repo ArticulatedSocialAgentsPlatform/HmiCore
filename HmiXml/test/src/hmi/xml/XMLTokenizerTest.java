@@ -84,7 +84,7 @@ public class XMLTokenizerTest
     {
         // String udir = System.getProperty("user.dir");
         String sharedprojectdir = System.getProperty("shared.project.root");
-        String udir = sharedprojectdir + "/Hmi/HmiXml";
+        String udir = sharedprojectdir + "/HmiCore/HmiXml";
 
         // System.out.println("user.dir = " + udir);
         File testFile = new File(udir + "/test/resource/XmlTokenizerTests/basictest1.xml"); // requires a copy of basictest1.xml inside the
@@ -117,7 +117,7 @@ public class XMLTokenizerTest
     {
 
         String sharedprojectdir = System.getProperty("shared.project.root");
-        String udir = sharedprojectdir + "/Hmi/HmiXml";
+        String udir = sharedprojectdir + "/HmiCore/HmiXml";
 
         // System.out.println("user.dir = " + udir);
         URL testFileURL = new URL("file:///" + udir + "/test/resource/XmlTokenizerTests/basictest1.xml");

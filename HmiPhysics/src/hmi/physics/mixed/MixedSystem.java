@@ -27,13 +27,13 @@ import hmi.physics.PhysicalHumanoid;
 import hmi.physics.PhysicalSegment;
 import hmi.physics.inversedynamics.IDBranch;
 import hmi.physics.inversedynamics.IDSegment;
+import hmi.util.PhysicsSync;
 
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import asap.utils.PhysicsSync;
 
 /**
  * A system that contains a group of physically steered joints and 0 or more
