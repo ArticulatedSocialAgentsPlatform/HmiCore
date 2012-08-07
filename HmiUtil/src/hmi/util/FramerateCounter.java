@@ -32,28 +32,54 @@ public class FramerateCounter implements ClockListener
 {
    
    /**
-    * Creates a new FramerateCounter that show framerates in the title bar of 
+    * Creates a new FramerateCounter that show framerates and/or the current clock time in the title bar of 
     * the specified Frame (which could be a JFrame)
     */
    public FramerateCounter(Frame frameRatecounterFrame) 
    {
       this.frameRatecounterFrame = frameRatecounterFrame;
    }
+
+   /**
+    * Creates a new FramerateCounter that show framerates and/or the current clock time in the title bar of 
+    * the specified Frame. The first text is always prefixText. Then, when FPSText is non-null,
+    * there is the specified FPSText followed by the current frame rate, in frames per second. 
+    * Finally, when TimeText is non-null, we have the specified TimeText followed by the 
+    * current clock time.
+    */
+   public FramerateCounter(Frame frameRatecounterFrame, String prefixText, String FPSText, String TimeText ) 
+   {
+      this.frameRatecounterFrame = frameRatecounterFrame;
+      setFramerateCounterText(prefixText);
+      setFPSText(FPSText);
+      setTimeText(TimeText);
+   }
+
    
    /**
     * Sets the framerate counter text, in front of the actual frame rate number. (By default this is the text &quot;FPS: &quot;)
     */
    public void setFramerateCounterText(String prefixText)
    {
-       this.framerateCounterText = prefixText;
+       this.framerateCounterText = (prefixText==null) ? "" : prefixText;
+   }
+   
+    /**
+    * Sets the FPS text, in front of the FPS display. (By default this is the text &quot;FPS: &quot;)
+    */
+   public void setFPSText(String FPSText)
+   {
+       this.FPSText = FPSText;
+       setDisplayFramerate(FPSText != null);
    }
    
    /**
     * Sets the Time text, in front of the actual time display. (By default this is the text &quot;Time: &quot;)
     */
-   public void setTimeText(String prefixText)
+   public void setTimeText(String TimeText)
    {
-       this.timeText = prefixText;
+       this.timeText = TimeText;
+       setDisplayTime(timeText != null);
    }
 
 
@@ -67,24 +93,28 @@ public class FramerateCounter implements ClockListener
       prevFramerateTime = currentTimeBaseTime;
       fpsCounter = 0;
       int secs = (int) (time);
-      if ( ! displayFramerate && ! displayTime) return;
-      if (displayFramerate) 
-      {
-         if (displayTime) 
+      if ( ! displayFramerate && ! displayTime) {
+           frameRatecounterFrame.setTitle(framerateCounterText);         
+      } 
+      else 
+      {  
+         if (displayFramerate) 
          {
-            frameRatecounterFrame.setTitle(framerateCounterText + "--" + "  " + timeText + secs);
+            if (displayTime) 
+            {
+               frameRatecounterFrame.setTitle(framerateCounterText + FPSText + "--" + "  " + timeText + secs);
+            }
+            else // displayFramerate && ! displayTime
+            {
+               
+               frameRatecounterFrame.setTitle(framerateCounterText + FPSText + "--");
+            }        
          }
-         else // displayFramerate && ! displayTime
+         else if (displayTime) // && ! displayFramerate
          {
-            
-            frameRatecounterFrame.setTitle(framerateCounterText + "--");
-         }        
+            frameRatecounterFrame.setTitle(framerateCounterText + timeText + secs);
+         }   
       }
-      else if (displayTime) // && ! displayFramerate
-      {
-         frameRatecounterFrame.setTitle(timeText + secs);
-      }   
-      
    }
 
    /**
@@ -92,12 +122,16 @@ public class FramerateCounter implements ClockListener
     */   
    public void time(double time)
    {
-      if ( ! displayFramerate && ! displayTime) return;
+      if ( ! displayFramerate && ! displayTime)
+      {
+         return;
+         
+      } 
       currentTimeBaseTime = System.nanoTime();   
       int secs = (int) (time);  
       if (! displayFramerate)  // && displayTime
       {
-         frameRatecounterFrame.setTitle(timeText + secs);     
+         frameRatecounterFrame.setTitle(framerateCounterText + timeText + secs);     
       }
       else { // displayFramerate      
          fpsCounter++;
@@ -107,18 +141,14 @@ public class FramerateCounter implements ClockListener
             int fps = (int) (fpsCounter / fpsDelta);
             if (displayTime)
             {
-               frameRatecounterFrame.setTitle(framerateCounterText + fps +"  " + timeText + secs);   
+               frameRatecounterFrame.setTitle(framerateCounterText + FPSText + fps +"  " + timeText + secs);   
             }
             else 
             {
-               frameRatecounterFrame.setTitle(framerateCounterText + fps);   
+               frameRatecounterFrame.setTitle(framerateCounterText + FPSText + fps);   
             }
             prevFramerateTime = currentTimeBaseTime;
             fpsCounter = 0;
-         
-          //  if (displayText != null) frameRatecounterFrame.setTitle(framerateCounterText + displayText);
-            
-            
          }
       }
       
@@ -276,7 +306,8 @@ public class FramerateCounter implements ClockListener
     
    private boolean displayFramerate = true;    // determines whether framerate will be shown.
    private boolean displayTime = true;         // determines whether the current time will be shown.
-   private String framerateCounterText = "FPS: "; // Text used as prefix for the framerate display
+   private String framerateCounterText = "";    // Text used as prefix for FPS and/or Time
+   private String FPSText = "FPS";                // Text used as prefix for the framerate display
    private String timeText = "Time: ";            // Text used as prefix for the time display
    private Frame frameRatecounterFrame; // Frame (or JFrame) used to show the framerate counter (in the title bar)
 
