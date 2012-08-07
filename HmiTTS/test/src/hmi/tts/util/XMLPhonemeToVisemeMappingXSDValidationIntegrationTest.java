@@ -19,7 +19,7 @@ public class XMLPhonemeToVisemeMappingXSDValidationIntegrationTest extends XSDVa
     private static final Resources MAPPING_XSD_RES = new Resources("xsd");
     private static final String MAPPING_XSD = "phonemetovisememapping.xsd";
     private static final String MAPPING_DIRS[] = {
-        System.getProperty("shared.project.root")+ "/HmiResource/HmiHumanoidFaceControl/resource/Humanoids/shared/phoneme2viseme/"};
+        System.getProperty("shared.project.root")+ "/HmiResource/HmiHumanoidEmbodimentShared/resource/Humanoids/shared/phoneme2viseme/"};
     
     @Before
     public void setup()
