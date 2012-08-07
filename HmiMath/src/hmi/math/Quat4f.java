@@ -28,20 +28,14 @@ package hmi.math;
 public final class Quat4f
 {
 
-    /** */
-    private Quat4f()
-    {
-    }
+    /* Prevent creation of Quat4f Objects.*/
+    private Quat4f() { }
 
     /**
      * Length of Quat4f arrays is 4
      */
     public static final int QUAT4F_SIZE = 4;
 
-    /*
-     * Some Vec4 operations are included here again, for convenience, other Vec4 operations can be useful for quaternions too: set, add, sub, equals,
-     * epsilonEquals, especially the variations for arrays with offsets.
-     */
 
     /**
      * Offset values for quaternion s, x, y, and z components q = (s, (x,y,z)), where s is the scalar part, x, y, z are the imaginary parts.
@@ -63,60 +57,13 @@ public final class Quat4f
     public final static double SLERPEPSILON = 0.001;
 
     /**
-     * Returns a new float[4] array with zero components Note that this is NOT the identity.
+     * Returns a new float[4] array with zero components Note that this is NOT the identity quaternion.
      */
     public static float[] getQuat4f()
     {
         return new float[QUAT4F_SIZE];
     }
-
-    /**
-     * q = e^v
-     * 
-     * @param q destination
-     * @param v the exponential map rotation (Vec3f) |v|=alpha, v/|v|=rotation axis, v==q is allowed
-     * 
-     *            Uses implementation from: Grassia, Sebastian F., Practical Parameterization of Rotations Using the Exponential Map (1998), in:
-     *            journal of graphics tools, 3:3(29--48) A Taylor expansion is used to calculate the quaternion accuratly for small angles
-     */
-    public static void exp(float[] q, float[] v)
-    {
-        double alpha = Vec3f.length(v);
-        double a;
-        if (alpha <= EPSEXPMAP)
-        {
-            a = 0.5 + (alpha * alpha) / 48.0;
-        }
-        else
-        {
-            a = Math.sin(alpha * 0.5) / alpha;
-        }
-        Quat4f.set(q, (float) Math.cos(alpha * 0.5), (float) (a * v[0]), (float) (a * v[1]), (float) (a * v[2]));
-    }
-
-    /**
-     * v = log q
-     * 
-     * @param v destination: the exponential map rotation (Vec3f) |v|=alpha, v/|v|=rotation axis
-     * @param q rotation v==q is allowed
-     * 
-     *            Uses implementation from: Grassia, Sebastian F., Practical Parameterization of Rotations Using the Exponential Map (1998), in:
-     *            journal of graphics tools, 3:3(29--48) A Taylor expansion is used to calculate the exponential map accuratly for small angles
-     */
-    public static void log(float[] v, float[] q)
-    {
-        double alpha = 2.0 * Math.acos(q[Quat4f.s]);
-        double a;
-        if (alpha <= EPSEXPMAP)
-        {
-            a = 1.0 / (0.5 + (alpha * alpha) / 48.0);
-        }
-        else
-        {
-            a = alpha / Math.sin(alpha * 0.5);
-        }
-        Vec3f.set(v, (float) (a * q[Quat4f.x]), (float) (a * q[Quat4f.y]), (float) (a * q[Quat4f.z]));
-    }
+    
 
     /**
      * Returns a new float[4] array with specified components No check is made that this is a unit quaternion
@@ -127,19 +74,19 @@ public final class Quat4f
     }
 
     /**
-     * Returns a new float[4] array initialized to the identity Quat4f values: (1, 0, 0, 0)
-     */
-    public static float[] getIdentity()
-    {
-        return new float[] { 1.0f, 0.0f, 0.0f, 0.0f };
-    }
-
-    /**
      * Returns a new float[4] array with initialized components
      */
     public static float[] getQuat4f(float[] q)
     {
         return new float[] { q[0], q[1], q[2], q[3] };
+    }
+
+    /**
+     * Returns a new float[4] array initialized to the identity Quat4f values: (1, 0, 0, 0)
+     */
+    public static float[] getIdentity()
+    {
+        return new float[] { 1.0f, 0.0f, 0.0f, 0.0f };
     }
 
     /**
@@ -286,6 +233,64 @@ public final class Quat4f
     // q[y] = (float)(cx * sy * cz - sx * cy * sz);
     // q[z] = (float)(cx * cy * sz - sx * sy * cz);
     // }
+
+
+    /**
+     * Sets the quaternion for a rotation around the x-axis.
+     */
+    public static void setXRot(float[] q, float angle)
+    {
+        q[S] = (float) Math.cos(angle/2.0);
+        q[X] = (float) Math.sin(angle/2.0);
+        q[Y] = 0.0f;
+        q[Z] = 0.0f;
+    }
+    
+    /**
+     * Sets the quaternion for a rotation around the y-axis.
+     */
+    public static void setYRot(float[] q, float angle)
+    {
+        q[S] = (float) Math.cos(angle/2.0);
+        q[X] = 0.0f;
+        q[Y] = (float) Math.sin(angle/2.0);      
+        q[Z] = 0.0f;
+    }
+    
+    /**
+     * Sets the quaternion for a rotation around the z-axis.
+     */
+    public static void setZRot(float[] q, float angle)
+    {
+        q[S] = (float) Math.cos(angle/2.0);        
+        q[Y] = 0.0f;
+        q[X] = 0.0f;
+        q[Z] = (float) Math.sin(angle/2.0);
+    }
+
+    /**
+     * Sets the quaternion for a rotation around the x-axis, with the angle specified in degrees.
+     */
+    public static void setXRotDegrees(float[] q, float degrees)
+    {
+        setXRot(q, (float) Math.toRadians(degrees));
+    }
+    
+    /**
+     * Sets the quaternion for a rotation around the y-axis, with the angle specified in degrees.
+     */
+    public static void setYRotDegrees(float[] q, float degrees)
+    {
+        setYRot(q, (float) Math.toRadians(degrees));
+    }
+    
+     /**
+     * Sets the quaternion for a rotation around the z-axis, with the angle specified in degrees.
+     */
+    public static void setZRotDegrees(float[] q, float degrees)
+    {
+        setZRot(q, (float) Math.toRadians(degrees));
+    }
 
     /**
      * Convert Euler angles to quaternion coefficients. Which angles, which order, which signs of the angles?
@@ -858,7 +863,7 @@ public final class Quat4f
     }
 
     /**
-     * replaces quaternion a by its conjugate. (x, y, z components negated, scalar component s unchanged)
+     * Replaces quaternion a by its conjugate. (x, y, z components negated, scalar component s unchanged)
      */
     public static void conjugate(float[] a, int aIndex)
     {
@@ -878,7 +883,7 @@ public final class Quat4f
     }
 
     /**
-     * replaces quaternion a by the conjugate of quaternion b
+     * Replaces quaternion a by the conjugate of quaternion b.
      */
     public static void conjugate(float[] a, float[] b)
     {
@@ -889,7 +894,7 @@ public final class Quat4f
     }
 
     /**
-     * replaces quaternion a by the conjugate of quaternion b
+     * Replaces quaternion a by the conjugate of quaternion b.
      */
     public static void conjugate(float[] a, int aIndex, float[] b, int bIndex)
     {
@@ -900,7 +905,7 @@ public final class Quat4f
     }
 
     /**
-     * replaces quaternion a by its inverse. It is not assumed that the quaternion is normalized, i.e. it need not have length 1.
+     * Replaces quaternion a by its inverse. It is not assumed that the quaternion is normalized, i.e. it need not have length 1.
      */
     public static void inverse(float[] a)
     {
@@ -912,7 +917,7 @@ public final class Quat4f
     }
 
     /**
-     * replaces quaternion a by the inverse of quaternion b It is not assumed that b is normalized, i.e. it need not have length 1.
+     * Replaces quaternion a by the inverse of quaternion b It is not assumed that b is normalized, i.e. it need not have length 1.
      */
     public static void inverse(float[] a, float[] b)
     {
@@ -924,7 +929,7 @@ public final class Quat4f
     }
 
     /**
-     * returns the square of the quaternion length
+     * Returns the square of the quaternion length.
      */
     public static float lengthSq(float[] a)
     {
@@ -932,7 +937,7 @@ public final class Quat4f
     }
 
     /**
-     * returns the quaternion length
+     * Returns the quaternion length.
      */
     public static float length(float[] a)
     {
@@ -1111,7 +1116,7 @@ public final class Quat4f
     }
 
     /**
-     * rotates a vector with a quaternion, assumes the quaternion is length 1 transforms v, and also returns it.
+     * Rotates a vector with a quaternion, assumes the quaternion is length 1 transforms v, and also returns it.
      */
     public static float[] transformVec3f(float[] q, int qIndex, float[] v, int vIndex)
     {
@@ -1129,7 +1134,7 @@ public final class Quat4f
     }
 
     /**
-     * rotates a vector with a quaternion, assumes the quaternion is length 1 transforms v, and also returns it.
+     * Rotates a vector with a quaternion, assumes the quaternion is length 1 transforms v, and also returns it.
      */
     public static void transformVec3f(float[] q, int qIndex, float[] src, int srcIndex, float[] dst, int dstIndex)
     {
@@ -1147,7 +1152,7 @@ public final class Quat4f
     }
 
     /**
-     * rotates a vector with a quaternion, assumes the quaternion is length 1 transforms v, and also returns it.
+     * Rotates a vector with a quaternion, assumes the quaternion is length 1 transforms v, and also returns it.
      */
     public static float[] transformVec3f(float[] q, float[] v)
     {
@@ -1176,33 +1181,37 @@ public final class Quat4f
     }
 
     /**
-     * Returns a String of the form (x, y, z), representing the Vec3f value.
-     * */
+     * Returns a String of the form (s, x, y, z), representing the Quat4f value.
+     */
     public static String toString(float[] a, int fieldwidth, int precision)
     {
         return toString(a, "%" + fieldwidth + "." + precision + "f");
     }
 
     /**
-     * Returns a String of the form (a0, a1, a2, a3), representing the Quat4f value.
+     * Returns a String of the form (s, x, y, z), representing the Quat4f value q.
      * */
-    public static String toString(float[] a, String fmt)
+    public static String toString(float[] q, String fmt)
     {
         StringBuffer buf = new StringBuffer(30);
         buf.append('(');
-        buf.append(String.format(fmt, a[0]));
+        buf.append(String.format(fmt, q[0]));
         buf.append(',');
-        buf.append(String.format(fmt, a[1]));
+        buf.append(String.format(fmt, q[1]));
         buf.append(',');
-        buf.append(String.format(fmt, a[2]));
+        buf.append(String.format(fmt, q[2]));
         buf.append(',');
-        buf.append(String.format(fmt, a[3]));
+        buf.append(String.format(fmt, q[3]));
         buf.append(')');
         return buf.toString();
     }
 
     private static final float PI_DEGREES = 180.0f;
 
+   /**
+    * Produces a string which explains the quat rotation in terms of rotations axis and rotation angle,
+    * withc specified fieldwidth and precision.
+    */
     public static String explainQuat4f(float[] q, int fieldwidth, int precision)
     {
         float[] aa = getAxisAngle4fFromQuat4f(q);
@@ -1217,24 +1226,63 @@ public final class Quat4f
         return buf.toString();
     }
 
+    /**
+     * Produces a string which explains the quat rotation in terms of rotations axis and rotation angle.
+     */
     public static String explainQuat4f(float[] q)
     {
         return explainQuat4f(q, 6, 3);
     }
 
+
     /**
-     * Calculates qout=qin^p qout can be the same array as qin
+     * q = e^v
+     * 
+     * @param q destination
+     * @param v the exponential map rotation (Vec3f) |v|=alpha, v/|v|=rotation axis, v==q is allowed
+     * 
+     *            Uses implementation from: Grassia, Sebastian F., Practical Parameterization of Rotations Using the Exponential Map (1998), in:
+     *            journal of graphics tools, 3:3(29--48) A Taylor expansion is used to calculate the quaternion accuratly for small angles
      */
-    /*
-     * public static void pow(float []qin, float p, float[] qout) { float angle = (float)Math.acos(qin[S]); float sinAngle = (float)Math.sin(angle);
+    public static void exp(float[] q, float[] v)
+    {
+        double alpha = Vec3f.length(v);
+        double a;
+        if (alpha <= EPSEXPMAP)
+        {
+            a = 0.5 + (alpha * alpha) / 48.0;
+        }
+        else
+        {
+            a = Math.sin(alpha * 0.5) / alpha;
+        }
+        Quat4f.set(q, (float) Math.cos(alpha * 0.5), (float) (a * v[0]), (float) (a * v[1]), (float) (a * v[2]));
+    }
+
+    /**
+     * v = log q
      * 
-     * float vx,vy,vz; if(sinAngle>EPS) { vx = qin[X]/sinAngle; vy = qin[Y]/sinAngle; vz = qin[Z]/sinAngle;
+     * @param v destination: the exponential map rotation (Vec3f) |v|=alpha, v/|v|=rotation axis
+     * @param q rotation v==q is allowed
      * 
-     * angle *= p;
-     * 
-     * sinAngle = (float)Math.sin(angle); qout[X] = vx * sinAngle; qout[Y] = vy * sinAngle; qout[Z] = vz * sinAngle; qout[S] = (float)Math.cos(angle);
-     * } else { qout[X]=qin[X]; qout[Y]=qin[Y]; qout[Z]=qin[Z]; qout[S]=qin[S]; } }
+     *            Uses implementation from: Grassia, Sebastian F., Practical Parameterization of Rotations Using the Exponential Map (1998), in:
+     *            journal of graphics tools, 3:3(29--48) A Taylor expansion is used to calculate the exponential map accuratly for small angles
      */
+    public static void log(float[] v, float[] q)
+    {
+        double alpha = 2.0 * Math.acos(q[Quat4f.s]);
+        double a;
+        if (alpha <= EPSEXPMAP)
+        {
+            a = 1.0 / (0.5 + (alpha * alpha) / 48.0);
+        }
+        else
+        {
+            a = alpha / Math.sin(alpha * 0.5);
+        }
+        Vec3f.set(v, (float) (a * q[Quat4f.x]), (float) (a * q[Quat4f.y]), (float) (a * q[Quat4f.z]));
+    }
+
 
     /**
      * Calculates qout=qin^p = exp(log(q)p)
@@ -1351,114 +1399,7 @@ public final class Quat4f
             q[2] = 0.0f;
             q[3] = 0.0f;
         }
-
     }
-
+    
 }
-
-// Leftovers from VOPartsConfig:
-//
-// // /**
-// // * getQuat4dFromRollPitchYaw calculates a quaternion representation from
-// // * "roll-pitch-yaw" angles with double precision.
-// // */
-// // public Quat4d getQuat4dFromRollPitchYaw(double roll, double pitch, double yaw) {
-// // //parlevink.util.Console.println("getQuat4dFromRollPitchYaw");
-// // Quat4d qy = ( (rotationFormat & YAW) != 0) ? (new Quat4d(0, Math.sin(yaw/2.0), 0, Math.cos(yaw/2.0))) : new Quat4d(0,0,0,1);
-// //
-// // Quat4d qz = ( (rotationFormat & ROLL) != 0) ? ( new Quat4d(0, 0, Math.sin(roll/2.0), Math.cos(roll/2.0))) : new Quat4d(0,0,0,1) ;
-// // Quat4d qx = ( (rotationFormat & PITCH) != 0) ? ( new Quat4d(Math.sin(pitch/2.0), 0, 0, Math.cos(pitch/2.0)) ) : new Quat4d(0,0,0,1);
-// // qy.mul(qx);
-// // qy.mul(qz);
-// // return qy;
-// // }
-//
-// /**
-// * calculates a quaternion representation from
-// * "roll-pitch-yaw" angles with double precision.
-// */
-// public Quat4d getQuat4dFromRollPitchYaw(double roll, double pitch, double yaw) {
-// //parlevink.util.Console.println("getQuat4dFromRollPitchYaw");
-// double cx = Math.cos(pitch/2.0);
-// double cy = Math.cos(yaw/2.0);
-// double cz = Math.cos(roll/2.0);
-// double sx = Math.sin(pitch/2.0);
-// double sy = Math.sin(yaw/2.0);
-// double sz = Math.sin(roll/2.0);
-// double w = cx * cy * cz + sx * sy * sz;
-// double x = cx * sy * sz + sx * cy * cz;
-// double y = cx * sy * cz - sx * cy * sz;
-// double z = cx * cy * sz - sx * sy * cz;
-// return new Quat4d(x, y, z, w);
-// }
-//
-// /**
-// * calculates a quaternion representation from
-// * "roll-pitch-yaw" angles with double precision.
-// */
-// public Quat4d getQuat4dFromRollPitchYaw(Vector3d rpy) {
-// return getQuat4dFromRollPitchYaw(rpy.x, rpy.y, rpy.z);
-// }
-//
-//
-// public Vector3d getRollPitchYaw(Quat4d q) {
-// double sqw = q.w * q.w;
-// double sqx = q.x * q.x;
-// double sqy = q.y * q.y;
-// double sqz = q.z * q.z;
-//
-// double roll = Math.atan2(2 * (q.x * q.y + q.z * q.w), sqw + sqy - sqx - sqz);
-// double pitch = Math.asin( -2 * (q.z * q.y - q.x * q.w) );
-// double yaw = Math.atan2( 2 * (q.z * q.x + q.y * q.w), sqw + sqz - sqx - sqy);
-// return new Vector3d(roll, pitch, yaw);
-// }
-//
-// public static double radToDegree = 180.0/Math.PI;
-// public static double degreeToRad = Math.PI/180.0;
-//
-// /**
-// * getQuat4dFromRollPitchYaw calculates a quaternion representation from
-// * "roll-pitch-yaw" angles with double precision.
-// *
-// public Quat4d getQuat4dFromAzimuthElevationRoll(double azimuthAngle, double elevationAngle, double rollAngle) {
-// //parlevink.util.Console.println("getQuat4dFromAzimuthElevationRoll");
-// double roll = - degreeToRad * rollAngle;
-// double pitch = - degreeToRad * elevationAngle ;
-// double yaw = - degreeToRad * azimuthAngle;
-// return getQuat4dFromRollPitchYaw(roll, pitch, yaw);
-// }
-//
-// public Vector3d getAzimuthElevationRollFromQuat4d(Quat4d q) {
-// Vector3d temp = getRollPitchYaw(q);
-//
-// return new Vector3d(temp.z * -radToDegree, temp.y * -radToDegree, temp.x * -radToDegree);
-// }
-//
-//
-// // public Vector3d getEulerFromQuat4d(Quat4d q) {
-// // Vector3d result = new Vector3d();
-// // Vector3d transformedAxis = new Vector3d();
-// // Vector3d axis = new Vector3d(1, 0, 0);
-// // Matrix3d m = new Matrix3d();
-// // m.set(q);
-// // m.transform(axis, transformedAxis);
-// // transformedAxis.y = 0.0;
-// //
-// // parlevink.util.Console.println("rotated: " + transformedAxis + ", length: " + (axis.length()));
-// // Vector3d cr = new Vector3d();
-// // cr.cross(axis, transformedAxis);
-// // parlevink.util.Console.println("cross: " + cr);
-// // double inp = axis.dot(transformedAxis);
-// // double angle = Math.acos(inp);
-// // if (cr.y < 0) angle = -angle;
-// // parlevink.util.Console.println("acos: " + angle + " Pi/3= " + (Math.PI/3.0));
-// // result.z = angle;
-// //
-// //
-// //
-// //
-// //
-// // return result;
-// // }
-//
 

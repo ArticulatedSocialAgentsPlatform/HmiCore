@@ -238,6 +238,58 @@ public class Quat4fTest
     }
 
     /**
+     * Test of setXRot method
+     */
+    @Test
+    public void setXRot()
+    {
+        float[] q = new float[4];
+        Quat4f.setXRot(q, (float)(Math.PI/2.0));
+        float[] expectedQ = new float[] { (float)Math.cos(Math.PI/4.0), (float)Math.sin(Math.PI/4.0), 0.0f, 0.0f };     
+        assertTrue(Quat4f.epsilonEquals(q, expectedQ, PRECISION));
+    }    
+    
+    /**
+     * Test of setYRot method
+     */
+    @Test
+    public void setYRot()
+    {
+        float[] q = new float[4];
+        Quat4f.setYRot(q, (float)(Math.PI/2.0));
+        float[] expectedQ = new float[] { (float)Math.cos(Math.PI/4.0), 0.0f, (float)Math.sin(Math.PI/4.0), 0.0f };     
+        assertTrue(Quat4f.epsilonEquals(q, expectedQ, PRECISION));
+    }    
+    
+    /**
+     * Test of setZRot method
+     */
+    @Test
+    public void setZRot()
+    {
+        float[] q = new float[4];
+        Quat4f.setZRot(q, (float)(Math.PI/2.0));
+        float[] expectedQ = new float[] { (float)Math.cos(Math.PI/4.0), 0.0f, 0.0f, (float)Math.sin(Math.PI/4.0) };     
+        assertTrue(Quat4f.epsilonEquals(q, expectedQ, PRECISION));
+    }    
+    
+    
+    /**
+     * Test of setFromXYZW method
+     */
+    @Test
+    public void setFromXYZW()
+    {
+        float[] qXYZW = new float[] {0.3f, 0.4f, 0.1f, 0.9f};
+        float[] qWXYZ = new float[4];
+        Quat4f.setFromXYZW(qWXYZ, qXYZW);
+        float[] expectedQWXYZ = new float[] { 0.9f, 0.3f, 0.4f, 0.1f  };     
+        assertTrue(Quat4f.epsilonEquals(qWXYZ, expectedQWXYZ, PRECISION));
+    }    
+    
+    
+
+    /**
      * Test of add method, of class Quat4f.
      */
     @Test
@@ -610,20 +662,6 @@ public class Quat4fTest
         }
     }
 
-    /**
-     * Test of lengthSq method, of class Quat4f.
-     */
-    @Test
-    public void lengthSq()
-    {
-    }
 
-    /**
-     * Test of length method, of class Quat4f.
-     */
-    @Test
-    public void length()
-    {
-    }
 
 }
