@@ -1,0 +1,27 @@
+<ivy-module version="2.0">
+   <info organisation="HMI" module="HmiDebug"/>
+   <dependencies>
+      <dependency org="HMI"               name="HmiAnimation"   transitive="false" rev="latest.${resolve.status}"  />
+      <dependency org="HMI"               name="HmiUtil"   transitive="false" rev="latest.${resolve.status}"  />
+      <dependency org="HMI"               name="HmiXml"   transitive="false" rev="latest.${resolve.status}"  />
+      <dependency org="HMI"               name="HmiMath"   transitive="false" rev="latest.${resolve.status}"  />
+
+      <dependency org="HMI"               name="HmiEnvironmentBase"   transitive="false" rev="latest.${resolve.status}"  />
+
+	  <dependency org="HMI"               name="HmiRenderEnvironment" transitive="false" rev="latest.${resolve.status}"  />
+	  <dependency org="HMI"               name="HmiPhysicsEnvironment" transitive="false" rev="latest.${resolve.status}"  />
+
+	  <dependency org="HMI"               name="HmiPhysicsEmbodiments" transitive="false" rev="latest.${resolve.status}"  />
+	  <dependency org="HMI"               name="HmiAnimationEmbodiments" transitive="false" rev="latest.${resolve.status}"  />
+
+	  
+	  <dependency org="HMI"               name="HmiGraphics" transitive="false" rev="latest.${resolve.status}"  />
+	  <dependency org="HMI"               name="HmiPhysics" transitive="false" rev="latest.${resolve.status}"  />
+
+      <dependency org="jcip"    name="jcip-annotations"      rev="latest.release"  />      
+	  <dependency org="lombok"  name="lombok"      rev="latest.release"  />
+      <dependency org="google"  name="guava"                 rev="latest.release"  />
+      <dependency org="slf4j"   name="slf4j-api"             rev="latest.release"  />
+      <dependency org="lwjgl"    name="lwjgl"            rev="latest.release"  />
+   </dependencies>
+</ivy-module>
