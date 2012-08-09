@@ -37,8 +37,5 @@ public final class RenderSync implements Sync
         }
         return sync;
     }
-	public synchronized Object getStaticSync()
-	{
-		return getSync();
-	}
+
 }

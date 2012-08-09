@@ -34,8 +34,4 @@ public final class PhysicsSync implements Sync
         }
         return sync;        
     }
-	public synchronized Object getStaticSync()
-	{
-		return getSync();
-	}
 }

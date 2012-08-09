@@ -34,8 +34,4 @@ public final class AnimationSync implements Sync
         }
         return sync;
     }
-	public synchronized Object getStaticSync()
-	{
-		return getSync();
-	}
 }

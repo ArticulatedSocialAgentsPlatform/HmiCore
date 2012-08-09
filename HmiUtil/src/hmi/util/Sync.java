@@ -19,7 +19,7 @@
 package hmi.util;
 
 /**
- * Interface for synchronisation singletons.
+ * Tagging interface for synchronisation in Hmi environments.
  *
  * Our Environments are generally synchronised on an implementation of this interface. For example, animation and rendering
  * are synchronised on the AnimationSync. This is to prevent the animation code from changing the state of the animation "pose"
@@ -27,7 +27,7 @@ package hmi.util;
  *
  * @author Dennis Reidsma
  */
+//FIXME: this interface, and all syncs, should actually be in HmiEnvironmentBase, but this is not possible because HmiPhysics refers to the PhysicsSync
 public interface Sync
 {
-    Object getStaticSync();
 }
