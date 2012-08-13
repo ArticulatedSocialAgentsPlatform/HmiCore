@@ -1,0 +1,58 @@
+
+\chapter{Software Requirements}\label{chapter:softwarerequirements}
+
+Our HMI projects are based on tools and languages including the following ones:
+
+\begin{enumerate}
+\item An \textbf{SVN client}, like Tortoise SVN or SmartSVN. There is even a commandline svn.
+\item The \textbf{Java development kit}, also called the JDK.
+\begin{itemize}
+\item There are many variations of Java on \verb#java.sun.com#, but what
+you need is the Java Standard Edition, also called Java SE.
+\item If you have some version installed already, check the version from the command line with
+\begin{verbatim}
+    java -version
+    javac -version
+\end{verbatim}
+Both should report some 1.7.x version or later.
+\item If \verb#java# or \verb#javac# does not work from the command line,
+ensure that Java is installed, and that the java/bin directory is present on your executable path.//
+For Windows-XP this is probably the \verb"C:\Program Files\Java\jdk1.6.x\bin" directory,
+for Windows 7 64--bit it is typically \verb"C:\Program Files (x86)\Java\jdk1.6.x".
+Note: Even on 64--bit systems, you can still use the 32-bit version of Java.
+\end{itemize}
+\item    You can compile and run with the standard \verb#javac# and \verb#java# commands,
+    but it is easier to do this using the \textbf{ant} build tool.
+    Our Hmi project style even requires an \verb"ant" build file for all projects.
+    \begin{itemize}
+    \item Check: From the command line you can verify that \verb#ant# is installed with:\\[1ex]
+    \verb#ant -version# \\[1ex]
+    It should say something like "Apache Ant version 1.8.2 "
+    If it is not installed, or you have a version older than 1.8.2:
+    \item Download \verb#ant# from \verb#ant.apache.org#.
+    \item ``Installation'' of \verb#ant#: just unzip, and ensure that the ant/bin directory is on your executable path.
+    \item For large (re)builds, especially of HmiDemo projects with lots of dependencies, the default \verb#ant# settings do not suffice, and \verb#ant# might crash because of memory problems.
+        When you run \verb#ant# from the (Windows) commandline, you run \verb#ant.bat# from the \verb#ant/bin# directory. That file reads an optional settings file called \verb#antrc_pre.bat#.
+        It searches for this file in several places, including in your HOME directory or your USERPROFILE
+        (Like ``C:/Documents and Settings/username'').
+        The ``out-of-memory'' problems can be solved by creating this file with a line like:\\
+        \verb#set ANT_OPTS=-Xmx256M -XX:MaxPermSize=256M#.
+    \end{itemize}
+ \item \verb"ant" is good for basic building, and in combination with a good editor like  \textbf{UltraEdit},
+ it can act as a basic development system.
+ A good alternative is to use some development tool like \textbf{Eclipse} or \textbf{Netbeans}.
+ \item \textbf{Netbeans} is a comprehensive development tool, freely available from
+ \verb#www.netbeans.org#. The simplest option is to download the ``complete'' version, and to install
+ only those modules you need. There are more plugins on the web, for instance.
+ Netbeans is based on \verb#ant# build scripts, which can be very convenient, but
+ also causes some problems for projects that need to cooperate with others not using Netbeans.
+ See the chapter on Netbeans.
+ \item \textbf{Eclipse} Popular alternative alternative for Netbeans.
+ \item \textbf{UltraEdit} is a good general purpose editor. EWI has this software available.
+ (It is \emph{not} free). With proper configuration, it can be used as a ``mini'' development tool.
+ \end{enumerate}
+
+
+
+
+

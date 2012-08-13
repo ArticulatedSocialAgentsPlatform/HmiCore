@@ -1,0 +1,184 @@
+\section{Netbeans tips}
+
+We discuss some hints for Netbeans, in particular for version 7.2.
+
+\subsection{Integrating NetBeans with our build system}
+
+NetBeans has, in the background, an \verb#ant# based build system that is not unlike our own
+build system. You can combine these, but you need to take some precautions when you create a NetBeans project.
+Potential problem: by default, NetBeans want to create its own build.xml \verb#ant# file in the
+project directory.
+The solution is first create a project, including the appropriate build file, and the appropriate directory
+structure including the \verb#lib#, the \verb#src#, \verb#test\lib#, and \verb#test\src# directories.
+Check that it compiles, etcetera, but after that: do an \verb#ant clean#.
+(Otherwise, NetBeans will complain that there is already a build directory in your project.)
+
+Then there are basically two options to proceed: the first is to create a
+NetBeans ``free form'' project.
+In that case, Netbeans will simply pick up your existing \verb#build.xml# file, and use that
+for it own builds. Disadvantage: it's ok for basic editing, compiling, etcetera,
+but you cannot profit from all Netbeans features.
+The second option is to create a new NetBeans ``Java project from existing sources''.
+In that case, NetBeans has its own build file, now called \verb#nbbuild.xml#.
+Advantage: you can profit from all netBeans features, and it will not disturb the shared
+build files. Disadvantage: you must setup the NetBeans project carefully, as we will describe now.
+
+\begin{enumerate}
+\item We assume that you are using NetBeans 7.2 (or higher)
+\item create, outside NetBeans, a basic project in line with our build system.
+If you have an existing project, that's ok as well.
+Ensure that you have ``resolved'' the project dependencies, so that the contents of
+the \verb#lib# and \verb#test\lib# directories is what you need.
+(Use \verb#ant resolve#)
+\item Ensure that the your project has no \verb#build# directory: for instance use \verb#ant clean#.
+\item Now create a new project within NetBeans. Choose ``New Java Project with Existing Sources''.
+\item Choose the correct project name (by default we pick the project directory name), and select the correct
+project folder. Enable the ``Use dedicated Folder for Storing Libraries'' option,
+but choose a \emph{different} name than ``\verb#.\lib#''.
+For instance, choose ``\verb#nbproject\lib#''.
+NetBeans stores some of its ``own'' info in  its ``\verb#lib#'' folder.
+ Unfortunately, our version manager Ivy will discard such info from \verb#.\lib# when you
+do an ``\verb#ant resolve#'' operation, so we must give the NetBeans lib a special place.
+\item ``Next'', add the \verb#src# folder to the list of ``Source Package Folders'',
+and add the \verb#test\src# folder to ``Test Package Folders''.
+\item Now you can ``Finish'', and you have a NetBeans project.
+Except that it won't compile, because you must correct the library settings:
+\item The NetBeans ``Projects'' panel on the left show two sets of libraries: ``\verb#Libraries#''
+and ``\verb#Test Libraries#''
+\begin{itemize}
+\item Right click on ``\verb#Libraries#'' and choose ``Add JAR/Folder''. Navigate to the project's
+\verb#lib# folder and add all \verb#jars# that you find there.
+Also add the project's \verb#resource# directory here. (This will ensure that this directory
+is on Java's classpath, so the ``getResourceAsStream'' method for loading resource data will work)
+Leave the ``Reference as Relative Path''
+option enabled: this prevents NetBeans from copying into its own \verb#nbproject\lib# directory.
+Do the same with ``\verb#Test Libraries#'', this time using the \verb#jars# from \verb#test\lib#,
+and the \verb#test\resource# directory.
+As you can see we now have a \verb#junit-4.8.2.jar#, that is present in our \verb#lib# directory,
+but also two more NetBeans ``libraries'', one for \verb#JUnit3.8.2# and one for \verb#JUnit4.8.2#.
+The latter two should be \emph{removed}.
+\end{itemize}
+
+\item By now, the project should be in shape: no unresolved libraries, it compiles and runs,
+and JUnits test work.
+\item Note that whenever you change the contents of the \verb#lib# directories, you will have to
+go back to the project properties page (from the File menu), and reestablish the correct
+libraries settings.
+For example, say you had some file ``\verb#guava-r06.jar#'' inside your \verb#lib# directory,
+but after the resolve operation it has been replaced by ``\verb#guava-r07.jar#''
+NetBeans now automatically removes \verb#guava-r06.jar# from its libraries, but does not
+auto-understand that it needs \verb#guava-r07.jar# instead.
+Right-click on the Netbeans project name, and choose ``Resolve Reference Problems...''.
+Select \verb#guava-r06.jar# and click "Resolve". Now you can navigate to the project's \verb#lib#
+directory, and select the new \verb#guava-r07.jar#.
+For the time being, NetBeans is now satisfied. In reality, it has not really removed the reference
+to \verb#guava-r06.jar#, but it has added a redirection inside your
+own ``private'' netbeans settings. So next time that you resolve, it cannot find \verb#guava-r06.jar#
+again. You can correct this by first removing the  \verb#guava# jar from the NetBeans library,
+then adding the correct version. problem: you \emph{cannot} remove it while the reference problem is not solved.
+In the end, the easy solution is to first remove \emph{all} jar files from \verb#lib# ( and also from \verb#test\lib#
+if you expect changes over there) before the resolve, then add them back after the resolve.
+
+
+\end{enumerate}
+
+
+
+\subsection{ building jar files}
+\begin{itemize}
+\item By default, compiled class files are included in the jar file
+produced by a build. But also \emph{all} files inside the src directory, except for
+.java and .form files are included. That is convenient if you want to include ``resource'' files,
+like data files, images , icons etcetera: put them in the appropriate source directory, and
+use the Java getResourceAsStream() method for reading the data.
+Although this works, our strong preference is to include ``resources'' into its own \verb#resource# directory within
+your project. (Our \verb#ant# build system puts your project's own \verb#resource# directory on the classpath, as well as
+other directories that you specify in the \verb#build.properties# file)
+Netbeans auto-include of src documents is also not so nice if you have some secret-remarks.txt, or some huge remarks.doc
+word file in your source directories. In this case, you must set the files to \emph{exclude}
+for packaging. For instance, via:\\
+\verb#Build | Set Main Project Configuration | Customize...#,\\
+or via right-clicking the project tab, and selecting ``Properties''.
+Choose the ``Packaging'' tab, and to the ``Exclude from jar file'', for instance,
+add \verb#,**/*.txt, **/*.doc#.
+\end{itemize}
+
+\subsection{subversion}
+\begin{itemize}
+\item First \emph{checkout of an existing project}: Use the ``versioning'', and select the checkout
+options (for svn). The repository name depends on the project, but will typically be something
+like ``http://hmisvn.ewi.utwente.nl/hmi'', where the last ``hmi'' identifies the specific repository
+from all svn repositories managed by Hmi. Use your own (EWI) username and password.
+After clicking ``next'' you can \emph{browse} the repository. Select the folder you want to have.
+This will typically be a folder containing a complete ``project'' like, for instance,
+the Hmi/HmiAnimation folder. The commandline svn allows for specifying the local directory name;
+in Netbeans, you can only select the local directory where the folder will be placed.
+In the example, if you select a local directory called ``javaprojects'', then a subdirectory called
+`` HmiAnimation'' (i.e. without the HMI part) will be placed in that directory.
+\item By default, netbeans wants to put everything on a subversion repository except for the private
+parts of the nbproject directory. We don't want the nbproject directory at all, since it sharing
+it doesn't work too well, and is the cause for a lot of annoyances.
+\end{itemize}
+
+
+%\item The combination of a ``shared'' \verb#ant# build file and a Netbeans project poses
+%some problems. It is very convenient to let Netbeans generate your \verb#ant# files, but
+%without precautions, these \verb#ant# files cannot be used by anyone else.
+%Even people running the same version of Netbeans will face some annoyances,
+%like broken library paths.
+%And if you \emph{don't} have Netbeans installed at all,
+%then even the ``default'' build target fails.
+%Proposed solutions:
+%\begin{enumerate}
+%\item The first solution is to create or generate appropriate \verb#ant# build files
+%outside Netbeans and then start a new Netbeans project ``with existing ant script''.
+%If your \verb#ant# file is ok, then usually Netbeans will find it, and even propose \verb#ant# targets to be used for standard Netbeans actions like compiling, running etcetera.
+%You can specify this when creating the Netbeans project,
+%or later on, by right-clcking the project, and then going to the ``Build and Run'' tab of the project properties.
+%The \emph{standard} IDE actions are: ``Build Project'', ``Clean Project'', ``Generate Javadoc'', ``Run Project'', and ``Test Project''.
+%Moreover, you can add ``Custom Contextual Menu Items''. This allows to specify labels for your own special \verb#ant# targets.
+%These labels will show up when you right-click the project.
+%\item The second option is to let Netbeans generate its own \verb#ant# scripts, but to
+%modify these, such that you can run it independently.
+%The advantage is that Netbeans scripts include somewhat complicated targets, for instance, for testing and debugging,
+%that your own \verb#ant# script doesn't have.
+%Moreover, it is easy to add other projects or libraries to your project
+%\end{enumerate}
+%For both options, you need to create some \verb#ant# scripts.
+%The idea is to split this into two parts: one part for basic tasks like compiling and running, that could replace the Netbeans targets, and a second part with targets that are missing anyway from Netbeans scripts,
+%or that need to be corrected.
+%Think of targets for creating a ``release'' version (not what Netbeans calls a ``distribution'' version).
+%The potential problem with this approach is that the Netbeans targets and your own targets are not fully consistent.
+%Say, you add some library in Netbeans, but you don't update your own ant file.
+%For a while it seemed that the Netbeans generated build files could be used `` as is'' by others, but that turned out to be not true.
+%In order to test this, it is not sufficient to run \verb#ant# from the command line:
+%it is even necessary to temporarily rename the ``Program Files/Netbeans x.y'' directory and the ``Documents and Settings/user/.netbeans/x.y'' directory.
+%It turns out that in this case the ``default'' target will fail to build. Solution: rename the default target in Netbeans's  build.xml
+%file, into, for instance, ``run'', or ``compile''.
+
+%\noindent
+%Some build.xml file types:
+%%
+%\begin{enumerate}
+%\item ``Standalone'' ant build files.
+%\item Netbeans generated build files.
+%\item build files that were standalone, but have been used to create
+%a netbeans project ``with existing ant file''.
+%\item Netbeans generated build files, adapted later on to include missing features,
+%or that are also suitable as ``standalone'' ant build files.
+%\end{enumerate}
+%%
+%Typically, you start with type $1$ or type $2$, and then later on you move to type $3$ or $4$.
+%The path from type $1$ to $3$ seems attractive, but not all Netbeans features will be enabled.
+%Basically, with this approach, Netbeans is used as a nice editor, but not much more.
+%The alternative, from $2$ to $4$ is potentially better, but also more complicated,
+%it requires more planning, and usually requires some manual adjustment.
+%The biggest problem with this approach is how to get \emph{consistent} settings for Netbeans and setings for ``standalone'' ant mode. The problem is that modifying settings from
+%within Netbeans will result in updates to files like, for instance, the project.properties file
+%inside the nbproject directory or, worse, properties files inside your private/personal
+%Windows directories. Such property files are likely to be missing on other systems, or else
+%they might have different and inconsistent settings.
+%The alternative is to override Netbeans ant property setting in a customization properties file.
+%This will guarantee consistent and portable setting, but effectively disables
+%the possibility to set properties from inside Netbeans and, moreover, may give the false impression
+%that you still \emph{can} control such properties from inside. 

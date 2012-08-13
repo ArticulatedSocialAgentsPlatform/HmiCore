@@ -1,0 +1,28 @@
+\section{Build file structure and implementation notes}
+
+Note: this section is intended for those who want to maintain or modify the
+internals of the build system. 
+
+\subsection{directory structure}
+
+The relocation of files and directories is defined by means of \verb#ant# properties.
+As usual, you can redefine these, or you can set their value, for instance in a build.properties file.
+Many of the property settings rely on other properties, indicating in the table below
+by means of the usual \verb#ant# syntax, where \verb#${propertyname}# denotes the value
+of \verb#propertyname#.
+\vspace{1em}
+
+
+
+
+\begin{tabular}{ll}
+relative.shared.ant.dir         &  HmiShared/ant                                                      \\ 
+shared.project.root             &  Shared root dir                                                    \\
+hmi.shared.project.dir.name     & HmiShared                                                           \\
+hmi.shared.project.dir          & \$\{shared.project.root\}/\$\{hmi.shared.project.dir.name\}         \\
+relative.shared.ant.dir         & HmiShared/ant \\
+shared.ant.dir                  & \$\{shared.project.root\}/\$\{relative.shared.ant.dir\}              \\
+shared.template.dir             & \$\{shared.ant.dir\}/template                                       \\
+
+\end{tabular}
+

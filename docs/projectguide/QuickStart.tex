@@ -1,0 +1,61 @@
+\chapter{QuickStart}\label{chapter:quickstart}
+
+We assume that the following software is installed: \verb"Java", \verb"ant", and some \verb"svn" client.
+If something is missing here, see  chapter \ref{chapter:softwarerequirements} on software requirements.
+\begin{enumerate}
+\item Allocate some directory for your Java projects. It will act as the base directory where
+ directories for shared repositories will reside. It is also a convenient ``root directory'' for your own projects.
+For the rest of this document we will call it ``\verb"<JavaProjects>"''.
+Example: For XP or Win-dows 7, \verb"<JavaProjects>" would typically be a directory like  \verb"C:\JavaProjects".
+\item Use your favorite \verb"svn" client to checkout the \verb"HmiShared" directory from our HMI SVN repositories.
+It is found in the
+\verb"http://hmisvn.ewi.utwente.nl/hmishared" repository.\\
+You should end up with the \verb"HmiShared" directory as subdirectory of \verb"<JavaProjects>".
+Within \verb"HmiShared", you will find our common \verb"ant" build scripts. A second important part of \verb"HmiShared" is a
+\verb"repository" directory containing library files, mostly \verb"jar" files, that are used in most projects.
+
+\item To check that it all ``works'' you might want to run one of the example projects, like our  \verb"HmiGraphicsDemo":
+\begin{itemize}
+\item Go to a dos-prompt in the root of the (example) project.
+\item     First run \verb"ant resolve" This will retrieve the necessary library files
+from various repository directories like \verb"HmiShared/repository" or \verb"Shared/repository",
+and puts these library files into your project's \verb"lib" directory.
+
+\item     Finally run  \verb"ant". This will compile, then  run the main class of the project.
+\end{itemize}
+
+
+\item You might then check out some selected directories from
+the \verb"Shared" directory.
+This repository contains, for example, data files for several specialized avatars and sound files for the Elckerlyc project.
+It is available from  the same HMI SVN repository mentioned above.
+\item It is advisable to check out the \verb"HmiDemo" modules, because they contain several useful code examples for many purposes. The \verb"HmiDemo" module is found in the \verb"http://hmisvn.ewi.utwente.nl/hmidemo" SVN repository.
+\item Now you can create a new Java project, or you can study one of the ``demo'' projects.
+After checking out, you might have a directory structure that looks like this:
+\begin{verbatim}
+<JavaProjects>/HmiShared
+<JavaProjects>/Shared
+<JavaProjects>/HmiDemo
+<JavaProjects>/ExampleStudentProject
+<JavaProjects>/MyOwnNewProject
+\end{verbatim}
+
+
+-------checkout Project non-recursively.
+
+
+\item You can create a project, for instance by copying material from the  \verb"ExampleStudentProject".
+ demo. The \verb"build.xml" file in the root of your newly created/copied project should be ok ``as is''.
+ On the other hand, the \verb"build.properties" file might need some editing.
+ For instance, if your project needs library files from other projects, you can specify this
+ in \verb"build.properties".
+ See section \ref{XX} below for details.
+
+ \item When you have created a new project yourselves, you can share it with others by uploading it to
+the \verb"http://hmisvn.ewi.utwente.nl/hmistudent" SVN repository. (See section \ref{xyz} for more detail how to do this.)
+
+\item We have a useful WIKI: http://asap-project.ewi.utwente.nl/wiki/BuildSystem
+
+
+\end{enumerate}
+

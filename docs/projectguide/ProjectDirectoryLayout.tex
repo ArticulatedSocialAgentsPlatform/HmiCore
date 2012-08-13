@@ -1,0 +1,78 @@
+\section{Project directory layout}
+
+We describe the preferred project directory structure. When using tools
+like Netbeans or Eclipse, the tool might generate this structure, at least partially,
+whenever you start a new project.
+We assume that all project related files and directories are combined inside a single
+directory, that we will call the ``project directory''.
+The convention is to put this directory as a whole inside some \verb#svn# repository.
+The location of the project directory on your own system is up to you.
+We assume however that there is a \emph{shared project directory}, containing shared ant scripts,
+shared libraries, project directories of one or more of your projects, etcetera.
+
+\emph{Inside} the project directory, we assume a fixed directory structure, described below.
+\begin{itemize}
+\item a \verb#src# directory, containing source code.
+\item a \verb#test# directory, containing (JUnit) tests.
+\item a \verb#build# directory, containing compiled classes.
+\item a \verb#dist# directory, containing packages build outputs.
+\item a \verb#docs# directory, containing documentation.
+\item a \verb#lib# directory, containing ``libraries'', i.e. jar files and things like \verb#dll# files.
+\item a \verb#resource# directory, containing (fixed) data, like images, icons, other data files.
+
+\item a \verb#build.xml# file, containing an Ant build script.
+\item a \verb#manifest.mf# file, containing the manifest file for packaging into jar files.
+\end{itemize}
+
+We describe these files and directories in some more detail:
+\begin{itemize}
+\item The \verb#src# directory. This contains a directory structure, conform your Java package
+structure, containing java source files.
+It is possible, in principle, to include ``resource files'', containing fixed data like
+icons, etcetera, also inside source directories. An alternative place, for such data is
+inside a separate ``resource'' directory.
+\item The \verb#test# directory. This is a directory like \verb#src#, but containing source code
+for tests, including JUnit tests. Netbeans will generate such JUnit tests inside this directory.
+\item The \verb#build# directory. This directory contains compiled classes, typically inside
+a \verb#classes# subdirectory, and possibly other generated stuff. The \verb#build# directory
+can be removed and regenerated at any time, for instance, by a ``clean-and-(re)build'' operation
+of your development tool, or by executing the \verb#clean# and \verb#build# targets from the \verb#ant#
+script.
+\item The \verb#dist# directory. ``Building'' a project means more than just recompile everything:
+it also includes creating a jar file containing classes, and possibly ``resources'' (see below).
+This packaged form is what would be used in other projects, or could be used for a Java webstart
+version of a project, or for a ``demo'' version of an application.
+Mainly because of the Netbeans habit to recreate the \verb#dist# directory every time you rebuild,
+this directory is not the appropriate place for a stable version that other projects should use.
+(Therefore, we have a separate repository directory.)
+
+\end{itemize} 
+
+\subsection{Sharing, and the repository}
+Project directories are in principle ``self contained'', that is, they contain all source code, resources and data,
+and library files, that are needed to build and run the project. 
+But off course, many projects will have dependencies on other projects, either from HMI or from elsewhere.
+They may need library files or access to shared data. 
+Typical example: projects \verb#HmiUtil# and \verb#HmiXml# contain utilities used by many other projects. 
+Each project \verb#P# \emph{using} those utilities will have the two jar file \verb#HmiUtil.jar# and
+\verb#HmiXml.jar# inside the \verb#lib# directory of  \verb#P#. 
+A second typical example: we have data like Collada files for avatars, texture files, audio data, used by many projects. 
+First question: how to obtain these libraries or data.
+Second relevant question: what to do when
+some bug fixes or even a new release is produced for some library or data set.
+Our approach is that we have a \emph{shared repository} containing versions, including the ``latest beta version''
+and the ``latest stable version'', of projects, including external ``projects''. 
+A project that depends on some other projects can \emph{declare} this in its (\verb#ant#) \verb#build.properties# file
+ and use the \verb#ant# \emph{resolve} target to copy the appropriate version to its own project's \verb#lib#
+ or \verb#resource# directories. 
+ The \verb#ant# build scripts make some assumptions concerning the location and directory layout
+ of the repository:
+ \begin{enumerate}
+ \item There is a directory called the ``shared project director''.
+ It doesn't really matter where it resides on your system, but a good choice is the
+ parent directory of all your projects. 
+
+ \emph{The location of the shared project directory must be specified inside each project's }\verb#ant build.xml# \emph{file}.
+ \item The shared project directory contains the repository directory.
+ \item The shared project directory also contains \emph{shared} \verb#ant# directory, containing shared scripts, templates and customization, used by the default \emph{project} \verb#ant# scripts. 
+ \end{enumerate}

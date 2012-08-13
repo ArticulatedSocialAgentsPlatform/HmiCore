@@ -1,0 +1,482 @@
+
+
+\chapter{Hmi Java Projects}\label{chapter:projectbuilding}
+
+
+This chapter describes in more detail how to deal with the Hmi Java Projects system.
+
+\section{Philosophy}
+It is often  necessary to (re)build Java projects, even by persons who
+didn't develop that project. Since many different tools are being used,
+we have to agree on a number of basic conventions and procedures.
+\begin{itemize}
+\item We do \emph{not} assume that everyone will be using the same development toolkit or any toolkit at all.
+But we \emph{do} require that a project created and developed, say, by means of Netbeans or Eclipse,
+can be (re)build without any of these tools available.
+\item Since we have to use some common build tool, we have agreed to use \emph{ant} as
+that ``common'' minimal platform.
+
+\item In principle every project lives in its own directory, containing all relevant source code, test code,
+project specific data, library files needed by that project, project documentation, etcetera.
+We have a preferred standard layout for the directory structure inside a project.
+A project also contains an \verb#ant# buildfile (\verb#build.xml#) and usually also a \verb#build.properties# file.
+We require that we can (re)build and run a project using \verb#ant#, without any reliance on development tools
+that might have been used to develop the project. To be clear: we don't want to install JBuilder or Netbeans or Eclipse or whatever just to build and run your project.
+The \verb#ant# file can be either a simple ``standalone'' build file, but the preferred way is to use
+a very small build file that just links to our shared build file. (See below)
+
+\item We have a limited number of shared projects, all of which are available from our GIT repositories:
+\begin{itemize}
+\item There is a ``project'' called \verb#hmibuild#. It contains the shared \verb#ant# build files. 
+You must have this project in order to use our build system.
+
+\item Shared software is available as source code or as compiled jar files. Most projects use the precompiled
+jar files, which are kept in a project's \verb#lib# directory. (For tools like Eclipse or Netbeans you must do some configuring
+in order to use these library files, see below).
+We use a tool called \verb#ivy#, used by our build files, for easy version management of \verb#lib# files 
+that relies on our web  repository. (\verb#hmirepo.ewi.utwente.nl#).
+Basically, when you type ``\verb#ant resolve#'', then \verb#ivy# will copy the library files
+    needed for your project into the \verb#lib# directory of your project.  What will be copied is derived from
+    a project file called ``\verb#ivy.xml#''. 
+\item There are a few ``projects'', like \verb#HmiResource#, that contains just ``resource'' data of all sorts, that is shared
+between projects. For instance, BML scripts, data for 3D scenes and avatars etcetera lives here.
+Usually, you can obtain such data also from the web repository, in packaged jar format. Sometimes, you want
+to actually see and modify that data, and in that case you will need to check out the relevant resource data
+from the git repositories. 
+
+\end{itemize}
+
+
+\item Projects can build ``on top'' of other projects, including external projects, in a hierarchical way.
+Projects that become \emph{mutually or circularly dependent} should be refactored, for instance by merging
+ mutually dependent projects together into a single project.
+
+\item Projects \emph{import and export} class code and data in the form of \verb"jar" files. There is
+no sharing of \emph{source} code. This ensures that every project can be built stand alone, after importing
+the necessary library files.
+
+\item Import and export of class code and data is effectuated via shared repositories.
+On your local system, this is just some directory shared by various projects.
+Parts of these shared directories are also mirrored on our shared SVN repositories.
+
+
+\end{itemize}
+
+
+
+\section{Ivy dependencies}
+
+\subsection{Why dependency management}
+The contents of lib directories consists of \verb"jar" files and/or ``\verb"dll"'' or ``\verb"so"'' files
+that are necessary for compiling and running the project. The basic strategy is that interdependencies between projects
+are via import/export of library \verb"jar" files, in preference over direct source code dependencies.
+Of course we have to face the problem of project \emph{versioning}. We have stable \emph{release} versions
+of projects, but also less stable \emph{beta} and \emph{alpha} versions.
+here we have some conventions and rules. For instance, we do not want a stable release version of project X
+to be dependent on an unstable alpha version of project Y. The other way around, so an alpha version of X dependent
+on a release version of Y is OK of course.  It will be clear that manual version management is not a good idea: lot's of work, and error prone. Instead, we use a dependency manager, Ivy.
+\subsection{How does it work}
+Every project has an ``\verb"ivy.xml"'' file that describes project dependencies.
+The \verb"ant" build files, relying on the Ivy system, use these so called ``ivy's'' for
+\emph{resolving} the contents of the project's \verb"lib" directory.
+The system is based upon the notion of \emph{configurations}, \emph{versions}, and \emph{status of versions}.
+For example, our build system uses ``alpha'', ``beta'', and ``release'' as possible status of some
+\verb"jar" version. The ordering of these statuses is relevant. For instance, when you ask for a ``latest beta'' version
+of some module Ivy will choose the latest amongst published beta and release (but not alpha) versions of that module.
+Similarly, if you ask for a ``latest alpha'', anything is acceptable, but if you ask for a ``latest release'', then
+only versions classified as ``release'' are taken into consideration.
+Ivy allows for several ``configurations'' of the project, each with its own set of dependencies.
+Currently, we have configurations for producing alpha, beta,  and release versions of the project itself, and
+a ``test'' configuration for (extra) dependencies needed for running tests.
+(For technical reasons we have two more configurations, called ``master'' and ``default'', which are discussed below)
+The work flow is roughly as follows: first move the project into either the alpha, beta or release configuration,
+second do your development, including testing etc, third publish an alpha, beta or normal release based upon the current
+configuration. When you actually publish, we attach a version number to the jar file. Also,
+the Ivy system records metadata concerning published modules based upon version numbers, to be used later on,
+when resolving for other projects. It does so by publishing not just a \verb"jar"" file (or other ``artefacts'', as they are called by Ivy), but also an accompanying \verb"ivy.xml" file, derived from the project's ivy at the moment of publication.
+In this way, the Ivy system knows not only about \emph{direct} dependencies, but is also capable
+of resolving \emph{recursive} dependencies. This means that, for instance, when my module X declares (just) a dependency
+on the \verb"HmiGraphics" package, the resolve process will look into the dependencies of \verb"HmiGraphics".
+The result is that project X will receive \verb"jar" files for \verb"HmiGraphics", but also
+for \verb"HmiAnimation", \verb"HmiXml", \verb"HmiMath", and \verb"HmiUtil", because of (recursive) dependencies.
+When some \verb"jar" file is required more than once, say via a direct dependency and also via some indirect dependency,
+and the versions required are not consistent, then Ivy delivers the ``latest'' version.
+So, for instance, in the example above, if project X declares (direct) dependencies on the alpha version of \verb"HmiGraphics" and the release version of \verb"HmiXml", while the alpha version of \verb"HmiGraphics"
+declares itself a dependency on the beta version of \verb"HmiXml", then project X will receive that beta version
+of \verb"HmiXml". That should be ok: since we are asking for some alpha version (of \verb"HmiGraphics",
+we should allow other alpha and/or beta versions if \verb"HmiGraphics" actually needs them, even if our own project
+would be satisfied with the most recent release version.
+
+\subsection{Version numbering}
+
+We use some \emph{conventions}; the Ivy system does not require some particular numbering scheme, but
+uses version numbers to determine which version is ``more recent''.
+This includes a few subtle cases. For instance, Ivy knows that version \verb"1.4-alpha" is before
+\verb"1.4", and that versions \verb"2.0-rc1" and \verb"2.0-dev384" are both \emph{before} \verb"2.0".
+Our conventions:
+\begin{itemize}
+\item Basically, we use version numbers of the form \verb"major.minor"
+where \verb"major" are  \verb"minor" are numbers.
+Examples: \verb"0.1", \verb"1.4", \verb"2.0", \verb"2.0.1".
+\item We allow suffixes of the form \verb"-alpha", to denote alpha release versions,
+and \verb"-rci" or \verb"-devi", where \verb"i" some number, to denote ``release candidates'' and ``developer versions''.
+The latter are beta releases, intended to become a full release somewhere in the future. So, for instance, \verb"2.0-dev384"
+is a developer version, working towards full release \verb"2.0". 
+\item The \verb"major.minor" form is the preferred form for both betas and full releases.
+\item The \verb"major.minor-alpha" form is the preferred form for alpha releases.
+\item The \verb"major.minor-rci" form can be used as a ``release candidate'' for release \verb"major.minor".
+\item The \verb"major.minor-devi" form is used as a ``developer version'' for release \verb"major.minor".
+Such versions are produced during our ``nightly'' build process. (Should be running on a daily basis; but when testing during
+the nightly build produces error, no new versions are published that night)
+\item Version numbers for full releases and beta releases are to be unique.
+Once published, you cannot reuse the same version number for a new release anymore.
+For alpha versions this would be counterproductive, since alpha versions can be produced in rapid succession,
+with only very minor differences. For this reason, our strategy is that alpha releases will not be put on
+the repository, so are not shared, therefore do not need unique version numbers.
+\item Sometimes we use version numbers of the form \verb"major.minor.maintenance".
+This form is intended for releases that are bug fixes for normal \verb"major.minor" releases.
+Say currently we have a release version \verb"2.3", and we already produced newer beta versions
+\verb"2.4" and \verb"2.5".
+Then we detect an annoying bug in \verb"2.3". Now we could correct this and then produce
+ a full release \verb"2.6", but that would also include our new/experimental/buggy beta and alpha code from \verb"2.4", \verb"2.5".
+  The better solution here would be to use \verb"git" to temporarily revert
+to the code of version \verb"2.3", do the bug fixing, then publish that as
+\emph{maintenance} release version \verb"2.3.1".
+Note that this is a \emph{release} version, not an alpha or beta, so it that will become the preferred one when resolving 
+ for a ``latest release'' version.
+\end{itemize}
+
+
+
+\subsection{Ant targets for producing releases}
+
+The ``current'' version number is kept within the project's \verb"manifest.mf" file.
+It is automatically updated by some of our \verb"ant" targets, and used for Ivy publishing.
+
+\begin{itemize}
+\item \verb"ant release"  increments the minor version number, then produces a  version with ``release'' status.
+When the current version happens to be a release candidate or developer version, then ``incrementing the minor''
+actually means ``stripping off'' the \verb"-devi" or \verb"-rci" suffix.
+\item \verb"ant majorrelease"  increments the major version number, resetting the minor number to $0$, then produces a release version. As before, when the current version happens to an developer or release candidate, then is replaced by
+    ``stripping off'' the \verb"-devi" or \verb"-rci" suffix. The released version gets ``release'' status.
+
+\item \verb"ant maintenancerelease" appends a maintenance number,or increments it when the current version already has
+a maintenance number, then produces a ``release'' version. Note that this does not take care of the process of ``reverting'' to the desired release version, 
+nor does it (re)set the current manifest version number to the desired one.
+Currently this has to be done manually.
+
+\item \verb"ant minorreleasecandidate" moves to the next minor version, appends the \verb"-rc1" suffix, and
+produces a beta release. When the current version is already a ``release candidate, the ``rc'' number is increased.
+
+\item \verb"ant majorreleasecandidate" is similar, but first increments the major number, as usual for a major release.
+\end{itemize}
+
+
+
+
+\section{Extended example}
+
+We describe an example of how to build versions of a number of dependent packages.
+We use here the HMI packages as an example.
+
+\begin{itemize}
+\item We assume that we start with existing source code, but no repository.
+
+\item For \verb"HmiUtil":
+\begin{itemize}
+\item \verb"ant resolve"
+This will resolve the project dependencies. For \verb"HmiUtil" this is just
+a dependency on the JUnit framework, for testing.
+The \verb"ivy" file for \verb"HmiUtil"
+contains the line:
+\begin{verbatim}
+<dependency org="junit" name="junit" conf="test" rev="latest.release"/>
+\end{verbatim}
+This line denotes that the \verb"HmiUtil" project depends on the \verb"junit" module from
+organization \verb"junit". We want the ``latest release''.
+\item \verb"ant"
+
+\item \verb"ant test"
+
+\end{itemize}
+
+\end{itemize}
+
+
+
+\section{Project directory layout}
+Java projects have a specific directory layout. It is possible to deviate, for instance, when you have
+a build tool that enforces a different layout. But we don't recommend this, especially because we
+want to have a structure that is easy to understand also for \emph{others}.
+
+\subsection{Global setup and shared directories}
+Projects reside inside their own directory. Build tools like Netbeans or Eclipse are able to ``link'' such projects,
+ for instance by importing jar files from one project into the other,
+ or by automatic rebuilding projects on which your current project depends.
+ Our build scheme allows for similar project dependencies, as described above, but does not integrate at the level of source code. As a consequence, you can allocate your project directory wherever you want, but for the sake of sharing
+ libraries, sharing data, or sharing build scripts, we need a few \emph{shared} directories.
+ ``Shared'' here means mostly sharing among your own projects; it's not a directory within a shared filesystem.
+ Real sharing is done by means of shared git repositories. (See below).
+ These shared directories are assumed to be located in a common base directory that we will call here
+ the ``\verb"JavaProjects>"'' directory.
+
+
+You are free to chose the location for \verb"<JavaProjects>", for example, it could be
+\verb"C:\JavaProjects" on some Windows7 system or \verb"/user/youraccount/javaprogs" on some Linux system.
+
+Within \verb"<JavaProjects>"  we (currently) have a few directories.
+The most important one is ``\verb"hmibuild"'', as it contains the shared \verb"ant" scripts. 
+
+You can also choose the location of individual project directories wherever you want,
+as long as you specify that location \emph{relative to the } \verb"JavaProjects>" base.
+Each project has an \verb"ant" build file called \verb"build.xml", and an\verb"built.properties" file
+located in that project's directory.
+The \verb"build.xml" file is usually a clone of the following:
+\begin{verbatim}
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="MyApp"  default="run">
+   <import file="../hmibuild/build.xml" />
+</project>
+\end{verbatim}
+
+This example assumes that your project is located next to your copy of \verb"hmibuild'', so that the file path \verb"../hmibuild/build.xml"
+is actually ok. 
+
+\subsection{Inside the project directory}
+
+In principle, we have a fixed directory layout within a project:
+
+\begin{verbatim}
+<JavaProjects>
+   <YourProject>
+       build.xml
+       build.properties
+       ivy.xml
+       src
+          <Java source files for project packages>
+       test
+          <Java Source Files for (JUnit) tests>
+          lib
+             <jar files for testing, like junit-4.8.jar>
+       lib
+          <library files, i.e. jar files, .dll or .so files etcetera>
+       resource
+          <data files, like configuration files, icon images, etcetera>
+       docs
+          <project documentation, including generated Javadoc files>
+       build
+          <class files generated by compiling this project>
+       dist
+          <jar files, containing class files and resources for this project>
+\end{verbatim}
+
+\subsection{Sharing by means of GIT repositories}
+Projects can be shared via one of our GIT repositories.
+The Hmi related packages, as well as other shared material are found on the
+\verb"hmigit.ewi.utwente.nl/" repositories.
+Access to these repositories are available on request; normally, you don't want the source code anyway, and you should use
+the packaged jar files, either stable releases, or from the daily build, via the ``\verb"ant resolve"'' method.
+
+What should be present \emph{on a GIT repository}?
+\begin{itemize}
+\item Source files, data files, documentation: yes.
+\item Binaries, and class files: no.
+\item Library files, i.e. dll's, jar files etcetera: no.
+\item Netbeans or Eclipse project directories or files: no.
+\item The \verb"ant" \verb"build.xml" file and  \verb"build.properties" file: yes.
+\end{itemize}
+
+\subsection{Project building using ant }
+
+We assume here that you are using the commandline version of \verb"ant". (There are tools
+like Netbeans or UltraEdit that allow you to issue these \verb"ant" command from within the tool.)
+
+Tip: \verb"ant" is by default rather ``verbose'', showing for instance all sub-targets as they are called
+from a main target. To get rid of this, you can add a system environment variable
+called \verb"ANT_ARGS" with value \verb"-quiet" to your system. (In Windows this is done via
+the ``Advanced'' System properties panel.)
+
+\begin{itemize}
+\item As always, \verb#ant -p# prints all available targets.
+\item \verb#ant resolve# tries to check the current contents of the project's \verb#lib#
+directory with similar directories within the repository. If necessary, repository files are copied into
+the project's \verb#lib# directory, either because they were missing, or because they were
+older than the repository version. Which files will be checked must be specified
+within the build.properties file; see below.
+\item \verb#ant resolveresources# is very much like \verb#ant resolve#, but compares and copies
+\emph{resource files}, that is, the contents of the \verb#resource# directory.
+
+\item Simply typing ``\verb#ant#'' should compile if necessary, then run the (current) main class of the project.
+This class is specified inside \verb#build.properties# by means of the \verb#run.main.class# variable.
+You can change by running \verb"ant main". This shows the current main class, and asks for a new main class.
+Simply typing a return will retain the current main).
+
+\item \verb"ant doc" produces JavaDoc documentation inside the \verb"docs/modulename" directory,
+where modulename is specified within \verb"build.properties".
+The packages to be included in the javadoc arespecifies also in
+\verb"build.properties".
+
+\item \verb#ant main# shows current main class, then asks for new main class. (Simply \verb#<Return># won't change it).
+(There is a similar target \verb#ueSetmain#, used in combination with tools like UltraEdit)
+\item \verb#ant doc# produces JavaDoc documentation within the project's \verb#docs# directory,
+including a zipped version inside the \verb#dist# directory.
+\item \verb#ant clean# deletes the \verb#build# directory, including all class files.
+\item \verb#ant jar# produces a \verb"jar" file containing clas files and resources inside the \verb#dist# directory.
+
+
+\item  \verb"ant release", and \verb"ant majorrelease"
+create  a new minor or major release. 
+First a new jar is created, then this jar file is copied into the repository directory where the project
+ publishes its releases.
+It does \emph{not} upload anything to the repositories.
+See the discussion on repositories below.
+
+%\item \verb"ant newversion" increments the ``micro'' part of the ``specification version''
+%from the \verb"manifest.mf" file. (The ``micro'' part is the ``third'' number in a version like \verb"2.1.4").
+
+
+\item \verb"ant rebuild" is a special purpose version of the standard \verb"ant build" target.
+It relies on the \verb"rebuild-list" property, specified in \verb"build.properties".
+The latter provides a list of project directories, of projects on which the current project depends, directly or indirectly.
+\item \verb"ant test" runs (JUnit) test cases for the project as a whole.
+\end{itemize}
+
+
+\subsection{The build.properties file}
+The \verb"build.properties" file contains a number of lines of the form \verb"ant-property=value".
+Most of these properties are set inside the \verb"ant" files to default values, but when you set
+them explicitly  inside \verb"built.properties", then they will overrule the defaults.
+The minimal \verb"built.properties" file would contain a line similar to:
+\verb"shared.project.root=..",
+and a line like: \verb"run.main.class=package.main".
+
+\begin{itemize}
+\item \verb"shared.project.root": the relative path to the \verb"<JavaProjects>" directory.
+(This one is important; with an incorrect path nothing will work)\\
+Example: \verb"shared.project.root=.."
+\item \verb"run.main.class": The name of the Java class that should be run as ``main'' class.
+Note that you must specify the fully qualified classname, that is, including the package name.
+Example: \verb"run.main.class=hmi.util.Info".
+\item \verb"resource.path": when set, it specifies a path (as always, relative to \verb"<JavaProjects>"),
+to a directory that will be included on the Java classpath. Directories found on this path are suitable
+for loading resources, for instance using the \verb"hmi.util.Resources" class, or via
+Java methods like \verb"getResourceAsStream".
+Example:\\
+\verb"resource.path=${shared.project.root}/Shared/repository/Humanoids"
+\item \verb"run.jvmargs":  (extra) arguments for \verb"java", while running the main class.
+Example: \verb"run.jvmargs=-Xms128m -Xmx1024m"
+\item \verb"run.library.path": Usually the java library path contains just the project's \verb"lib" directory,
+so for instance \verb"dll" files should reside in that directory.
+When you want to include other places, you can specify this with the \verb"run.library.path" property.
+Example:\\ \verb"run.library.path=lib;${env.windir}/system32"
+\item \verb"javadoc.packages": the packages to be included when running javadoc,
+via \verb"ant doc". Example: \verb"javadoc.packages=hmi.graphics.*"
+\item \verb"module.name": The (base-)name for \verb"jar" files for this project, and also used for the javadoc directory inside the project's \verb"doc" directory.
+The actual version of a \verb"jar" file is determined from the ``Specification-Version'' line inside
+the \verb"manifest.mf" file.
+\item \verb"dependencies" and \verb"resources": a list of repository modules for the project's \verb"lib" directory
+or \verb"resource" directory.
+These modules will be updated when running \verb"ant resolve" (for the the ``dependencies''), or
+when running \verb"ant resolveresources" (for the ``resources'').
+Note that you can sometimes refer to \emph{external} resources via the \verb"resource.path" property, rather than
+resolving them into your \verb"resource" directory.
+  \begin{itemize}
+    \item The line of the form \verb#dependencies=<dep1>, <dep2>, .....,<dep-n># specifies \emph{library}
+      dependencies, that is, files that live within the project's \verb#lib# directory.
+    \item The line of the form \verb#resources=<dep1>, <dep2>, .....,<dep-n># specifies \emph{resource}
+      dependencies, that is, files that live within the project's \verb#resource# directory.
+    \item A dependency (i.e. an entry of the dependencies line) refers to some
+      directory within the repository. The contents of that directory will be compared and copied if necessary.
+    \item A dependency of the form \verb#<organization>/<module.name>#, or of the form
+      \verb#<module.name># for projects that don't specify an ``organization'', refers
+      to the ``\emph{latest stable}'' release build on the repository.
+    \item A dependency of the form \verb#<organization>/<module.name>/<version># or
+      \verb#<module.name>/<version># refers to some \emph{specified version} within the repository.
+      The allowed ``\verb#<version>#'' values are: \verb#latest#, \verb#alpha#, \verb#beta#, or
+      some version \emph{number} like \verb#2.1#, \verb#-3.1.4# or \verb#_2#.
+  \end{itemize}
+Example:\\
+\verb"dependencies=Sun/jogl, Hmi/HmiGraphics/beta, Hmi/HmiMath/1.1"
+\item \verb"repositories": A list of directories that act as repository, for the purpose of
+\verb"ant resolve" and \verb"ant resolveresources". The default repository list includes \verb"HmiShared/repository"
+and \verb"Shared/repository", so usually it isn't necessary to specify this property. Example:\\
+\verb"repositories=HmiShared/repository, /C:/Myrepository"
+
+\item \verb"publish.repository": The path to the repository directory where \emph{this} project
+will publish its releases. The default place is \verb"Shared/repository".
+Example: \verb"publish.repository=/C:/MyRepos"
+\item \verb"organization": When specified, organization will be a subdirectory within \verb"publish.directory"
+where releases are published. Example: \verb"organization=Hmi"
+\item \verb"rebuild-list": a list of project directories (relative to \verb"<JavaProjects>"),
+used by the \verb"ant rebuild" target.
+\end{itemize}
+
+
+\noindent
+Our \verb"ant" \verb"build.xml" files are in essence identical for all projects.
+Occasionally, you might have to change the line:\\
+\verb#<property name="shared.project.root" location=".."  />#\\
+The line above specifies that our shared root directory ``\verb"<JavaProjects>"'' is one level up
+from the project directory, which is correct for most projects.
+If your project directory is \emph{not} a direct subdirectory of \verb"<JavaProjects>", you
+should adapt this line inside \verb"build.xml" accordingly.
+Customization can be dome by editing the \verb"build.properties" file, that we describe below. If this is not enough,
+you can create a \verb"build-customize.xml" file inside your project directory,
+containing extra \verb"ant" targets as you see fit.
+An example \verb"build.properties" file:
+
+\section{Repositories}
+
+A ``repository'' is a collection of library files and data.
+We have such repositories in the form of local repository directories, as well as (remote) SVN repositories.
+The local directories can be seen as largely as ``cached'' copies of the corresponding SVN versions.
+For each project, we maintain a module inside a repository, where various releases are kept, each
+in its own subdirectory.
+For instance, the \verb"HmiUtil" module contains the \verb"jar" files for the \verb"hmi.util" package.
+The ``publish repository'' for the \verb"HmiUtil" project, specified inside its \verb"build.properties" file,
+is \verb"HmiShared/repository/HMI".
+Therefore, the releases are maintained within subdirectories of
+\verb"<JavaProjects>/HmiShared/repository/HMI/HmiUtil".
+Inside that directory you will find subdirectories \verb"alpha", \verb"beta", \verb"latest",
+and a few more carrying explicit version numbers, like \verb"1.0".
+The idea is that ``\verb"latest"'' always contains the latest (stable) release version.
+Inside the directory, you will typically find a \verb"lib" directory with content that will be added or
+updated for an \verb"ant resolve" action.
+
+\section{Versioning}
+Projects can produce releases in the form of packaged \verb"jar" files, carrying some
+version number, like for instance \verb"HmiUtil-1.1.jar".
+This version number is also present within the jar's \emph{manifest}, which is kept
+in the \verb"manifest.mf" file within the project directory.
+A version number has the form \verb"<major>.<minor>.<micro>", (where the \verb"<micro>" part is optional).
+There are no strict rules for dealing with version numbering, but the following guidelines
+are sensible:
+\begin{enumerate}
+\item When a new version is produced that does \emph{not} introduce or modify existing
+functionality, the specification version remains the same, and only the implementation version string
+is updated. (We automatically use the current date and time for the implementation version string.)
+\item When functionality is \emph{added}, the minor version of the specification version is incremented.
+\item For more substantial modifications, in particular removal of functionality, or a complete redesign,
+the major version is incremented (and the minor version goes to zero).
+\item  There is no clear role for the micro version number. Typically, one can use this
+for small changes in functionality, especially when new beta releases are made.
+They are also used when a ``stable'' release turns out to contain bugs, in which case
+improved versions get a new micro version.
+\item The \verb"manifest.mf" file also includes an ``Implementation Version'' line,
+which specifies the date and time of the release. Implementation versions should not be \emph{compared},
+i.e. a ``later'' implementation should not be considered ``better'', just ``different''.
+These implementation version lines are updated automatically when a new jar file is produced.
+\end{enumerate}
+
+The micro version number of a project can be incremented by running \verb"ant newversion".
+The idea is to increment the micro version of beta releases often, and semi-automatic.
+Increments of the major or minor version should be done \emph{manually}, by editing the \verb"manifest.mf" file.
+Versions of the manifest inside a \verb"jar" file can be queried at runtime, for instance, to check
+that some library \verb"jar" file is not out-of-date. For this purpose, we often add a special \verb"Info" class
+to every package. When this is specified as the ``main'' class, it will print the manifest
+information, at least when run from a \verb"jar" file.
+This \verb"Info" class contains methods for easy checking version compatibility.
+For example, \verb#hmi.util.Info.requireVersion("1.1")# will show an error message when
+the older \verb"HmiUtil-1.0.jar" version happens to be present in the \verb"lib" directory.
+(If you copy the \verb"Info" class, you should change just the \emph{package} line inside the source)
+
