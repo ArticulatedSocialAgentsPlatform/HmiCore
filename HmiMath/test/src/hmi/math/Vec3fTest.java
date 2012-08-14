@@ -36,6 +36,8 @@ import static org.junit.Assert.*;
  */
 public class Vec3fTest {
     
+    private static final double PRECISION = 0.01;
+    
     public Vec3fTest() {
     }
 
@@ -466,6 +468,18 @@ public class Vec3fTest {
         assertTrue(result.equals(expect));
         assertTrue(result2.equals(expect));
   
+    }
+    
+    @Test
+    public void testAngleBetweenOrthogonalVectors()
+    {
+        assertEquals(Math.PI*0.5, Vec3f.angleBetweenVectors(Vec3f.getVec3f(10, 0, 0), Vec3f.getVec3f(0,0.1f,0)),PRECISION);
+    }
+    
+    @Test
+    public void testAngleBetweenParallelVectors()
+    {
+        assertEquals(0, Vec3f.angleBetweenVectors(Vec3f.getVec3f(0, 5, 0), Vec3f.getVec3f(0,0.1f,0)),PRECISION);
     }
   
 }

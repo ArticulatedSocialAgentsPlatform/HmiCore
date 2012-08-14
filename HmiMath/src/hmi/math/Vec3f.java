@@ -582,6 +582,11 @@ public final class Vec3f {
        return (float) Math.sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);  
    }
     
+   public static float angleBetweenVectors(float a[], float b[])
+   {
+       //cos t = a.b/(||a|||b||)
+       return (float)Math.acos(dot(a, b)/(length(a)*length(b)));
+   }
    
    /**
     * Linear interpolates between a sequence of  vectors a and b, and puts the result in vector dst:
