@@ -481,5 +481,10 @@ public class Vec3fTest {
     {
         assertEquals(0, Vec3f.angleBetweenVectors(Vec3f.getVec3f(0, 5, 0), Vec3f.getVec3f(0,0.1f,0)),PRECISION);
     }
-  
+    
+    @Test
+    public void testDistanceBetweenPoints()
+    {
+        assertEquals((float)Math.sqrt(1+4+9), Vec3f.distanceBetweenPoints(Vec3f.getVec3f(1,2,3), Vec3f.getVec3f(2,4,6)), PRECISION);
+    }  
 }

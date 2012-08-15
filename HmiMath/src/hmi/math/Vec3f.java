@@ -575,6 +575,8 @@ public final class Vec3f {
        return (float) Math.sqrt(a[aIndex]*a[aIndex] + a[aIndex+1]*a[aIndex+1] + a[aIndex+2]*a[aIndex+2]);  
    }
    
+   
+   
    /**
     * returns the vector length
     */
@@ -586,6 +588,14 @@ public final class Vec3f {
    {
        //cos t = a.b/(||a|||b||)
        return (float)Math.acos(dot(a, b)/(length(a)*length(b)));
+   }
+   
+   public static float distanceBetweenPoints(float a[], float b[])
+   {
+       float xdist = a[0]-b[0];
+       float ydist = a[1]-b[1];
+       float zdist = a[2]-b[2];
+       return (float)Math.sqrt(xdist*xdist+ydist*ydist+zdist*zdist);
    }
    
    /**
