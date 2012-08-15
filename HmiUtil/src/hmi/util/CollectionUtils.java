@@ -2,9 +2,14 @@ package hmi.util;
 
 import java.util.Collection;
 
-public class ArrayUtils
+/**
+ * Utils for collections
+ * @author hvanwelbergen
+ *
+ */
+public class CollectionUtils
 {
-    private ArrayUtils(){}
+    private CollectionUtils(){}
     
     /**
      * Ensures that the list has at least size n (by filling it with zeros until it has)
