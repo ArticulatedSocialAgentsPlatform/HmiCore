@@ -44,8 +44,8 @@ import org.slf4j.LoggerFactory;
  */
 public class Skeleton extends XMLStructureAdapter
 {
-   private String id; // id of the Skeleton as a whole. null or an interned String
-   private VJoint root; // root joint of the skeleton tree.
+   private String id;          // id of the Skeleton as a whole. null or an interned String
+   private VJoint root;        // root joint of the skeleton tree.
    private List<VJoint> roots; // when there is more than one root.
    
    private List<String> jointSids;
@@ -56,6 +56,9 @@ public class Skeleton extends XMLStructureAdapter
    private boolean encodeRotation = false;
    private boolean encodeScale = false;
    private String encoding = ""; // possible strings: T, TR TRS an empty String or null is interpreted as "T"
+   
+   private float[][] jointMatrices; // transform matrices for all joints, linked to the global matrices within the VJoints.
+   
    
    private static Logger logger = LoggerFactory.getLogger("hmi.animation.Skeleton");
 
@@ -109,9 +112,67 @@ public class Skeleton extends XMLStructureAdapter
    {
       return id;
    } 
-   
+  
 
-  /**
+   /**
+    * Sets the root joint for the Skeleton, implicitly defining the complete Skeleton VJoint tree.
+    */
+   public void setRoot(VJoint root)
+   {
+      this.root = root;
+   }
+
+
+
+   /**
+    * Returns the root joint of the VJoint tree structure that defines the Skeleton joints.
+    */
+   public VJoint getRoot()
+   {
+      return root;
+   }
+   
+   
+   /**
+    * Uses the specified list of joints sids, and tries to locate the global matrices for those sids.
+    * The refs to those matrices are set into the specified matrices array. 
+    * if certain sids are not found in this Skeleton, the corresponding matrices element
+    * is not touched. (So one could use several Skeletons to collect matrices)
+    */
+   public void linkToJointMatrices(String[] sids, float[][] matrices) 
+   {
+       if (joints == null || sids == null || matrices == null) return;
+       for (int i=0; i<sids.length; i++) 
+       {
+           String sid = sids[i];
+           for (int j=0; j<joints.size(); j++) 
+           {
+               if (joints.get(j).getSid().equals(sid)) 
+               {
+                   matrices[i] = joints.get(j).getGlobalMatrix();
+                   break;            
+               }          
+           }   
+       }
+   }
+  
+  /* Calculate  number of joints in the VJoint tree */
+   private int calculateJointCount(VJoint vj) 
+   {
+      if (vj == null) return 0;
+      int result = 1;
+      for (VJoint child : vj.getChildren())
+      {
+         result += calculateJointCount(child);
+      }
+      return result;
+   }
+  
+   /*********************************************************
+   /* XML SECTION
+   /********************************************************
+  
+   /**
     * Sets the type of XML encoding: T, TR, or TRS
     * denoting Translation and optionally Rotation and Scale
     * The default is that only Translations are encoded/decoded
@@ -150,64 +211,7 @@ public class Skeleton extends XMLStructureAdapter
    {
       return encoding;
    }
-   
-//   /**
-//    * returns whether the VJoints of this Skeleton have translations to be encoded or decoded from XML
-//    */
-//   public boolean encodeTranslation()
-//   {
-//      return encodeTranslation;
-//   }
-//   
-//   /**
-//    * returns whether the VJoints of this Skeleton have rotations to be encoded or decoded from XML
-//    */
-//   public boolean encodeRotation()
-//   {
-//      return encodeRotation;
-//   }
-//   
-//      /**
-//    * returns whether the VJoints of this Skeleton have scales to be encoded or decoded from XML
-//    */
-//   public boolean encodeScale()
-//   {
-//      return encodeScale;
-//   }
-// 
-
-
-
-
-   /**
-    * Sets the root joint for the Skeleton, implicitly defining the Skeleton VJoint tree.
-    */
-   public void setRoot(VJoint root)
-   {
-      this.root = root;
-   }
-
-
-
-   /**
-    * Returns the root joint of the VJoint tree structure that defines the Skeleton joints.
-    */
-   public VJoint getRoot()
-   {
-      return root;
-   }
   
-  /* Calculate  number of joints in the VJoint tree */
-   private int calculateJointCount(VJoint vj) 
-   {
-      if (vj == null) return 0;
-      int result = 1;
-      for (VJoint child : vj.getChildren())
-      {
-         result += calculateJointCount(child);
-      }
-      return result;
-   }
   
    /**
     * Static flag, that denotes whether jointCount attribute will be included or not for writing XML.
@@ -309,7 +313,7 @@ public class Skeleton extends XMLStructureAdapter
     private static final int DEFAULT_MAX_BONE_COUNT = 32; // used in decodeContent for List allocation
     
     public boolean LINE_BASED = true; // denotes whether bones are encoded on single lines, or are allowed to spread over several lines.
-    // When LINE_BASED = true, lines in the bones section can be "commented ouT using C/Java style comment chars of the form //
+    // When LINE_BASED = true, lines in the bones section can be "commented out" using C/Java style comment chars of the form //
     
     /**
      * Decodes XML content, and converts it into the double time values and float cofig data.
@@ -329,7 +333,7 @@ public class Skeleton extends XMLStructureAdapter
               if (LINE_BASED) {
                   sectionTokenizer = new StringTokenizer(boneEncoding, LINE_DELIMITERS);   // split into lines
                   boneTokenizer = null;
-                  // boneTokenizer will be alocated per line
+                  // boneTokenizer will be allocated per line
               } else {
                   sectionTokenizer = new StringTokenizer(boneEncoding, ATTRIBUTE_TOKEN_DELIMITERS); // immediately split into bone tokens
                   boneTokenizer = sectionTokenizer; // reuse same tokenizer for bones
