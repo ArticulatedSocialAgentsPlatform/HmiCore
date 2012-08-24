@@ -33,7 +33,7 @@ Basic attributes:
 </skeleton>
 
 2)
-feitelijke animatie data. Voor "files" gebruiken we vaak "SkeltonInterpolators": een XML header met de encodings, en de joint namen die voor deze animatie gebruikt worden.
+feitelijke animatie data. Voor "files" gebruiken we vaak "SkeletonInterpolators": een XML header met de encodings, en de joint namen die voor deze animatie gebruikt worden.
 encoding="T1R"  : 1 translation, gevolgd door n rotaties. de translatie is er alleen voor de Humanoid root, alle joints hebben een rotatie)
 rotationEncoding="quaternions" : duidelijk
 parts=" ....." : de joint namen
