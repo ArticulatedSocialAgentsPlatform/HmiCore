@@ -212,17 +212,24 @@ public class XMLSkeleton extends XMLStructureAdapter
     @Override
     public StringBuilder appendContent(StringBuilder buf, XMLFormatting fmt) {
         int tab = fmt.getTab();
-        if (jointSids != null) {
+        if (jointSids == null || jointSids.isEmpty()) {
+            appendEmptyTag(buf, fmt,  "joints");
+        } else {
             appendSTag(buf, "joints", fmt);
             appendNewLine(buf, fmt.indent().getTab());
             appendStrings(buf, jointSids.toArray(new String[0]), ' ', fmt, NR_JOINTS_PER_LINE);
             appendETag(buf, "joints", fmt.unIndent());
         }
-        appendSTag(buf, "bones", fmt);
-        for (VJoint root : roots) {     
-            appendVJoint(buf, root, fmt.indent());
+        if (roots == null || roots.isEmpty()) {
+            appendEmptyTag(buf, fmt,  "bones");
+        } else {
+            appendSTag(buf, "bones", fmt);
+            fmt.indent();
+            for (VJoint root : roots) {     
+                appendVJoint(buf, root, fmt);
+            }
+            appendETag(buf, "bones", fmt.unIndent());
         }
-        appendETag(buf, "bones", fmt.unIndent());
         return buf;        
     }
     

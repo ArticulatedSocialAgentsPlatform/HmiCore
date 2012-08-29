@@ -1,5 +1,6 @@
 package hmi.animation;
 
+import hmi.math.Mat4f;
 import hmi.xml.XMLTokenizer;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,12 +20,17 @@ public class Skeleton
    // sidsSpecified is to true when jointSids have been specified explicitly,
    // either by calling setJointSids(), or when XML with a <joints> section is decoded.
    //private boolean sidsSpecified = false; 
-   private ArrayList<String> jointSids = new ArrayList<>();;
-  // private VJoint[] joints;
+   private ArrayList<String> jointSids = new ArrayList<>();
+   // jointSidsSpecified is  set to "true" only when setJointSids is called explicitly. Remains false when addSids is used instead.
+   private boolean jointSidsSpecified = false; 
+ 
    
    private float[][] jointMatrices; // transform matrices for all joints, linked to the global matrices within the VJoints.
    private float[][] inverseBindMatrices;
    private float[][] transformMatrices;
+   private boolean invalidMatrices = true; // signals "invalid" matrix arrays, due to modifications for roots and/or jointSids
+
+   
    
 
    
@@ -53,70 +59,81 @@ public class Skeleton
  
    
    /**
+    * Initializes this Skeleton from the specified XMLSkeleton
+    */
+   public Skeleton(XMLSkeleton xmlSkel) {
+       this();
+       setId(xmlSkel.getId());
+       setRoots(xmlSkel.getRoots());
+       setJointSids(xmlSkel.getJointSids());  
+   }
+   
+   /**
     * Read a Skeleton from an XMLTokenizer. 
     */
    public Skeleton(XMLTokenizer tokenizer) throws IOException {
-      this();
-      XMLSkeleton xmlSkel = new XMLSkeleton(tokenizer);
-      setId(xmlSkel.getId());
-      setRoots(xmlSkel.getRoots());
-      setJointSids(xmlSkel.getJointSids());    
+      this(new XMLSkeleton(tokenizer));
+   }
+   
+   /**
+    * Returns an XML encoding, via XMLSkeleton.
+    */
+   public String toXMLString() {
+       XMLSkeleton xmlSkel = new XMLSkeleton(id);
+       xmlSkel.setJointSids(jointSids);
+       xmlSkel.setRoots(roots);
+       return xmlSkel.toXMLString();
    }
    
    
-   /*private setter for id */
+   /* private setter for id */
    private void setId(String id) {
-      this.id = id == null ? "" : id.intern();
+       this.id = id == null ? "" : id.intern();
    }
  
    /**
     * Returns the Skeleton id.
     */
-   public String getId() {  return id; } 
+   public String getId() { return id; } 
   
 
-  /**
+   /**
     * Sets the List of joint sids.
     */
-   public void setJointSids(ArrayList<String> sids) {
-       this.jointSids = sids;
-       dirty = true;
+   public final void setJointSids(List<String> sids) {
+       jointSids.clear();
+       jointSids.addAll(sids);
+       jointSidsSpecified = true;
+       invalidMatrices = true;
    }
    
    
    /**
-    * returns the List of joints sids.
+    * Returns the List of joints sids.
     */
-   public ArrayList<String> getJointSids() {
-       return jointSids;
-   }
+   public ArrayList<String> getJointSids() { return jointSids; }
    
 
    /**
     * Returns the root joints.
     */
-   public ArrayList<VJoint> getRoots() {  
-       return roots;
-   }
+   public ArrayList<VJoint> getRoots() { return roots; }
    
    /**
     * Returns the root joint with specified index 0.
     */
    public VJoint getRoot() {  
-       if (roots.isEmpty()) {
-           return null;
-       } else {
-           return roots.get(0);
-       }
+       return (roots.isEmpty() ? null : roots.get(0));
    }
    
    /**
     * Sets the List of roots
-    * 
     */
-    public void setRoots(ArrayList<VJoint> roots) {
-        this.roots = roots;
-        dirty = true;
+    public final void setRoots(List<VJoint> roots) {
+        this.roots.clear();
+        if (! jointSidsSpecified) { jointSids.clear(); }
+        for (VJoint rt : roots) { addRoot(rt); }
+        invalidMatrices = true;
     }
    
    /**
@@ -124,36 +141,69 @@ public class Skeleton
     * If joints have not specified explicitly, they will be derived by exploring the VJoint tree.
     */
    public final void addRoot(VJoint root) {
-      roots.add(root);
-      dirty = true;
+       if (root == null) return;
+       roots.add(root);
+       if (! jointSidsSpecified) { addSids(root); }
+       invalidMatrices = true;
+   }
+   
+   /* Inorder traversal, adding joint sids to jointSids List */
+   private void addSids(VJoint vj) {
+       jointSids.add(vj.getSid());
+       for (VJoint child : vj.getChildren()) { addSids(child); }          
    }
    
    
    /**
-    * Calls calculaterMatrices for all VJoint roots. 
+    * Calls calculaterMatrices for all VJoint roots,
+    * then calculates the transform matrices, either by copying from the joint matrices,
+    * or by multiplying the latter with inverse bind matrices, if defined.
+    * Note that in both cases the transform matrices are properly synced for
+    * the Thread that calls this method, and are decoupled from the joint matrices
+    * that reside inside the VJoint trees. 
     */
    public synchronized void calculateMatrices() {
        for (VJoint rt : roots) {
            rt.calculateMatrices();
        }
        if (transformMatrices != null) {
-           // update, in this synchronized block
+           if (inverseBindMatrices ==  null) { // just copy:
+               for (int i=0; i<transformMatrices.length; i++) {
+                   if (transformMatrices[i] != null) {
+                       Mat4f.set(transformMatrices[i], jointMatrices[i]);
+                   }
+               }             
+           } else { // multiply with inverse bind matrices:
+               for (int i=0; i<transformMatrices.length; i++) {
+                   if (transformMatrices[i] != null) {
+                       Mat4f.mul(transformMatrices[i], jointMatrices[i], inverseBindMatrices[i]);
+                   }
+               }            
+           }
        }
    }
    
-   private boolean dirty = true; // signals modifications for roots and/or jointSids
+   /**
+    * Sets a reference to the specified matrices, to be used as inverse bind matrices
+    * for the calculateMatrices calls later on.
+    */
+   public void setInverseBindMatrices(float[][] matrices) {
+       this.inverseBindMatrices = matrices;
+   }
    
    /**
-    * Returns a reference to the array of transform matrices, including
-    * one float matrix for every joint, 
+    * Returns a reference to the array of transform matrices, 
+    * including one float matrix for every joint, 
     * in the order as specified by the joint sid List.
     * The array is never null, but might contain some null matrices,
     * when certain jointSids are not actually present in the VJoint trees.
-    * This method will also allocate all matrices, based upon the current
-    * definitions for roots and jointSids. 
+    * This method will also allocate (but not initialize) all matrices, 
+    * based upon the current roots and jointSids. 
+    * The matrix values to which the array refers should be updated later on 
+    * by calling calculateMatrices.
     */
    public float[][] getTransformMatrices() {    
-       if (dirty) {            
+       if ( invalidMatrices) {            
            jointMatrices = new float[jointSids.size()][];
            inverseBindMatrices = new float[jointSids.size()][];
            transformMatrices = new float[jointSids.size()][];
@@ -162,11 +212,13 @@ public class Skeleton
                VJoint vj = searchVJoint(sid);
                if (vj != null) {
                    jointMatrices[index] = vj.getGlobalMatrix();
+                   transformMatrices[index] = Mat4f.getMat4f();
+               } else {
+                   System.out.println("Skeleton.getTransformMatrices: no VJoint found for sid=\"" + sid + "\"");
                }
                index++;
-           }
-     
-           dirty = false;
+           }     
+           invalidMatrices = false;
        }
        return transformMatrices;     
    }

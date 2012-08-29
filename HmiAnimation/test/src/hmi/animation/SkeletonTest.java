@@ -8,6 +8,8 @@ import static org.junit.Assert.assertTrue;
 import hmi.xml.XMLTokenizer;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
@@ -25,9 +27,9 @@ public class SkeletonTest {
     VJoint vj011;
     VJoint vj012;
     VJoint vj0110;
-    String[] sidsInorder;
-    String[] sidsSubset;
-    String[] sidsOutOfOrder;
+    List<String> sidsInorder;
+    List<String> sidsSubset;
+    List<String> sidsOutOfOrder;
    
     public Skeleton createSkeleton(String id)
     {
@@ -40,9 +42,9 @@ public class SkeletonTest {
     @Before
     public void init()
     {
-       sidsInorder = new String[] {"root", "lhip", "rhip", "rknee0", "rknee1", "foot", "rknee2"}; 
-       sidsOutOfOrder = new String[] {"root", "rhip",  "lhip", "rknee0", "rknee1", "rknee2", "foot"}; 
-       sidsSubset = new String[] {"root", "lhip", "rhip"}; 
+       sidsInorder = Arrays.asList(new String[] {"root", "lhip", "rhip", "rknee0", "rknee1", "foot", "rknee2"}); 
+       sidsOutOfOrder = Arrays.asList(new String[] {"root", "rhip",  "lhip", "rknee0", "rknee1", "rknee2", "foot"}); 
+       sidsSubset = Arrays.asList(new String[] {"root", "lhip", "rhip"}); 
        vj0 = new VJoint("vj0", "root");
        vj00 = new VJoint("vj00", "lhip" );
        vj01 = new VJoint("vj01", "rhip");
@@ -158,64 +160,64 @@ public class SkeletonTest {
     } 
 
   
-//    @Test
-//    public void testXMLBasics() throws IOException 
-//    {
-//        Skeleton skel = new Skeleton("skel1");
-//        String encoded = skel.toXMLString();
-//        //System.out.println("Skeleton encoded:" + encoded);
-//        XMLTokenizer tokenizer = new XMLTokenizer(encoded);
-//        Skeleton skelDecoded = new Skeleton(tokenizer);
-//        String decoded = skelDecoded.toXMLString();
-//        //System.out.println("Skeleton decoded:" + decoded + " id:" + skelDecoded.getId());
-//        assertTrue(skelDecoded.getId().equals("skel1"));
-//        assertTrue(skelDecoded.getId() =="skel1");
-//    }
+    @Test
+    public void testXMLBasics() throws IOException 
+    {
+        Skeleton skel = new Skeleton("skel1");
+        String encoded = skel.toXMLString();
+        System.out.println("Skeleton encoded:\n" + encoded);
+        XMLTokenizer tokenizer = new XMLTokenizer(encoded);
+        Skeleton skelDecoded = new Skeleton(tokenizer);
+        String decoded = skelDecoded.toXMLString();
+        System.out.println("Skeleton decoded:\n" + decoded );
+        assertTrue(skelDecoded.getId().equals("skel1"));
+        assertTrue(skelDecoded.getId() =="skel1");
+    }
     
-//    @Test
-//    public void testXML1() throws IOException 
-//    {
-//        Skeleton skel = createSkeleton("testSkel");
-//        skel.addRoot(vj0);
-//        assertTrue(skel.getRoot(0) == vj0);
-//        skel.setEncoding("TRS");
-//        
-//        String encoded = skel.toXMLString();
-//        System.out.println("Skeleton encoded:\n" + encoded);
-//        XMLTokenizer tokenizer = new XMLTokenizer(encoded);
-//        Skeleton skelDecoded = new Skeleton(tokenizer);
-//        String decoded = skelDecoded.toXMLString();
-//        System.out.println("Skeleton decoded:" + decoded + " id:" + skelDecoded.getId());
-//        assertTrue(skelDecoded.getId().equals("testSkel"));
-//        assertTrue(skelDecoded.getId() =="testSkel");
-////        assertTrue(skelDecoded.getRoot() != null);
-////        assertTrue(skelDecoded.getRoot().getSid() == vj0.getSid());
-//  
-//    }
-//  
-//    @Test
-//    public void testXML2() throws IOException 
-//    {
-//        Skeleton skel = createSkeleton("testSkel");
-//        
-//        skel.setJointSids(sidsSubset);
-//        skel.addRoot(vj0);
-//        assertTrue(skel.getRoot(0) == vj0);
-//        skel.setEncoding("TRS");
-//        
-//        String encoded = skel.toXMLString();
-//        System.out.println("Skeleton encoded:\n" + encoded);
-//        XMLTokenizer tokenizer = new XMLTokenizer(encoded);
-//        Skeleton skelDecoded = new Skeleton(tokenizer);
-//        String decoded = skelDecoded.toXMLString();
-//        System.out.println("Skeleton decoded:" + decoded + " id:" + skelDecoded.getId());
-//        assertTrue(skelDecoded.getId().equals("testSkel"));
-//        assertTrue(skelDecoded.getId() =="testSkel");
-////        assertTrue(skelDecoded.getRoot() != null);
-////        assertTrue(skelDecoded.getRoot().getSid() == vj0.getSid());
-//  
-//    }
-//  
+    @Test
+    public void testXML1() throws IOException 
+    {
+        Skeleton skel = createSkeleton("testSkel");
+        skel.addRoot(vj0);
+        assertTrue(skel.getRoot() == vj0);
+        //skel.setEncoding("TRS");
+        
+        String encoded = skel.toXMLString();
+        System.out.println("Skeleton encoded:\n" + encoded);
+        XMLTokenizer tokenizer = new XMLTokenizer(encoded);
+        Skeleton skelDecoded = new Skeleton(tokenizer);
+        String decoded = skelDecoded.toXMLString();
+        System.out.println("Skeleton decoded:" + decoded + " id:" + skelDecoded.getId());
+        assertTrue(skelDecoded.getId().equals("testSkel"));
+        assertTrue(skelDecoded.getId() =="testSkel");
+        assertTrue(skelDecoded.getRoot() != null);
+        assertTrue(skelDecoded.getRoot().getSid() == vj0.getSid());
+  
+    }
+  
+    @Test
+    public void testXML2() throws IOException 
+    {
+        Skeleton skel = createSkeleton("testSkel");
+        
+        skel.setJointSids(sidsSubset);
+        skel.addRoot(vj0);
+        assertTrue(skel.getRoot() == vj0);
+       // skel.setEncoding("TRS");
+        
+        String encoded = skel.toXMLString();
+        System.out.println("Skeleton encoded:\n" + encoded);
+        XMLTokenizer tokenizer = new XMLTokenizer(encoded);
+        Skeleton skelDecoded = new Skeleton(tokenizer);
+        String decoded = skelDecoded.toXMLString();
+        System.out.println("Skeleton decoded:" + decoded + " id:" + skelDecoded.getId());
+        assertTrue(skelDecoded.getId().equals("testSkel"));
+        assertTrue(skelDecoded.getId() =="testSkel");
+        assertTrue(skelDecoded.getRoot() != null);
+        assertTrue(skelDecoded.getRoot().getSid() == vj0.getSid());
+  
+    }
+  
   
   
 }
