@@ -1156,6 +1156,21 @@ public class XMLStructureAdapter implements XMLStructure
         buf.append("/>");
         return buf;
     }
+    
+    /**
+     * This method appends an "empty element" XML STag with specified tag name to buf.
+     * The string appended is of the form &lt;tagName/&gt; and is indented according to the specified XMLFormatting.
+     * No attributes are included
+     */
+    public final static StringBuilder appendEmptyTag(StringBuilder buf, XMLFormatting fmt, String tagName)
+    {
+        buf.append('\n');
+        appendSpaces(buf, fmt);
+        buf.append('<');
+        buf.append(tagName);
+        buf.append("/>");
+        return buf;
+    }
 
     /**
      * This method appends an "empty element" XML STag with specified tag name to buf.
