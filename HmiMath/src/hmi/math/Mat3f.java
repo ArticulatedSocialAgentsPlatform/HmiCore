@@ -77,10 +77,8 @@ public final class Mat3f
     @Deprecated
     public static ScalingType getScalingTypeVec3f(float[] scaleVec)
     {
-        if (scaleVec[0] != scaleVec[1] || scaleVec[0] != scaleVec[2])
-            return ScalingType.ALIGNED;
-        if (scaleVec[0] == 1.0f)
-            return ScalingType.IDENTITY;
+        if (scaleVec[0] != scaleVec[1] || scaleVec[0] != scaleVec[2]) return ScalingType.ALIGNED;
+        if (scaleVec[0] == 1.0f) return ScalingType.IDENTITY;
         return ScalingType.UNIFORM;
     }
 
@@ -200,8 +198,8 @@ public final class Mat3f
     /**
      * Sets the matrix from 9 float values;
      */
-    public static void set(float[] dst, float src00, float src01, float src02, float src10, float src11, float src12, float src20, float src21,
-            float src22)
+    public static void set(float[] dst, float src00, float src01, float src02, float src10, float src11, float src12, float src20,
+            float src21, float src22)
     {
         dst[M00] = src00;
         dst[M01] = src01;
@@ -217,8 +215,8 @@ public final class Mat3f
     /**
      * Sets the matrix from 9 float values;
      */
-    public static void set(float[] dst, int dIndex, float src00, float src01, float src02, float src10, float src11, float src12, float src20,
-            float src21, float src22)
+    public static void set(float[] dst, int dIndex, float src00, float src01, float src02, float src10, float src11, float src12,
+            float src20, float src21, float src22)
     {
         dst[dIndex + M00] = src00;
         dst[dIndex + M01] = src01;
@@ -341,7 +339,8 @@ public final class Mat3f
      */
     public static void setFromQuatScale(float[] m, int mIndex, float[] q, int qIndex, float s)
     {
-        m[mIndex] = (float) (s * (1.0 - 2.0 * q[qIndex + Quat4f.y] * q[qIndex + Quat4f.y] - 2.0 * q[qIndex + Quat4f.z] * q[qIndex + Quat4f.z]));
+        m[mIndex] = (float) (s * (1.0 - 2.0 * q[qIndex + Quat4f.y] * q[qIndex + Quat4f.y] - 2.0 * q[qIndex + Quat4f.z]
+                * q[qIndex + Quat4f.z]));
         m[mIndex + 1] = (float) (s * (2.0 * q[qIndex + Quat4f.x] * q[qIndex + Quat4f.y] - 2.0 * q[qIndex + Quat4f.s] * q[qIndex + Quat4f.z]));
         m[mIndex + 2] = (float) (s * (2.0 * q[qIndex + Quat4f.s] * q[qIndex + Quat4f.y] + 2.0 * q[qIndex + Quat4f.x] * q[qIndex + Quat4f.z]));
 
@@ -351,7 +350,8 @@ public final class Mat3f
 
         m[mIndex + 6] = (float) (s * (2.0 * q[qIndex + Quat4f.x] * q[qIndex + Quat4f.z] - 2.0 * q[qIndex + Quat4f.s] * q[qIndex + Quat4f.y]));
         m[mIndex + 7] = (float) (s * (2.0 * q[qIndex + Quat4f.s] * q[qIndex + Quat4f.x] + 2.0 * q[qIndex + Quat4f.y] * q[qIndex + Quat4f.z]));
-        m[mIndex + 8] = (float) (s * (1.0 - 2.0 * q[qIndex + Quat4f.x] * q[qIndex + Quat4f.x] - 2.0 * q[qIndex + Quat4f.y] * q[qIndex + Quat4f.y]));
+        m[mIndex + 8] = (float) (s * (1.0 - 2.0 * q[qIndex + Quat4f.x] * q[qIndex + Quat4f.x] - 2.0 * q[qIndex + Quat4f.y]
+                * q[qIndex + Quat4f.y]));
     }
 
     private static final float NORMALIZE_THRESHOLD = 0.001f;
@@ -532,6 +532,16 @@ public final class Mat3f
         col[0] = m[j];
         col[1] = m[j + COL_SIZE];
         col[2] = m[j + 2 * COL_SIZE];
+    }
+
+    /**
+     * Copies a matrix column with index j from a 3X3 matrix m. The result is copied to a Vec3 array col.
+     */
+    public static void setColumn(float[] m, int j, float[] col)
+    {
+        m[j] = col[0];
+        m[j + COL_SIZE] = col[1];
+        m[j + 2 * COL_SIZE] = col[2];
     }
 
     /**
@@ -767,10 +777,8 @@ public final class Mat3f
         for (int i = 0; i < MAT3F_SIZE; i++)
         {
             diff = a[i] - b[i];
-            if (Float.isNaN(diff))
-                return false;
-            if (diff != 0.0f)
-                return false;
+            if (Float.isNaN(diff)) return false;
+            if (diff != 0.0f) return false;
         }
         return true;
     }
@@ -784,10 +792,8 @@ public final class Mat3f
         for (int i = 0; i < MAT3F_SIZE; i++)
         {
             diff = a[i + aIndex] - b[i + bIndex];
-            if (Float.isNaN(diff))
-                return false;
-            if ((diff < 0 ? -diff : diff) > epsilon)
-                return false;
+            if (Float.isNaN(diff)) return false;
+            if ((diff < 0 ? -diff : diff) > epsilon) return false;
         }
         return true;
     }
@@ -801,10 +807,8 @@ public final class Mat3f
         for (int i = 0; i < MAT3F_SIZE; i++)
         {
             diff = a[i] - b[i];
-            if (Float.isNaN(diff))
-                return false;
-            if ((diff < 0 ? -diff : diff) > epsilon)
-                return false;
+            if (Float.isNaN(diff)) return false;
+            if ((diff < 0 ? -diff : diff) > epsilon) return false;
         }
         return true;
     }
@@ -1111,8 +1115,7 @@ public final class Mat3f
         for (int i = 0; i < MAT3F_SIZE; i++)
         {
             float mx = (m[i] < 0.0f) ? -m[i] : m[i];
-            if (mx > max)
-                max = mx;
+            if (mx > max) max = mx;
         }
         return max;
     }
@@ -1193,23 +1196,17 @@ public final class Mat3f
     public static boolean isOrthogonal(float[] m, float epsilon)
     {
         float ip = m[M00] * m[M00] + m[M10] * m[M10] + m[M20] * m[M20];
-        if (Math.abs(ip - 1.0f) > epsilon)
-            return false;
+        if (Math.abs(ip - 1.0f) > epsilon) return false;
         ip = m[M01] * m[M01] + m[M11] * m[M11] + m[M21] * m[M21];
-        if (Math.abs(ip - 1.0f) > epsilon)
-            return false;
+        if (Math.abs(ip - 1.0f) > epsilon) return false;
         ip = m[M02] * m[M02] + m[M12] * m[M12] + m[M22] * m[M22];
-        if (Math.abs(ip - 1.0f) > epsilon)
-            return false;
+        if (Math.abs(ip - 1.0f) > epsilon) return false;
         ip = m[M00] * m[M01] + m[M10] * m[M11] + m[M20] * m[M21];
-        if (Math.abs(ip) > epsilon)
-            return false;
+        if (Math.abs(ip) > epsilon) return false;
         ip = m[M00] * m[M02] + m[M10] * m[M12] + m[M20] * m[M22];
-        if (Math.abs(ip) > epsilon)
-            return false;
+        if (Math.abs(ip) > epsilon) return false;
         ip = m[M01] * m[M02] + m[M11] * m[M12] + m[M21] * m[M22];
-        if (Math.abs(ip) > epsilon)
-            return false;
+        if (Math.abs(ip) > epsilon) return false;
         return true;
     }
 
@@ -1254,8 +1251,7 @@ public final class Mat3f
         do
         {
             det = invertTranspose(mkInvT, mk);
-            if (det == 0.0f)
-                return 0.0f;
+            if (det == 0.0f) return 0.0f;
             nInv1 = norm1(mkInvT);
             nInvInf = normInf(mkInvT);
             float r = (nInv1 * nInvInf) / (n1 * nInf);
@@ -1306,8 +1302,7 @@ public final class Mat3f
         do
         {
             det = invertTranspose(mkInvT, mk);
-            if (det == 0.0f)
-                return ScalingType.UNDEFINED;
+            if (det == 0.0f) return ScalingType.UNDEFINED;
             nInv1 = norm1(mkInvT);
             nInvInf = normInf(mkInvT);
             float r = (nInv1 * nInvInf) / (n1 * nInf);
@@ -1390,8 +1385,7 @@ public final class Mat3f
         // return ScalingType.UNIFORM; // uniform scaling, with some non-unit scaling factor
         // }
 
-        if (m[M00] == 1.0f && m[M11] == 1.0f && m[M22] == 1.0f)
-            return ScalingType.IDENTITY; // No scaling at all
+        if (m[M00] == 1.0f && m[M11] == 1.0f && m[M22] == 1.0f) return ScalingType.IDENTITY; // No scaling at all
         return ScalingType.ALIGNED;
     }
 
@@ -1486,14 +1480,12 @@ public final class Mat3f
         float rr0 = rv0 * cosa - rv1 * sina;
         float rr1 = rv0 * sina + rv1 * cosa;
 
-        if (rr0 < MINIMAL_SKEW_ANGLE)
-            throw new IllegalArgumentException("Mat4f.getSkewMatrix: illegal angle (" + angle + ")");
+        if (rr0 < MINIMAL_SKEW_ANGLE) throw new IllegalArgumentException("Mat4f.getSkewMatrix: illegal angle (" + angle + ")");
 
         float d = (rr1 / rr0) - (rv1 / rv0);
-        if (matrix == null)
-            matrix = new float[9];
-        set(matrix, d * e1[0] * e0[0] + 1.0f, d * e1[0] * e0[1], d * e1[0] * e0[2], d * e1[1] * e0[0], d * e1[1] * e0[1] + 1.0f, d * e1[1] * e0[2], d
-                * e1[2] * e0[0], d * e1[2] * e0[1], d * e1[2] * e0[2] + 1.0f);
+        if (matrix == null) matrix = new float[9];
+        set(matrix, d * e1[0] * e0[0] + 1.0f, d * e1[0] * e0[1], d * e1[0] * e0[2], d * e1[1] * e0[0], d * e1[1] * e0[1] + 1.0f, d * e1[1]
+                * e0[2], d * e1[2] * e0[0], d * e1[2] * e0[1], d * e1[2] * e0[2] + 1.0f);
         return matrix;
     }
 
