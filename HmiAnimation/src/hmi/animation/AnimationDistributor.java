@@ -355,7 +355,7 @@ public class AnimationDistributor implements ClockListener
         // "LeftToe", // 23
 
         Skeleton skel = new Skeleton(characterId);
-        skel.setRoot(pelvis);
+        skel.addRoot(pelvis);
         return skel;
     }
 
