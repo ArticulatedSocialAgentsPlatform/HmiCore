@@ -1215,7 +1215,7 @@ public class VJoint implements VObject
 
     /**
      * Performs a recursive tree walk over the scene graph with this VJoint as root, calculating the global and local matrices for all visited
-     * VObjects, automaticly setting all local matrices The calculation per VJoint is: globalMatrix' = parent.globalMatrix * localMatrix. For this
+     * VObjects, automatically setting all local matrices The calculation per VJoint is: globalMatrix' = parent.globalMatrix * localMatrix. For this
      * (root) VJoint, the &quot;parent's&quot; global matrix is specified by means of the parentGlobalMatrix parameter.
      */
     public void calculateMatrices(float[] parentGlobalMatrix)

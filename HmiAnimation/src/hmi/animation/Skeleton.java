@@ -4,6 +4,7 @@ import hmi.math.Mat4f;
 import hmi.xml.XMLTokenizer;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,19 @@ import org.slf4j.LoggerFactory;
 /**
  *
  * Encapsulates a VJoint based skeleton structure.
+ * 
+ * One of the tasks of Skeleton is to act as a synchronized interface between
+ * animator/modifier (Threads) of the skeleton, and render/user Threads, that
+ * need the transform data. Basically, the roles are as follows:
+ * 1) Animator Threads can freely modify VJoint rotations and other
+ * local transform data, without locking.
+ * 2) The animator Thread should call updateJointMatrices once in a while,
+ * to transfer this data to the jointMatrices data, that is shared with other Threads.
+ * This is a synchronized method.
+ * 3) Render Threads should not use VJoint local data. Rather, they should call
+ * the (synchronized) updateTransformMatrices method, which accesses the joint matrices
+ * in a safe way. Afterwards, the render Thread can freely use the transform matrices,
+ * without locking. 
  */
 public class Skeleton 
 {
@@ -29,10 +43,6 @@ public class Skeleton
    private float[][] inverseBindMatrices;
    private float[][] transformMatrices;
    private boolean invalidMatrices = true; // signals "invalid" matrix arrays, due to modifications for roots and/or jointSids
-
-   
-   
-
    
    private static Logger logger = LoggerFactory.getLogger("hmi.animation.Skeleton");
 
@@ -45,7 +55,7 @@ public class Skeleton
     * Create a new Skeleton with specified Skeleton id.
     */
    public Skeleton(String id) {
-      setId(id);
+       setId(id);
    }
    
 
@@ -53,8 +63,8 @@ public class Skeleton
     * Create a new Skeleton with specified Skeleton id and specified VJoint tree.
     */
    public Skeleton(String id, VJoint root) {
-      this(id);
-      addRoot(root);
+       this(id);
+       addRoot(root);
    }
  
    
@@ -72,7 +82,7 @@ public class Skeleton
     * Read a Skeleton from an XMLTokenizer. 
     */
    public Skeleton(XMLTokenizer tokenizer) throws IOException {
-      this(new XMLSkeleton(tokenizer));
+       this(new XMLSkeleton(tokenizer));
    }
    
    /**
@@ -85,6 +95,28 @@ public class Skeleton
        return xmlSkel.toXMLString();
    }
    
+   /**
+    * Returns an (XML encoded) String representation, as defined by XMLSkeleton.
+    */
+    @Override
+    public String toString() {
+        return toXMLString();
+    }
+   
+   /**
+    * Creates and returns a new Skeleton, from an XML encoded description,
+    * as defined by XMLSkeleton.
+    * @param xmlEncoding the XML encoded joint/bones structure
+    * @return Skeleton as specified by the encoding, or null when incorrect.
+    */
+   public static Skeleton fromXML(String xmlEncoding)  {
+       try {
+           return new Skeleton(new XMLTokenizer(xmlEncoding));
+       } catch (IOException e) { // shoukld not happen for String bases tokenizer.
+           System.out.println("Skeleton.fromXML: Unexpected error: " + e);
+           return null;
+       }
+   }
    
    /* private setter for id */
    private void setId(String id) {
@@ -96,6 +128,16 @@ public class Skeleton
     */
    public String getId() { return id; } 
   
+   
+   /**
+    * Sets the List of joint sids, specified by means of
+    * a String array, rather than a List.
+    */
+   public final void setJointSids(String[] sids) {
+      jointSids.clear();
+        jointSids.addAll(Arrays.asList(sids)); 
+   }
+   
 
    /**
     * Sets the List of joint sids.
@@ -154,18 +196,55 @@ public class Skeleton
    }
    
    
-   /**
-    * Calls calculaterMatrices for all VJoint roots,
-    * then calculates the transform matrices, either by copying from the joint matrices,
-    * or by multiplying the latter with inverse bind matrices, if defined.
-    * Note that in both cases the transform matrices are properly synced for
-    * the Thread that calls this method, and are decoupled from the joint matrices
-    * that reside inside the VJoint trees. 
+   /* Method for creating a VJoint id from a specified sid */
+   public String makeId(String sid) {
+       return id + "-" + sid;
+   }
+   
+   /** 
+    * Create a new VJoint that is added as root node
+    * The VJoint sid is specified, its id is set to
+    * the Skeleton id + "-" + sid.
     */
-   public synchronized void calculateMatrices() {
+   public void createRoot(String sid) {
+       addRoot(new VJoint(makeId(sid), sid));       
+   }
+   
+   /**
+    * Creates a new VJoint with specified child sid, added as a child node
+    * to a parent node with specified parent sid.
+    * * If no such parent node is present, no new child node will
+    * be created.
+    */
+   public void addChildNode(String parentSid, String childSid) {
+       VJoint parent = getVJoint(parentSid);
+       if (parent != null) {
+           parent.addChild(new VJoint(makeId(childSid), childSid));
+       }
+   }
+   
+   /**
+    * Calls calculateMatrices for all VJoint roots.
+    * This method is synchronized, so as to prevent reading
+    * jointMatrices while they are being calculated, and to enforce
+    * jointMatrix data to become visible to other Threads that
+    * needs this data after the updateJointMatrices method returns.
+    * Typical caller "animation Thread".
+    */
+   public synchronized void updateJointMatrices() {
        for (VJoint rt : roots) {
            rt.calculateMatrices();
        }
+   }
+   
+   /**
+    * Calculates the transform matrices, either by copying from the joint matrices,
+    * or by multiplying the latter with inverse bind matrices, if the later are defined.
+    * The method is synchronized, so cooperates well with updateJointmatrices calls.
+    * This updateTransformMatrices method would be called typically by a render
+    * Thread, or some other "user" Thread. 
+    */
+   public synchronized void updateTransformMatrices() {
        if (transformMatrices != null) {
            if (inverseBindMatrices ==  null) { // just copy:
                for (int i=0; i<transformMatrices.length; i++) {
@@ -202,14 +281,15 @@ public class Skeleton
     * The matrix values to which the array refers should be updated later on 
     * by calling calculateMatrices.
     */
-   public float[][] getTransformMatrices() {    
+   public float[][] getTransformMatricesRef() {    
        if ( invalidMatrices) {            
            jointMatrices = new float[jointSids.size()][];
-           inverseBindMatrices = new float[jointSids.size()][];
+           //inverseBindMatrices = new float[jointSids.size()][];
            transformMatrices = new float[jointSids.size()][];
+           // inverseBindMatrices are not allocated here.
            int index = 0;
            for (String sid : jointSids) {
-               VJoint vj = searchVJoint(sid);
+               VJoint vj = getVJoint(sid);
                if (vj != null) {
                    jointMatrices[index] = vj.getGlobalMatrix();
                    transformMatrices[index] = Mat4f.getMat4f();
@@ -223,179 +303,36 @@ public class Skeleton
        return transformMatrices;     
    }
    
-   /* Search for the VJoint for the specified sid, in all trees */
-   private VJoint searchVJoint(String sid) {
+   /**
+    * Search for the VJoint for the specified sid, from all Skeleton roots. 
+    */
+   public VJoint getVJoint(String sid) {
        for (VJoint rt : roots) {
-           VJoint result = searchVJoint(rt, sid);
+           VJoint result = getVJoint(rt, sid);
            if (result != null) return result;
        }
        return null;
    }
    
-    /* Search for the VJoint for the specified sid, via the specified tree root node */
-   private VJoint searchVJoint(VJoint root, String sid) {
-       if (root.getSid().equals(sid)) {
-           return root;
+    /**
+     * Search for the VJoint for the specified sid, 
+     * from the specified VJoint as \&quot;root&quot;, 
+     * which should be some existing VJoint inside one of the Skeleton trees.
+     * (Not necessarily a root node of one of the trees.)
+     */
+   public VJoint getVJoint(VJoint vj, String sid) {
+       if (vj.getSid().equals(sid)) {
+           return vj;
        } else {
-           for (VJoint child : root.getChildren()) {
-               VJoint result = searchVJoint(child, sid);
+           for (VJoint child : vj.getChildren()) {
+               VJoint result = getVJoint(child, sid);
                if (result != null) return result;
            }
        }    
        return null;
    }
 
-//   /*
-//    * Add the newSidArray elements to to the jointSid array.
-//    */
-//   private void addToSidsArray(String[] newSidArray) {
-//       if (jointSids == null) { // first (or only) root   
-//           jointSids = newSidArray;
-//       } else { // we already had another root, so add new elements
-//           String[] oldSidArray = jointSids;
-//           int newSize = oldSidArray.length + newSidArray.length; 
-//           jointSids = new String[newSize];
-//           System.arraycopy(oldSidArray, 0, jointSids, 0, oldSidArray.length);
-//           System.arraycopy(newSidArray, 0, jointSids, oldSidArray.length, newSidArray.length);        
-//       }
-//   }
-//   
-//   /*
-//    * Create a jointSid array, collecting sids from  the specified VJoint tree.
-//    */
-//   private String[] createSidArray(VJoint root) {
-//       List<String> sidList = new ArrayList<>();
-//       addSidsToList(sidList, root);    
-//       return sidList.toArray(new String[0]);
-//      
-//   }
-//   
-//   /* Auxiliary for addToSidsArray */
-//   private void addSidsToList(List<String> sidList, VJoint vj) {
-//       if (vj == null) return;
-//       sidList.add(vj.getSid());
-//       for (VJoint child : vj.getChildren()) {
-//           addSidsToList(sidList, child);
-//       }
-//   }
-//   
-//   
-//   /* assume the joints array is defined, create the jointSids array */
-//   private void makeJointSidsArray() {
-//       if (joints==null) return;
-//       jointSids = new String[joints.length];
-//       for (int i=0; i<jointSids.length; i++) {
-//           jointSids[i] = joints[i].getSid();
-//       }
-//   }
-// 
-//   /* Add joints, using the specified joint sids */
-//   private void addToJointsArray(String[] sids) {
-//       if (sids == null) return;
-//       VJoint[] newJoints = new VJoint[sids.length];
-//       for (int i=0; i<newJoints.length; i++) {
-//           newJoints[i] = new VJoint(id + "-" + sids[i], sids[i]);
-//       }    
-//       if (joints == null) {
-//           joints = newJoints;
-//       } else {
-//           VJoint[] oldJoints = joints;
-//           joints = new VJoint[oldJoints.length + newJoints.length];
-//           System.arraycopy(oldJoints, 0, joints, 0, oldJoints.length);
-//           System.arraycopy(newJoints, 0, joints, oldJoints.length, newJoints.length);        
-//       }
-//   }
-//   
-//   
-//   
-//   /**
-//    * Specifies explicitly which joint sids will be used, for all
-//    * VJoint trees together, overriding the implicitly defined sid array.
-//    * When a VJoint tree(s) is/are defined, only those joints with
-//    * a sid occurring in the specified sid array will be accessible via the 
-//    * joint matrices etc.
-//    */
-//   public void setJointSids( String[] sids) {
-//       this.jointSids = sids;
-//       sidsSpecified = true;
-//       addToJointsArray(sids);
-//       linkToVJoints();
-//   }   
-//   
-//   private void linkToVJoints() {
-//       for (int i=0; i<roots.length; i++) {
-//          linkToVJoints(roots[i]);
-//       }
-//   }
-//   
-//   private void linkToVJoints(VJoint root) {
-//       if (root == null || jointSids == null || joints == null) return;
-//       for (int i=0; i<jointSids.length; i++) {
-//           VJoint vj = searchVJoint(root, jointSids[i]);
-//           if (vj != null) {
-//               joints[i] = vj;
-//           } // else ? 
-//       }
-//   }
-//
-//     
-//   /* finds a VJoint in the VJoint tree, by searching for a specified sid.
-//    * Returns null when there is no such VJoint.
-//    */
-//   private VJoint searchVJoint(VJoint root, String sid) {
-//       if (root == null) return null;
-//       if (root.getSid().equals(sid)) {
-//           return root;
-//       } else {
-//           for (VJoint child : root.getChildren()) {
-//               VJoint result = searchVJoint(child, sid);
-//               if (result != null) return result;
-//           }
-//       }    
-//       return null;
-//   }
-//   
-//   
-//   
-//   
-////   /* Returns the index of the specified joint sid, or -1 if not present in the jointSids list */
-////   private int findJointSidIndex(String sid) {
-////       for (int index=0; index<jointSids.length; index++) {
-////           if (jointSids[index].equals(sid) ) {
-////               return index;
-////           }
-////       }
-////       return -1;
-////   }
-//   
-////   /* Returns the index of the specified joint sid, or -1 if not present in the jointSids list */
-////   private VJoint findVJointInJoints(String sid) {
-////       for (int i=0; i<joints.length; i++) {
-////           if (joints[i].getSid().equals(sid)) {
-////               return joints[i];
-////           }
-////       }
-////       return null;
-////   }
-//   
-//   /*********************************************************
-//   /* joint matrices SECTION
-//   /********************************************************
-//  
-//      
-// 
-//   
-//   /* Assuming joints is defined, create a jointMatrices array, and link to
-//    * the global matrices of the corresponding VJoints.
-//    */
-//   private void makeJointMatricesArray() {
-//       if (joints == null) return;
-//       jointMatrices = new float[joints.length][];
-//       for (int i=0; i< jointMatrices.length; i++) {
-//           jointMatrices[i] = joints[i].getGlobalMatrix();
-//       }
-//   }
-//   
+
    
    
    
