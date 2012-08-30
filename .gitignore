@@ -1,4 +1,5 @@
 /**/build
+/**/privateprops
 /**/lib/*
 /**/lib
 /**/test/lib
@@ -21,3 +22,5 @@ manifest.mf
 /HmiUtil/nbproject/private/
 /HmiAnimation/nbproject/private/
 /docs/HmiCore
+/**/nbproject/
+/**/nbbuild.xml
