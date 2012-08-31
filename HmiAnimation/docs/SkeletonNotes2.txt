@@ -36,8 +36,25 @@ Basic attributes:
    </bones>
 </skeleton>
 
-Opmerking: het skelton wordt gespecificeerd in de "natural rest pose", waarbij geen rotaties worden toegepast. Dus typisch zoiets als de T-pose.
+Opmerking: het skeleton wordt gespecificeerd in de "natural rest pose", waarbij geen rotaties worden toegepast. Dus typisch zoiets als de T-pose.
 Dit vereist enige aanpassingen bij UT omdat onze animaties uitgaan van H-Anim restpose. 
+
+De <joints> lijst bepaald de (interne) volgorde/enumeration van joints. Er zijn geen harde eisen aan deze lijst, wel
+is het volgende aan te bevelen:
+
+  - <joints> is een in-order tree traversal van de skeleton structure.
+  - Met name staan "parent" voor hun children. 
+  - de bones sectie gaat in volgorde van de <joints" enumeratie.
+  De <joints> lijst moet voor de bones staan. Of worden weggelaten. In het laatste geval
+  wordt de impliciete volgorde bepaald bood de bones lijst. 
+  
+  Vraag: waar is die <joints> lijst eigenlijk voor nodig? Antwoord: stel je wilt een skeleton
+  beschrijven met verschillende LODs. De simpelste levels bevatten bijvoorbeeld geen vingers. In meer gedetaileerdere level
+  wil je die wel toevoegen. Dan is het handig om de nummering *consistent* te houden met de simpele levels, dus
+  liever geen hernummering van de joints die er al waren. Dat kan, door de vingers achter aan de joints lijst toe te voegen,
+  ook al staan ze in de bones op een meer logische plaats, bijvoorbeeld na de pols joints.
+  Ander voorbeeld: we willen alsno een joint ergens in de wervelkolom "tussenschuiven", zonder de numering
+  van bestaande joints te herzien.
 
 2)
 feitelijke animatie data. Voor "files" gebruiken we vaak "SkeletonInterpolators": een XML header met de encodings, en de joint namen die voor deze animatie gebruikt worden.
