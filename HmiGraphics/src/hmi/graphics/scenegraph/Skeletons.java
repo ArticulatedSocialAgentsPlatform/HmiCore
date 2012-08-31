@@ -44,15 +44,15 @@ public final class Skeletons {
    
   
   
-     private static void alignSegment1(VJoint skeletonRoot, String parentSid, String childSid, float[] dir)
-    {
-        Vec3f.normalize(dir);
-        VJoint parentJoint =skeletonRoot.getPartBySid(parentSid);
-        VJoint childJoint = skeletonRoot.getPartBySid(childSid);
-        float[] a = childJoint.getRelativePositionFrom(parentJoint);
-        float[] q = Quat4f.getFromVectors(a, dir);
-        parentJoint.setRotation(q);
-    }
+//     private static void alignSegment1(VJoint skeletonRoot, String parentSid, String childSid, float[] dir)
+//    {
+//        Vec3f.normalize(dir);
+//        VJoint parentJoint =skeletonRoot.getPartBySid(parentSid);
+//        VJoint childJoint = skeletonRoot.getPartBySid(childSid);
+//        float[] a = childJoint.getRelativePositionFrom(parentJoint);
+//        float[] q = Quat4f.getFromVectors(a, dir);
+//        parentJoint.setRotation(q);
+//    }
   
   
    /* auxiliary method for aligning some body segment inside a skeleton structure with a specified direction vector */
@@ -207,7 +207,7 @@ public final class Skeletons {
          VJoint rootJoint = skeletonRoot.getVJoint();
     
          adaptTranslationVectors(rootJoint);
-         rootJoint.calculateMatrices();  
+         //rootJoint.calculateMatrices();  
       }
       
       for (GSkinnedMesh gsm : skinnedMeshList) {
@@ -221,28 +221,46 @@ public final class Skeletons {
   
     /*******************************************/
     
-   public static void processHAnim(GNode humanRootGnode, String humanoidRootSid)
-   {
-      
-       // GNode humanRootGnode = gscene.getPartBySid(humanoidRootSid);
-        humanRootGnode.removeLinearTransforms(); // optional ? (at least for blueguy not needed)
-
-//        if (setToHAnim)
-//        {
-            VJoint skeletonRoot = humanRootGnode.getVJoint();
+   /** Blueguy specific: */ 
+   
+   
+   
+   public static void setHAnimPoseBLUEGUY(VJoint skeletonRoot) {
+           
             float[] armDir = Vec3f.getVec3f(0f, -1f, 0f);
             alignSegment(skeletonRoot, Hanim.r_shoulder, Hanim.r_elbow, armDir);
             alignSegment(skeletonRoot,Hanim.l_shoulder, Hanim.l_elbow, armDir);
-            if (humanRootGnode.getPartBySid(Hanim.l_thumb1) != null && humanRootGnode.getPartBySid(Hanim.l_thumb2) != null)
+            if (skeletonRoot.getPartBySid(Hanim.l_thumb1) != null && skeletonRoot.getPartBySid(Hanim.l_thumb2) != null)
             {
+                //hmi.util.Console.println("setHAnimPoseBLUEGUY align thumbs ");
                 float[] thumbDir = Vec3f.getVec3f(0f, -1f, 1f);
                 alignSegment(skeletonRoot, Hanim.l_thumb1, Hanim.l_thumb2, thumbDir);
                 alignSegment(skeletonRoot, Hanim.l_thumb2, Hanim.l_thumb3, thumbDir);
                 alignSegment(skeletonRoot, Hanim.r_thumb1, Hanim.r_thumb2, thumbDir);
                 alignSegment(skeletonRoot, Hanim.r_thumb2, Hanim.r_thumb3, thumbDir);
-            }
-            skeletonRoot.calculateMatrices(); // not necessary; added for similariry with seamless loader
-            humanRootGnode.removeLinearTransforms(); // equivalent of setNeutralPose
+            } 
+   }
+   
+   
+   
+   public static void processHAnim(GNode humanRootGnode, String humanoidRootSid)
+   {
+      
+       // GNode humanRootGnode = gscene.getPartBySid(humanoidRootSid);
+       // humanRootGnode.removeLinearTransforms(); // optional ? (at least for blueguy not needed)
+
+//        if (setToHAnim)
+//        {
+             VJoint skeletonRoot = humanRootGnode.getVJoint();
+             
+             setHAnimPoseBLUEGUY(skeletonRoot);
+            
+//            adaptTranslationVectors(skeletonRoot);
+//            gsm.setBindPose();  <====== NO equivalent here, since Blueguy has no skinned mesh
+//            humanRootGnode.clearJointRotations();
+            
+           //skeletonRoot.calculateMatrices(); // not necessary; added for similariry with seamless loader
+           humanRootGnode.removeLinearTransforms(); // equivalent of setNeutralPose
 //        }
         
      }
