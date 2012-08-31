@@ -1,6 +1,7 @@
 package hmi.animation;
 
 import hmi.math.Mat4f;
+import hmi.math.Vec3f;
 import hmi.xml.XMLTokenizer;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class Skeleton
 {
    private String id;          // id of the Skeleton as a whole. null or an interned String
    private ArrayList<VJoint> roots = new ArrayList<>();
+   private ArrayList<VJoint> joints = new ArrayList<>(); // references to the actual VJoint nodes.
 
    // sidsSpecified is to true when jointSids have been specified explicitly,
    // either by calling setJointSids(), or when XML with a <joints> section is decoded.
@@ -181,6 +183,7 @@ public class Skeleton
    /**
     * Adds a root joint for the Skeleton, implicitly defining (part of) the Skeleton VJoint tree.
     * If joints have not specified explicitly, they will be derived by exploring the VJoint tree.
+    * *====> TAKE CARE OF DISTINCTION JOINT/NODE
     */
    public final void addRoot(VJoint root) {
        if (root == null) return;
@@ -334,7 +337,54 @@ public class Skeleton
 
 
    
+   /**
+    * Defines the current pose to be the "neutral" pose, assumed when all
+    * joint rotations are set to identity. Typically a pose like the
+    * HAnim rest pose.
+    */
+   public void setNeutralPose() {
+       for (VJoint rt : roots) {
+           rt.calculateMatrices();
+           adaptTranslationVectors(rt);
+           // set bind pose.....
+           
+           float[] bindTranslation = Vec3f.getVec3f();
+           float[] rotation = Mat4f.getMat4f();
+           float[] zeroVec = Vec3f.getZero();
+           
+           for (int i=0; i<joints.size(); i++) {
+               
+               Mat4f.set(rotation, joints.get(i).getGlobalMatrix());
+               Mat4f.setTranslation(rotation, zeroVec);
+               Mat4f.mul(inverseBindMatrices[i], rotation, inverseBindMatrices[i]);    
+               
+               joints.get(i).clearRotation();
+           }
+          
+       }
+       
+       
+       
+   }
    
+   /*
+    * Assuming that the (global) matrices contain the $V_i$ matrices that will be (left) multiplied with existing
+    * inverse bind matrices, this method adapts translation vector t_i' = V_{parent(i)}(t_i) 
+    */
+   private static void adaptTranslationVectors(VJoint joint) {
+       float[] localTranslation = Vec3f.getVec3f();
+       float[] rotations = Mat4f.getMat4f();
+       
+       if (joint.getParent() != null) {
+          joint.getTranslation(localTranslation);
+          Mat4f.set(rotations, joint.getParent().getGlobalMatrix());
+          Mat4f.transformVector(rotations, localTranslation);
+          joint.setTranslation(localTranslation);
+       }
+       for (VJoint child : joint.getChildren()) {
+           adaptTranslationVectors(child);
+       }
+   }
    
    
    
