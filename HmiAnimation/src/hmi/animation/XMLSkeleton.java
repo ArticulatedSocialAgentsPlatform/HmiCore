@@ -73,8 +73,7 @@ public class XMLSkeleton extends XMLStructureAdapter
    /**
     * Read a Skeleton from an XMLTokenizer. 
     */
-   public XMLSkeleton(XMLTokenizer tokenizer) throws IOException
-   {
+   public XMLSkeleton(XMLTokenizer tokenizer) throws IOException {
       this();
       readXML(tokenizer);
    }

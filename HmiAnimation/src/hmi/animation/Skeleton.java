@@ -136,18 +136,25 @@ public class Skeleton
     * a String array, rather than a List.
     */
    public final void setJointSids(String[] sids) {
-      jointSids.clear();
-        jointSids.addAll(Arrays.asList(sids)); 
+       setJointSids(Arrays.asList(sids));
    }
    
 
    /**
     * Sets the List of joint sids.
+    * If VJoint trees have been added already, these will be resolved/
     */
    public final void setJointSids(List<String> sids) {
        jointSids.clear();
        jointSids.addAll(sids);
        jointSidsSpecified = true;
+       joints = new ArrayList<>(jointSids.size());
+       for (int i=0; i<jointSids.size(); i++) {
+           joints.add(null);
+       }
+       for (VJoint rt : roots) {
+           resolveJoints(rt);
+       }
        invalidMatrices = true;
    }
    
@@ -182,48 +189,85 @@ public class Skeleton
    
    /**
     * Adds a root joint for the Skeleton, implicitly defining (part of) the Skeleton VJoint tree.
-    * If joints have not specified explicitly, they will be derived by exploring the VJoint tree.
+    * If joint sids have not specified explicitly, they will be derived by exploring the VJoint tree.
     * *====> TAKE CARE OF DISTINCTION JOINT/NODE
     */
    public final void addRoot(VJoint root) {
        if (root == null) return;
        roots.add(root);
-       if (! jointSidsSpecified) { addSids(root); }
+       if (jointSidsSpecified) { 
+           resolveJoints(root);         
+       } else {
+           addJoints(root); 
+       }
        invalidMatrices = true;
    }
    
-   /* Inorder traversal, adding joint sids to jointSids List */
-   private void addSids(VJoint vj) {
+//   /* Inorder traversal, adding joint sids to jointSids List */
+//   private void addSids(VJoint vj) {
+//       jointSids.add(vj.getSid());
+//       for (VJoint child : vj.getChildren()) { addSids(child); }          
+//   }
+   
+   
+   
+   /* Inorder traversal, adding joints/joint sids to the Lists */
+   private void addJoints(VJoint vj) {
        jointSids.add(vj.getSid());
-       for (VJoint child : vj.getChildren()) { addSids(child); }          
+       joints.add(vj);
+       for (VJoint child : vj.getChildren()) { addJoints(child); }          
    }
    
    
-   /* Method for creating a VJoint id from a specified sid */
+   
+   
+   /*
+    * Adds to the joints List by traversing the specified VJoint tree.
+    * Assumption: jointSidsSpecified is true, so the jointSids
+    * List is specified, and is fixed. Moreover, the joints List
+    * already exists, and has the same size as jointSids, possibly
+    * containing null VJoint elements.
+    */
+   private void resolveJoints(VJoint rt) {
+       int index = 0;
+       for (String sid : jointSids) {
+           VJoint vj = getVJoint(rt, sid);
+           if (vj != null) { // don't overwrite joints already resolved before.
+               joints.set(index, vj);
+           }
+           index++;
+       } 
+   }
+   
+   
+   
+   
+   
+//   /** 
+//    * Create a new VJoint that is added as root node
+//    * The VJoint sid is specified, its id is set to
+//    * the Skeleton id + "-" + sid.
+//    */
+//   public void createRoot(String sid) {
+//       addRoot(new VJoint(makeId(sid), sid));       
+//   }
+//   
+//   /**
+//    * Creates a new VJoint with specified child sid, added as a child node
+//    * to a parent node with specified parent sid.
+//    * * If no such parent node is present, no new child node will
+//    * be created.
+//    */
+//   public void addChildNode(String parentSid, String childSid) {
+//       VJoint parent = getVJoint(parentSid);
+//       if (parent != null) {
+//           parent.addChild(new VJoint(makeId(childSid), childSid));
+//       }
+//   }
+   
+      /* Method for creating a VJoint id from a specified sid */
    public String makeId(String sid) {
        return id + "-" + sid;
-   }
-   
-   /** 
-    * Create a new VJoint that is added as root node
-    * The VJoint sid is specified, its id is set to
-    * the Skeleton id + "-" + sid.
-    */
-   public void createRoot(String sid) {
-       addRoot(new VJoint(makeId(sid), sid));       
-   }
-   
-   /**
-    * Creates a new VJoint with specified child sid, added as a child node
-    * to a parent node with specified parent sid.
-    * * If no such parent node is present, no new child node will
-    * be created.
-    */
-   public void addChildNode(String parentSid, String childSid) {
-       VJoint parent = getVJoint(parentSid);
-       if (parent != null) {
-           parent.addChild(new VJoint(makeId(childSid), childSid));
-       }
    }
    
    /**
@@ -276,7 +320,7 @@ public class Skeleton
    /**
     * Returns a reference to the array of transform matrices, 
     * including one float matrix for every joint, 
-    * in the order as specified by the joint sid List.
+    * in the order as specified by the joints List.
     * The array is never null, but might contain some null matrices,
     * when certain jointSids are not actually present in the VJoint trees.
     * This method will also allocate (but not initialize) all matrices, 
@@ -286,21 +330,20 @@ public class Skeleton
     */
    public float[][] getTransformMatricesRef() {    
        if ( invalidMatrices) {            
-           jointMatrices = new float[jointSids.size()][];
+           jointMatrices = new float[joints.size()][];
            //inverseBindMatrices = new float[jointSids.size()][];
-           transformMatrices = new float[jointSids.size()][];
+           transformMatrices = new float[joints.size()][];
            // inverseBindMatrices are not allocated here.
            int index = 0;
-           for (String sid : jointSids) {
-               VJoint vj = getVJoint(sid);
+           for (VJoint vj : joints) {
                if (vj != null) {
                    jointMatrices[index] = vj.getGlobalMatrix();
                    transformMatrices[index] = Mat4f.getMat4f();
                } else {
-                   System.out.println("Skeleton.getTransformMatrices: no VJoint found for sid=\"" + sid + "\"");
+                   System.out.println("Skeleton.getTransformMatrices: no VJoint found for sid=\"" + jointSids.get(index) + "\"");
                }
                index++;
-           }     
+           }
            invalidMatrices = false;
        }
        return transformMatrices;     
@@ -345,46 +388,62 @@ public class Skeleton
    public void setNeutralPose() {
        for (VJoint rt : roots) {
            rt.calculateMatrices();
-           adaptTranslationVectors(rt);
+           
+       }
+           //adaptTranslationVectors(rt);
            // set bind pose.....
            
-           float[] bindTranslation = Vec3f.getVec3f();
-           float[] rotation = Mat4f.getMat4f();
-           float[] zeroVec = Vec3f.getZero();
+       float[] bindTranslation = Vec3f.getVec3f();
+       float[] parentRotation = Mat4f.getMat4f();
+       float[] rotation = Mat4f.getMat4f();
+       float[] zeroVec = Vec3f.getZero();
            
-           for (int i=0; i<joints.size(); i++) {
+//       float[] localTranslation = Vec3f.getVec3f();
+//       float[] rotations = Mat4f.getMat4f();
+       
+       for (int i=0; i<joints.size(); i++) {
                
-               Mat4f.set(rotation, joints.get(i).getGlobalMatrix());
-               Mat4f.setTranslation(rotation, zeroVec);
+           VJoint vj = joints.get(i);
+           if (vj != null) {
+               if (vj.getParent() != null) {
+                   vj.getTranslation(bindTranslation);
+                   Mat4f.set(parentRotation, vj.getParent().getGlobalMatrix());
+                   Mat4f.transformVector(parentRotation, bindTranslation); // will use only rotation part of parentRotation
+                   vj.setTranslation(bindTranslation);
+                   
+               }
+               Mat4f.set(rotation, vj.getGlobalMatrix());
+               Mat4f.setTranslation(rotation, zeroVec); // clear translation part
                Mat4f.mul(inverseBindMatrices[i], rotation, inverseBindMatrices[i]);    
                
-               joints.get(i).clearRotation();
+               vj.clearRotation(); // sets local rotation to Id.
            }
-          
        }
+          
+   
        
        
        
    }
    
-   /*
-    * Assuming that the (global) matrices contain the $V_i$ matrices that will be (left) multiplied with existing
-    * inverse bind matrices, this method adapts translation vector t_i' = V_{parent(i)}(t_i) 
-    */
-   private static void adaptTranslationVectors(VJoint joint) {
-       float[] localTranslation = Vec3f.getVec3f();
-       float[] rotations = Mat4f.getMat4f();
-       
-       if (joint.getParent() != null) {
-          joint.getTranslation(localTranslation);
-          Mat4f.set(rotations, joint.getParent().getGlobalMatrix());
-          Mat4f.transformVector(rotations, localTranslation);
-          joint.setTranslation(localTranslation);
-       }
-       for (VJoint child : joint.getChildren()) {
-           adaptTranslationVectors(child);
-       }
-   }
+//   /*
+//    * Assuming that the (global) matrices contain the $V_i$ matrices that will be (left) multiplied with existing
+//    * inverse bind matrices, this method adapts translation vector t_i' = V_{parent(i)}(t_i) 
+//    */
+//   private static void adaptTranslationVectors(VJoint joint) {
+//       float[] localTranslation = Vec3f.getVec3f();
+//       float[] rotations = Mat4f.getMat4f();
+//       
+//       if (joint.getParent() != null) {
+//          joint.getTranslation(localTranslation);
+//          Mat4f.set(rotations, joint.getParent().getGlobalMatrix());
+//          Mat4f.transformVector(rotations, localTranslation);
+//          joint.setTranslation(localTranslation);
+//       }
+//       for (VJoint child : joint.getChildren()) {
+//           adaptTranslationVectors(child);
+//       }
+//   }
    
    
    
