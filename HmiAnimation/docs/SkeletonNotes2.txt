@@ -1,0 +1,131 @@
+
+
+
+
+Skeletons format.
+
+Basic attributes:
+
+- skeleton id and name
+- joint (scoped-) ids and names
+- joint hierarchy
+- bone sizes, specified via joint positions.
+
+1) de query voor skelletonstructures zou een stukje "XML" kunnen leveren zoals dit:
+
+<skeleton id="basic_skeleton">
+   <joints>
+      HumanoidRoot vl5 vt6 vt1 skullbase l_hip l_knee l_subtalar l_midtarsal ...
+   </joints>
+   <bones position="relativeToParent" origin="floor"> 
+   <!--bones position="relativeToOrigin" origin="floor"--> 
+      <!-- name parentname x y z coordinates for position (relatief t.o.v. joint centre can parent bone. Voor HumanoidRoot, "parent bone= origin = floor" ) 
+      HumanoidRoot Null           0.0   1.1  0.0     
+      vl5          HumanoidRoot   0.0  -0.2  0.0
+      vt10         vl5            0.0  -0.7  0.0
+      vt6          vt10           0.0  -0.3  0.0
+      vt1          vt6              ......
+      vc4          vt1
+      skullbase    vc4
+      l_hip        HumanoidRoot
+      l_knee       l_hip
+      l_ankle      l_knee
+      l_subtalar   l_ankle
+      l_midtarsal  l_subtalar
+      ...
+   </bones>
+</skeleton>
+
+Opmerking: het skeleton wordt gespecificeerd in de "natural rest pose", waarbij geen rotaties worden toegepast. Dus typisch zoiets als de T-pose.
+Dit vereist enige aanpassingen bij UT omdat onze animaties uitgaan van H-Anim restpose. 
+
+De <joints> lijst bepaald de (interne) volgorde/enumeration van joints. Er zijn geen harde eisen aan deze lijst, wel
+is het volgende aan te bevelen:
+
+  - <joints> is een in-order tree traversal van de skeleton structure.
+  - Met name staan "parent" voor hun children. 
+  - de bones sectie gaat in volgorde van de <joints" enumeratie.
+  De <joints> lijst moet voor de bones staan. Of worden weggelaten. In het laatste geval
+  wordt de impliciete volgorde bepaald bood de bones lijst. 
+  
+  Vraag: waar is die <joints> lijst eigenlijk voor nodig? Antwoord: stel je wilt een skeleton
+  beschrijven met verschillende LODs. De simpelste levels bevatten bijvoorbeeld geen vingers. In meer gedetaileerdere level
+  wil je die wel toevoegen. Dan is het handig om de nummering *consistent* te houden met de simpele levels, dus
+  liever geen hernummering van de joints die er al waren. Dat kan, door de vingers achter aan de joints lijst toe te voegen,
+  ook al staan ze in de bones op een meer logische plaats, bijvoorbeeld na de pols joints.
+  Ander voorbeeld: we willen alsno een joint ergens in de wervelkolom "tussenschuiven", zonder de numering
+  van bestaande joints te herzien.
+
+2)
+feitelijke animatie data. Voor "files" gebruiken we vaak "SkeletonInterpolators": een XML header met de encodings, en de joint namen die voor deze animatie gebruikt worden.
+encoding="T1R"  : 1 translation, gevolgd door n rotaties. de translatie is er alleen voor de Humanoid root, alle joints hebben een rotatie)
+rotationEncoding="quaternions" : duidelijk
+parts=" ....." : de joint namen
+Na de header een x aantal regels met, per regel:
+timestamp(double) translation (3 floats), n X quaternion, dus n * 4 floats, volgorde s, x, y, z,  (= s + xi + yj + zk)
+
+Voor de koppeling willen we misschien eerder een "streaming" formaat. Dus we moeten even kijken hoe we dat doen met de XML
+headers.
+
+Opmerking Daan : we hebben ook een character-id nodig voor streaming
+liefst UDP formaat.
+
+<SkeletonInterpolator encoding="T1R"     (T1R geeft aan: 1 translatie (voor de HumanoidRoot, relatief tov origin), gevolgd door (uitsluitend) rotaties, voor alle bones, inclusief HumanoidRoot)
+                      rotationEncoding="quaternions"    (alternatieven: quatXYZW ("real part" achteraan),  quatWXYZ (dat is hetzelfde als quaternions), axisAngle
+                      rotation="relativeToParent"  (alternatief: rotation="relativeToOrigin")
+                      joints="HumanoidRoot vt10 skullbase l_sternoclavicular l_shoulder l_elbow l_wrist r_sternoclavicular r_shoulder r_elbow r_wrist l_hip l_knee l_ankle r_hip r_knee r_ankle"
+>
+3.0 0.032438 -0.023447 0.005590  0.993390 0.007888 -0.023504 -0.112082  0.974148 -0.029739 -0.178472 0.135272  0.995786 -0.040137 -0.082341 0.004445  0.998894 -0.000000 -0.000039 0.047013  0.980773 0.009116 0.005467 0.194861  0.968428 -0.083121 0.023571 -0.233842  0.979441 0.000587 0.201709 -0.002851  0.998894 0.000000 -0.000039 -0.047013  0.999711 -0.004714 -0.022188 -0.008023  0.974365 0.018266 0.222669 0.026396  0.998305 0.026759 0.002152 -0.051646  0.999515 0.006356 -0.029602 -0.007219  0.999532 0.022049 0.003877 0.020845  0.999903 -0.013898 -0.000002 0.001183
+3.056755 0.000848 0.974186 -0.000190 0.729334 0.001539 -0.684153 -0.002046  0.999848 -0.007713 0.012469 0.009484  0.999166 0.033751 -0.022067 0.006428  0.993290 0.008042 -0.025144 -0.112601  0.974377 -0.010701 -0.175973 0.139672  0.992486 -0.071341 -0.099045 0.008498  0.998894 -0.000000 -0.000039 0.047013  0.980663 0.009151 0.005678 0.195406  0.968376 -0.083674 0.025095 -0.233704  0.978013 0.000625 0.208524 -0.002930  0.998894 0.000000 -0.000039 -0.047013  0.999699 -0.007178 -0.022265 -0.007433  0.973373 0.018360 0.226917 0.026751  0.997965 0.028291 0.002385 -0.057101  0.999540 0.002976 -0.029278 -0.007343  0.999506 0.023159 0.003873 0.020870  0.999906 -0.013664 -0.000002 0.001188
+3.090088 0.000657 0.974098 -0.000350 0.727492 0.002269 -0.686109 -0.002209  0.999840 -0.008054 0.013324 0.008798  0.999139 0.035317 -0.020761 0.006488  0.993817 0.007895 -0.025052 -0.107879  0.974207 0.004753 -0.176512 0.140503  0.989867 -0.095639 -0.104322 0.011577  0.998894 -0.000000 -0.000039 0.047013  0.980094 0.009289 0.006282 0.198218  0.967849 -0.084150 0.024282 -0.235790  0.974724 0.000710 0.223390 -0.003099  0.998894 0.000000 -0.000039 -0.047013  0.999699 -0.008277 -0.021869 -0.007434  0.969147 0.018541 0.244038 0.029243  0.997830 0.032351 0.002328 -0.057293  0.999565 0.001860 -0.028676 -0.006670  0.999496 0.023850 0.003899 0.020597  0.999908 -0.013499 -0.000002 0.001158
+</SkeletonInterpolator>
+
+
+
+Interface voor communicatie tussen "Elckerlyck" en "Suit":
+- Er is een kanaal voor "real-time" data, dus ruwweg, de quaternions voor real-time animatie.
+- Er is een onafhankelijk kanaal voor de "rest". 
+- We gebruiken in principe ActiveMQ voor dit tweede kanaal. ActiveMQ in de "minimale" configuratie, wel met gebruik
+ van Active<Q "topics" (Zodat je alleen de voor jou relevannte messages ontvangt).
+ 
+ Eerste idee voor de messages:
+ 
+  - sommige messages zijn in feite "remote method calling": er is een "query" message, beantwoord door een "reply" message
+  - andere messages zijn "fire & forget": een "request" message, maar geen "reply".  (Vraag: gaat dat wel werken: wat als er "exceptions"/"errors" kunnen optreden?
+    
+    <query type="getAvatarTypes"/>                                             : vraagt om een lijst van avatar types
+    <reply type="avatarTypes" value="Mister1, Mister2, Lady1, Soldier"/>       : mogelijke reply
+    
+    <request type="loadAvatar" type="Mister1" id="John Doe"/>                  : request om een Mister1 type in te laden die we daarna "John Doe" zullen noemen. (initieel onzichtbaar)
+    <request type="unloadAvatar" type="Mister1" id="John Doe"/>                : request om een Mister1 type in te laden die we daarna "John Doe" zullen noemen. (initieel onzichtbaar)
+    Mogelijke replies:
+    <reply type="ok"/>                                                         : respons op request 
+    <reply type="exception" description="Type not available"/>                 : response op mislukte request
+    
+    <request type="hideObject" id="John Doe"/>                                 : request om een object (in dit geval een character) onzichtbaar te maken.
+    <request type="unhideObject" id="John Doe"/>                               : request om een object (in dit geval een character) zichtbaar te maken.
+    
+    <query type="getLoadedAvatars"/>                                           : vraagt om een lijst van characters die op dit moment "loaded" zijn
+    <reply type="loadedAvatars" value="John Doe, MissEmily"/>                  : mogelijke reply: levert dus ids op, geen types
+    
+    
+    <request type="getSkeletonData" type="Mister1" />                          : request om skeleton data (zoals boven beschreven) op te sturen als reply
+    <reply type="skeletonData">
+        <skeleton id="basic_skeleton">
+           <joints>
+               HumanoidRoot vl5 vt6 vt1 skullbase l_hip l_knee l_subtalar l_midtarsal ...
+           </joints>
+           <bones position="relativeToOrigin" origin="floor"> 
+              HumanoidRoot Null           0.0   1.1  0.0     
+              vl5          HumanoidRoot   0.0  -0.2  0.0
+              vt10         vl5            0.0  -0.7  0.0
+              vt6          vt10           0.0  -0.3  0.0
+              ....
+           </bones>
+        </skeleton>
+     </reply>
+    
+    
+    
+    
+    

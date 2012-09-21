@@ -67,7 +67,7 @@ public class AnimationDistributor2
     {
         this.serverPort = serverPort;
         this.senderPort = senderPort;
-        log.info("AnimationDistributor running...");
+//        log.info("AnimationDistributor running...");
         init();
     }
 
@@ -155,7 +155,7 @@ public class AnimationDistributor2
         Skeleton skel = getSkeleton(skeletonId);
         if (skel == null)
         {
-            log.error("addSkeletonPose: Skeleton for " + skeletonId + " not available");
+//            log.error("addSkeletonPose: Skeleton for " + skeletonId + " not available");
             return null;
         }
         SkeletonPose skPose = new SkeletonPose(poseId, skel, partIdents, configType);
@@ -226,7 +226,7 @@ public class AnimationDistributor2
     {
         if (dataOut == null)
         {
-            log.error("Cannot send, no relion connection");
+//            log.error("Cannot send, no relion connection");
             return;
         }
         try
@@ -236,12 +236,12 @@ public class AnimationDistributor2
             dataOut.flush();
             buf = byteOut.toByteArray();
             DatagramPacket packet = new DatagramPacket(buf, buf.length, serverAddress, serverPort);
-            log.debug(pose.toString());
+//            log.debug(pose.toString());
             socket.send(packet);
         }
         catch (IOException e)
         {
-            log.error("AnimationDistributor: " + e);
+         //   log.error("AnimationDistributor: " + e);
         }
         finally
         {
@@ -337,7 +337,7 @@ public class AnimationDistributor2
         // "LeftToe", // 23
 
         Skeleton skel = new Skeleton(characterId);
-        skel.setRoot(pelvis);
+        skel.addRoot(pelvis);
         return skel;
     }
 

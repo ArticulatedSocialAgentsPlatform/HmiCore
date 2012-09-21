@@ -1,460 +1,450 @@
 package hmi.animation;
 
-import hmi.math.Quat4f;
+import hmi.math.Mat4f;
 import hmi.math.Vec3f;
-import hmi.xml.XMLFormatting;
-import hmi.xml.XMLStructureAdapter;
 import hmi.xml.XMLTokenizer;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * XML representation of a VJoint Skeleton.
- * Captures only sid, parent sid, and translation/position relative to the root.
- * @author Job Zwiers
  *
- <skeleton id="basic_skeleton">
-   <joints>
-      HumanoidRoot vl5 vt6 vt1 skullbase l_hip l_knee l_subtalar l_midtarsal ...
-   </joints>
-   <bones jointCount=12 encoding="T"> <!-- name parentname x y z coordinates for relative position of joint centre of rotation within skeleton-->
-      HumanoidRoot Null           0.0   0.0  0.0     
-      vl5          HumanoidRoot   0.0  -0.2  0.0
-      vt10         vl5            0.0  -0.7  0.0
-      vt6          vt10           0.0  -0.3  0.0
-      vt1          vt6              ......
-      vc4          vt1
-      skullbase    vc4
-      l_hip        HumanoidRoot
-      l_knee       l_hip
-      l_ankle      l_knee
-      l_subtalar   l_ankle
-      l_midtarsal  l_subtalar
-      ...
-   </bones>
-</skeleton>
+ * Encapsulates a VJoint based skeleton structure.
+ * 
+ * One of the tasks of Skeleton is to act as a synchronized interface between
+ * animator/modifier (Threads) of the skeleton, and render/user Threads, that
+ * need the transform data. Basically, the roles are as follows:
+ * 1) Animator Threads can freely modify VJoint rotations and other
+ * local transform data, without locking.
+ * 2) The animator Thread should call updateJointMatrices once in a while,
+ * to transfer this data to the jointMatrices data, that is shared with other Threads.
+ * This is a synchronized method.
+ * 3) Render Threads should not use VJoint local data. Rather, they should call
+ * the (synchronized) updateTransformMatrices method, which accesses the joint matrices
+ * in a safe way. Afterwards, the render Thread can freely use the transform matrices,
+ * without locking. 
  */
-public class Skeleton extends XMLStructureAdapter
+public class Skeleton 
 {
-   private String id; // id of the Skeleton as a whole. null or an interned String
-   private VJoint root; // root joint of the skeleton tree.
-   private List<VJoint> roots; // when there is more than one root.
+   private String id;          // id of the Skeleton as a whole. null or an interned String
+   private ArrayList<VJoint> roots = new ArrayList<>();
+   private ArrayList<VJoint> joints = new ArrayList<>(); // references to the actual VJoint nodes.
+
+   // sidsSpecified is to true when jointSids have been specified explicitly,
+   // either by calling setJointSids(), or when XML with a <joints> section is decoded.
+   //private boolean sidsSpecified = false; 
+   private ArrayList<String> jointSids = new ArrayList<>();
+   // jointSidsSpecified is  set to "true" only when setJointSids is called explicitly. Remains false when addSids is used instead.
+   private boolean jointSidsSpecified = false; 
+ 
    
-   private List<String> jointSids;
-   private List<String> parentSids;
-   private List<VJoint> joints;
-   private int jointCount = -1; // value < 0 denotes an  unspecified value.
-   private boolean encodeTranslation = true; // default is to encode only translations
-   private boolean encodeRotation = false;
-   private boolean encodeScale = false;
-   private String encoding = ""; // possible strings: T, TR TRS an empty String or null is interpreted as "T"
+   private float[][] jointMatrices; // transform matrices for all joints, linked to the global matrices within the VJoints.
+   private float[][] inverseBindMatrices;
+   private float[][] transformMatrices;
+   private boolean invalidMatrices = true; // signals "invalid" matrix arrays, due to modifications for roots and/or jointSids
    
    private static Logger logger = LoggerFactory.getLogger("hmi.animation.Skeleton");
 
-   /* private Constructor to discourage Skeletons without id */     
-   private Skeleton()
-   {
-     id = "";
-   }
+   /* prevent Skeletons without id */
+   private Skeleton() {}
+   
+  
    
    /**
     * Create a new Skeleton with specified Skeleton id.
     */
-   public Skeleton(String id)
-   {
-      this();
-      setId(id);
+   public Skeleton(String id) {
+       setId(id);
    }
    
 
    /**
     * Create a new Skeleton with specified Skeleton id and specified VJoint tree.
     */
-   public Skeleton(String id, VJoint root)
-   {
-      this();
-      setId(id);
-      setRoot(root);
+   public Skeleton(String id, VJoint root) {
+       this(id);
+       addRoot(root);
    }
  
+   
+   /**
+    * Initializes this Skeleton from the specified XMLSkeleton
+    */
+   public Skeleton(XMLSkeleton xmlSkel) {
+       this();
+       setId(xmlSkel.getId());
+       setRoots(xmlSkel.getRoots());
+       setJointSids(xmlSkel.getJointSids());  
+   }
    
    /**
     * Read a Skeleton from an XMLTokenizer. 
     */
-   public Skeleton(XMLTokenizer tokenizer) throws IOException
-   {
-      this();
-      readXML(tokenizer);
+   public Skeleton(XMLTokenizer tokenizer) throws IOException {
+       this(new XMLSkeleton(tokenizer));
    }
    
+   /**
+    * Returns an XML encoding, via XMLSkeleton.
+    */
+   public String toXMLString() {
+       XMLSkeleton xmlSkel = new XMLSkeleton(id);
+       xmlSkel.setJointSids(jointSids);
+       xmlSkel.setRoots(roots);
+       return xmlSkel.toXMLString();
+   }
    
-   /*private setter for id */
-   private void setId(String id) 
-   {
-      this.id = id == null ? "" : id.intern();
+   /**
+    * Returns an (XML encoded) String representation, as defined by XMLSkeleton.
+    */
+    @Override
+    public String toString() {
+        return toXMLString();
+    }
+   
+   /**
+    * Creates and returns a new Skeleton, from an XML encoded description,
+    * as defined by XMLSkeleton.
+    * @param xmlEncoding the XML encoded joint/bones structure
+    * @return Skeleton as specified by the encoding, or null when incorrect.
+    */
+   public static Skeleton fromXML(String xmlEncoding)  {
+       try {
+           return new Skeleton(new XMLTokenizer(xmlEncoding));
+       } catch (IOException e) { // shoukld not happen for String bases tokenizer.
+           System.out.println("Skeleton.fromXML: Unexpected error: " + e);
+           return null;
+       }
+   }
+   
+   /* private setter for id */
+   private void setId(String id) {
+       this.id = id == null ? "" : id.intern();
    }
  
    /**
-    * Returns the Skeleton id, possibly &quot;&quot;
+    * Returns the Skeleton id.
     */
-   public String getId() 
-   {
-      return id;
-   } 
+   public String getId() { return id; } 
+  
+   
+   /**
+    * Sets the List of joint sids, specified by means of
+    * a String array, rather than a List.
+    */
+   public final void setJointSids(String[] sids) {
+       setJointSids(Arrays.asList(sids));
+   }
    
 
-  /**
-    * Sets the type of XML encoding: T, TR, or TRS
-    * denoting Translation and optionally Rotation and Scale
-    * The default is that only Translations are encoded/decoded
+   /**
+    * Sets the List of joint sids.
+    * If VJoint trees have been added already, these will be resolved/
     */
-   public void setEncoding(String encoding) 
-   {
-      this.encoding = encoding;
-      if (encoding == null || encoding.equals("") || encoding.equals("T"))
-      {
-         encodeTranslation = true;  
-         encodeRotation = false;
-         encodeScale = false;
-      }
-      else if (encoding.equals("TR"))
-      {
-         encodeTranslation = true;  
-         encodeRotation = true;
-         encodeScale = false;
-      } 
-      else if (encoding.equals("TRS"))
-      {
-         encodeTranslation = true;  
-         encodeRotation = true;
-         encodeScale = true;
-      } 
-      else
-      {
-         System.out.println("Skeleton.setEncoding, unknown/unsupported type: " + encoding);      
-      }     
+   public final void setJointSids(List<String> sids) {
+       jointSids.clear();
+       jointSids.addAll(sids);
+       jointSidsSpecified = true;
+       joints = new ArrayList<>(jointSids.size());
+       for (int i=0; i<jointSids.size(); i++) {
+           joints.add(null);
+       }
+       for (VJoint rt : roots) {
+           resolveJoints(rt);
+       }
+       invalidMatrices = true;
+   }
+   
+   
+   /**
+    * Returns the List of joints sids.
+    */
+   public ArrayList<String> getJointSids() { return jointSids; }
+   
+
+   /**
+    * Returns the root joints.
+    */
+   public ArrayList<VJoint> getRoots() { return roots; }
+   
+   /**
+    * Returns the root joint with specified index 0.
+    */
+   public VJoint getRoot() {  
+       return (roots.isEmpty() ? null : roots.get(0));
    }
    
    /**
-    * Returns the String that denotes the encoding type: T, TR or TRS
+    * Sets the List of roots
     */
-   public String getEncoding()
-   {
-      return encoding;
+    public final void setRoots(List<VJoint> roots) {
+        this.roots.clear();
+        if (! jointSidsSpecified) { jointSids.clear(); }
+        for (VJoint rt : roots) { addRoot(rt); }
+        invalidMatrices = true;
+    }
+   
+   /**
+    * Adds a root joint for the Skeleton, implicitly defining (part of) the Skeleton VJoint tree.
+    * If joint sids have not specified explicitly, they will be derived by exploring the VJoint tree.
+    * *====> TAKE CARE OF DISTINCTION JOINT/NODE
+    */
+   public final void addRoot(VJoint root) {
+       if (root == null) return;
+       roots.add(root);
+       if (jointSidsSpecified) { 
+           resolveJoints(root);         
+       } else {
+           addJoints(root); 
+       }
+       invalidMatrices = true;
    }
    
-//   /**
-//    * returns whether the VJoints of this Skeleton have translations to be encoded or decoded from XML
+//   /* Inorder traversal, adding joint sids to jointSids List */
+//   private void addSids(VJoint vj) {
+//       jointSids.add(vj.getSid());
+//       for (VJoint child : vj.getChildren()) { addSids(child); }          
+//   }
+   
+   
+   
+   /* Inorder traversal, adding joints/joint sids to the Lists */
+   private void addJoints(VJoint vj) {
+       jointSids.add(vj.getSid());
+       joints.add(vj);
+       for (VJoint child : vj.getChildren()) { addJoints(child); }          
+   }
+   
+   
+   
+   
+   /*
+    * Adds to the joints List by traversing the specified VJoint tree.
+    * Assumption: jointSidsSpecified is true, so the jointSids
+    * List is specified, and is fixed. Moreover, the joints List
+    * already exists, and has the same size as jointSids, possibly
+    * containing null VJoint elements.
+    */
+   private void resolveJoints(VJoint rt) {
+       int index = 0;
+       for (String sid : jointSids) {
+           VJoint vj = getVJoint(rt, sid);
+           if (vj != null) { // don't overwrite joints already resolved before.
+               joints.set(index, vj);
+           }
+           index++;
+       } 
+   }
+   
+   
+   
+   
+   
+//   /** 
+//    * Create a new VJoint that is added as root node
+//    * The VJoint sid is specified, its id is set to
+//    * the Skeleton id + "-" + sid.
 //    */
-//   public boolean encodeTranslation()
-//   {
-//      return encodeTranslation;
+//   public void createRoot(String sid) {
+//       addRoot(new VJoint(makeId(sid), sid));       
 //   }
 //   
 //   /**
-//    * returns whether the VJoints of this Skeleton have rotations to be encoded or decoded from XML
+//    * Creates a new VJoint with specified child sid, added as a child node
+//    * to a parent node with specified parent sid.
+//    * * If no such parent node is present, no new child node will
+//    * be created.
 //    */
-//   public boolean encodeRotation()
-//   {
-//      return encodeRotation;
+//   public void addChildNode(String parentSid, String childSid) {
+//       VJoint parent = getVJoint(parentSid);
+//       if (parent != null) {
+//           parent.addChild(new VJoint(makeId(childSid), childSid));
+//       }
 //   }
-//   
-//      /**
-//    * returns whether the VJoints of this Skeleton have scales to be encoded or decoded from XML
-//    */
-//   public boolean encodeScale()
-//   {
-//      return encodeScale;
-//   }
-// 
-
-
-
-
-   /**
-    * Sets the root joint for the Skeleton, implicitly defining the Skeleton VJoint tree.
-    */
-   public void setRoot(VJoint root)
-   {
-      this.root = root;
-   }
-
-
-
-   /**
-    * Returns the root joint of the VJoint tree structure that defines the Skeleton joints.
-    */
-   public VJoint getRoot()
-   {
-      return root;
-   }
-  
-  /* Calculate  number of joints in the VJoint tree */
-   private int calculateJointCount(VJoint vj) 
-   {
-      if (vj == null) return 0;
-      int result = 1;
-      for (VJoint child : vj.getChildren())
-      {
-         result += calculateJointCount(child);
-      }
-      return result;
-   }
-  
-   /**
-    * Static flag, that denotes whether jointCount attribute will be included or not for writing XML.
-    * (The jointCount attribute is always recognized when reading XML)
-    */
-   public static boolean HAS_JOINTCOUNT_ATTRIBUTE = true;
    
+      /* Method for creating a VJoint id from a specified sid */
+   public String makeId(String sid) {
+       return id + "-" + sid;
+   }
    
    /**
-    *  Appends the XML attributes
+    * Calls calculateMatrices for all VJoint roots.
+    * This method is synchronized, so as to prevent reading
+    * jointMatrices while they are being calculated, and to enforce
+    * jointMatrix data to become visible to other Threads that
+    * needs this data after the updateJointMatrices method returns.
+    * Typical caller "animation Thread".
     */
-   @Override
-   public StringBuilder appendAttributeString(StringBuilder buf) 
-   {     
-      appendAttribute(buf, "id", id);
-      jointCount = calculateJointCount(root);
-      if (HAS_JOINTCOUNT_ATTRIBUTE) appendAttribute(buf, "jointCount", jointCount);
-      if ( ! (encoding == null || encoding.equals(""))) appendAttribute(buf, "encoding", encoding); // only append when explicitly set
-      return buf;
+   public synchronized void updateJointMatrices() {
+       for (VJoint rt : roots) {
+           rt.calculateMatrices();
+       }
+   }
+   
+   /**
+    * Calculates the transform matrices, either by copying from the joint matrices,
+    * or by multiplying the latter with inverse bind matrices, if the later are defined.
+    * The method is synchronized, so cooperates well with updateJointmatrices calls.
+    * This updateTransformMatrices method would be called typically by a render
+    * Thread, or some other "user" Thread. 
+    */
+   public synchronized void updateTransformMatrices() {
+       if (transformMatrices != null) {
+           if (inverseBindMatrices ==  null) { // just copy:
+               for (int i=0; i<transformMatrices.length; i++) {
+                   if (transformMatrices[i] != null) {
+                       Mat4f.set(transformMatrices[i], jointMatrices[i]);
+                   }
+               }             
+           } else { // multiply with inverse bind matrices:
+               for (int i=0; i<transformMatrices.length; i++) {
+                   if (transformMatrices[i] != null) {
+                       Mat4f.mul(transformMatrices[i], jointMatrices[i], inverseBindMatrices[i]);
+                   }
+               }            
+           }
+       }
+   }
+   
+   /**
+    * Sets a reference to the specified matrices, to be used as inverse bind matrices
+    * for the calculateMatrices calls later on.
+    */
+   public void setInverseBindMatrices(float[][] matrices) {
+       this.inverseBindMatrices = matrices;
+   }
+   
+   /**
+    * Returns a reference to the array of transform matrices, 
+    * including one float matrix for every joint, 
+    * in the order as specified by the joints List.
+    * The array is never null, but might contain some null matrices,
+    * when certain jointSids are not actually present in the VJoint trees.
+    * This method will also allocate (but not initialize) all matrices, 
+    * based upon the current roots and jointSids. 
+    * The matrix values to which the array refers should be updated later on 
+    * by calling calculateMatrices.
+    */
+   public float[][] getTransformMatricesRef() {    
+       if ( invalidMatrices) {            
+           jointMatrices = new float[joints.size()][];
+           //inverseBindMatrices = new float[jointSids.size()][];
+           transformMatrices = new float[joints.size()][];
+           // inverseBindMatrices are not allocated here.
+           int index = 0;
+           for (VJoint vj : joints) {
+               if (vj != null) {
+                   jointMatrices[index] = vj.getGlobalMatrix();
+                   transformMatrices[index] = Mat4f.getMat4f();
+               } else {
+                   System.out.println("Skeleton.getTransformMatrices: no VJoint found for sid=\"" + jointSids.get(index) + "\"");
+               }
+               index++;
+           }
+           invalidMatrices = false;
+       }
+       return transformMatrices;     
+   }
+   
+   /**
+    * Search for the VJoint for the specified sid, from all Skeleton roots. 
+    */
+   public VJoint getVJoint(String sid) {
+       for (VJoint rt : roots) {
+           VJoint result = getVJoint(rt, sid);
+           if (result != null) return result;
+       }
+       return null;
+   }
+   
+    /**
+     * Search for the VJoint for the specified sid, 
+     * from the specified VJoint as \&quot;root&quot;, 
+     * which should be some existing VJoint inside one of the Skeleton trees.
+     * (Not necessarily a root node of one of the trees.)
+     */
+   public VJoint getVJoint(VJoint vj, String sid) {
+       if (vj.getSid().equals(sid)) {
+           return vj;
+       } else {
+           for (VJoint child : vj.getChildren()) {
+               VJoint result = getVJoint(child, sid);
+               if (result != null) return result;
+           }
+       }    
+       return null;
    }
 
 
-    /**
-     * Decodes the XML attributes
-     */
-    @Override
-    public void decodeAttributes(HashMap<String, String> attrMap, XMLTokenizer tokenizer)
-    {
-        setId(getOptionalAttribute("id", attrMap, null));
-        jointCount = getOptionalIntAttribute("jointCount", attrMap, -1);
-        encoding = getOptionalAttribute("encoding", attrMap, ""); // default is "T", reperseneted here by ""
-        setEncoding(encoding);
-        super.decodeAttributes(attrMap, tokenizer);
-    }
-
-
-    /**
-     * Append the XML content part
-     */
-    @Override
-    public StringBuilder appendContent(StringBuilder buf, XMLFormatting fmt)
-    {
-        int tab = fmt.getTab();
-        appendSTag(buf, "bones", fmt);
-        if (root != null) appendVJoint(buf, root, fmt.indent());
-        appendETag(buf, "bones", fmt.unIndent());
-        return buf;        
-    }
-    
-    
-    /* 
-     * Recursive method for appending one line per VJoint: 
-     * joint-sid, parent-sid, x, y, z
-     */
-    private StringBuilder appendVJoint(StringBuilder buf, VJoint vj, XMLFormatting fmt) 
-    {
-       buf.append('\n');
-       appendSpaces(buf, fmt);
-       buf.append(vj.getSid());
-       buf.append("   ");
-       VJoint parent = vj.getParent();
-       buf.append(parent==null ? "null" : parent.getSid());
+   
+   /**
+    * Defines the current pose to be the "neutral" pose, assumed when all
+    * joint rotations are set to identity. Typically a pose like the
+    * HAnim rest pose.
+    */
+   public void setNeutralPose() {
+       for (VJoint rt : roots) {
+           rt.calculateMatrices();
+           
+       }
+           //adaptTranslationVectors(rt);
+           // set bind pose.....
+           
+       float[] bindTranslation = Vec3f.getVec3f();
+       float[] parentRotation = Mat4f.getMat4f();
+       float[] rotation = Mat4f.getMat4f();
+       float[] zeroVec = Vec3f.getZero();
+           
+//       float[] localTranslation = Vec3f.getVec3f();
+//       float[] rotations = Mat4f.getMat4f();
        
-       if (encodeTranslation)
-       {
-          buf.append("   ");
-          float[] trans = Vec3f.getVec3f();
-          vj.getTranslation(trans);
-          buf.append(trans[0]);
-          buf.append(' '); buf.append(trans[1]);
-          buf.append(' '); buf.append(trans[2]);    
+       for (int i=0; i<joints.size(); i++) {
+               
+           VJoint vj = joints.get(i);
+           if (vj != null) {
+               if (vj.getParent() != null) {
+                   vj.getTranslation(bindTranslation);
+                   Mat4f.set(parentRotation, vj.getParent().getGlobalMatrix());
+                   Mat4f.transformVector(parentRotation, bindTranslation); // will use only rotation part of parentRotation
+                   vj.setTranslation(bindTranslation);
+                   
+               }
+               Mat4f.set(rotation, vj.getGlobalMatrix());
+               Mat4f.setTranslation(rotation, zeroVec); // clear translation part
+               Mat4f.mul(inverseBindMatrices[i], rotation, inverseBindMatrices[i]);    
+               
+               vj.clearRotation(); // sets local rotation to Id.
+           }
        }
-        if (encodeRotation)
-       {
-          buf.append("   ");
-          float[] rot = Quat4f.getQuat4f();
-          vj.getRotation(rot);
-          buf.append(rot[0]);
-          buf.append(' '); buf.append(rot[1]);
-          buf.append(' '); buf.append(rot[2]);    
-          buf.append(' '); buf.append(rot[3]);    
-       }
-       if (encodeScale)
-       {
-          buf.append("   ");
-          float[] scal = Vec3f.getVec3f();
-          vj.getScale(scal);
-          buf.append(scal[0]);
-          buf.append(' '); buf.append(scal[1]);
-          buf.append(' '); buf.append(scal[2]);    
-       }
-       for (VJoint child : vj.getChildren())
-       {
-           appendVJoint(buf, child, fmt);
-       }
-       return buf;
-    }
-    
-    private static final int DEFAULT_MAX_BONE_COUNT = 32; // used in decodeContent for List allocation
-    
-    public boolean LINE_BASED = true; // denotes whether bones are encoded on single lines, or are allowed to spread over several lines.
-    // When LINE_BASED = true, lines in the bones section can be "commented ouT using C/Java style comment chars of the form //
-    
-    /**
-     * Decodes XML content, and converts it into the double time values and float cofig data.
-     */
-    @Override
-    public void decodeContent(XMLTokenizer tokenizer) throws IOException
-    {
-       while (tokenizer.atSTag())
-       {
-          String tag = tokenizer.getTagName();
-          if (tag.equals("bones"))     
-          {
-              tokenizer.takeSTag();
-              String boneEncoding = tokenizer.takeOptionalCharData();
-              StringTokenizer sectionTokenizer;
-              StringTokenizer boneTokenizer;
-              if (LINE_BASED) {
-                  sectionTokenizer = new StringTokenizer(boneEncoding, LINE_DELIMITERS);   // split into lines
-                  boneTokenizer = null;
-                  // boneTokenizer will be alocated per line
-              } else {
-                  sectionTokenizer = new StringTokenizer(boneEncoding, ATTRIBUTE_TOKEN_DELIMITERS); // immediately split into bone tokens
-                  boneTokenizer = sectionTokenizer; // reuse same tokenizer for bones
-              }
-              int listSize = (jointCount >= 0) ? jointCount : DEFAULT_MAX_BONE_COUNT;
-              
-              jointSids = new ArrayList<String>(listSize);
-              joints = new ArrayList<VJoint>(listSize);
-              parentSids = new ArrayList<String>(listSize);
-              int count = 0;
-              
-              try {
-                 while (sectionTokenizer.hasMoreTokens())
-                 {                
-                    if (LINE_BASED)
-                    {
-                       String boneLine = sectionTokenizer.nextToken(); // complete line
-                       boneTokenizer = new StringTokenizer(boneLine, ATTRIBUTE_TOKEN_DELIMITERS);
-                    }
-                    
-                    String jointSid =  boneTokenizer.nextToken(); // joint sid
-                    if (LINE_BASED && jointSid.startsWith("//")) { 
-                      // skip comment
-                    }
-                    else 
-                    {
-                       //System.out.println(" decode bone " + jointSid);
-                       jointSids.add(jointSid);
-                       VJoint jnt = new VJoint(id + "-" + jointSid, jointSid);
-                       
-                       String parentSid = boneTokenizer.nextToken(); // parent
-                       parentSids.add(parentSid);
-                       if (encodeTranslation)
-                       {
-                          float x = Float.parseFloat(boneTokenizer.nextToken());
-                          float y = Float.parseFloat(boneTokenizer.nextToken());
-                          float z = Float.parseFloat(boneTokenizer.nextToken());
-                          jnt.setTranslation(x, y, z);
-                       }
-                       if (encodeRotation)
-                       {
-                          float s = Float.parseFloat(boneTokenizer.nextToken());
-                          float x = Float.parseFloat(boneTokenizer.nextToken());
-                          float y = Float.parseFloat(boneTokenizer.nextToken());
-                          float z = Float.parseFloat(boneTokenizer.nextToken());
-                          jnt.setRotation(s, x, y, z);
-                       }
-                       if (encodeScale)
-                       {
-                          float sx = Float.parseFloat(boneTokenizer.nextToken());
-                          float sy = Float.parseFloat(boneTokenizer.nextToken());
-                          float sz = Float.parseFloat(boneTokenizer.nextToken());
-                          jnt.setScale(sx, sy, sz);
-                       }
-                       joints.add(jnt);
-                       count++;    
-                    }
-                 }
-              }
-              catch (NoSuchElementException e)
-              {
-                logger.warn(tokenizer.getErrorMessage("Skeleton: incorrect bone encoding: " + boneEncoding)); 
-              }
-              if (jointCount >= 0 && count != jointCount) 
-              {
-                 System.out.println("Skeleton " + id + " count =\"" + jointCount + "\" has different number of actual bones: " + count);
-              }
-              
-              for (int i=0; i<joints.size(); i++) 
-              {
-                  String parentSid = parentSids.get(i);
-                  if (parentSid.equals("null") || parentSid.equals("Null")) // root joint
-                  {
-                     if (getRoot() == null)
-                     {
-                         setRoot(joints.get(i));
-                     }
-                     else 
-                     {
-                        System.out.println("Skeleton " + id + " has more than one root: "  + root.getSid() + ", " + joints.get(i).getSid());
-                     }
-                  }
-                  else 
-                  {
-                     boolean foundParent = false;
-                     for (VJoint vj : joints)
-                     {
-                        foundParent = (vj.getSid().equals(parentSid));
-                        if (foundParent) 
-                        {
-                           vj.addChild(joints.get(i));
-                           break;
-                        }
-                     }
-                     if ( ! foundParent)
-                     { // should have found parent by now
-                        System.out.println("Skeleton " + id + " joint " + joints.get(i).getSid() + " with unknow parent: " + parentSid);
-                     }
-                  } 
-              }
-              
-              tokenizer.takeETag();
-          } 
-          else 
-          {
-              logger.warn(tokenizer.getErrorMessage("Skeleton: skip: " + tokenizer.getTagName()));
-              tokenizer.skipTag();
-          } 
-       }
-    }   
-    
-
-    private static final String XMLTAG = "skeleton";
-    
-    /**
-     * The XML Stag for XML encoding -- use this static method when you want to see if a given String equals
-     * the xml tag for this class
-     */
-    public static String xmlTag() { return XMLTAG; }
-  
-    /**
-     * The XML Stag for XML encoding -- use this method to find out the run-time xml tag of an object
-     */
-    @Override
-    public String getXMLTag() {
-       return XMLTAG;
-    }
+          
+   
+       
+       
+       
+   }
+   
+//   /*
+//    * Assuming that the (global) matrices contain the $V_i$ matrices that will be (left) multiplied with existing
+//    * inverse bind matrices, this method adapts translation vector t_i' = V_{parent(i)}(t_i) 
+//    */
+//   private static void adaptTranslationVectors(VJoint joint) {
+//       float[] localTranslation = Vec3f.getVec3f();
+//       float[] rotations = Mat4f.getMat4f();
+//       
+//       if (joint.getParent() != null) {
+//          joint.getTranslation(localTranslation);
+//          Mat4f.set(rotations, joint.getParent().getGlobalMatrix());
+//          Mat4f.transformVector(rotations, localTranslation);
+//          joint.setTranslation(localTranslation);
+//       }
+//       for (VJoint child : joint.getChildren()) {
+//           adaptTranslationVectors(child);
+//       }
+//   }
+   
+   
+   
 }

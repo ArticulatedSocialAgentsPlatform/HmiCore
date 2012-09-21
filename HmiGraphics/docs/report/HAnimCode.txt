@@ -1,43 +1,94 @@
-
-   /**
-    * Sets all skeletons into HAnim pose
-    */
-   public  void GScene.setSkeletonHAnimPoses() {
+    HAnim:
     
-       for (GNode skeletonRoot : skeletonRoots) {
-          Skeletons.setHAnimPose(skeletonRoot.getVJoint());
-       }
-       calculateVJointMatrices();
-       Skeletons.setNeutralPoses(skeletonRoots, skinnedMeshList, rootNodes);
-         
-   }
-   ======================================
+    In a nutshell:
+    Armandia:
+        Skeletons.setHAnimPose(skeletonRoot.getVJoint());
+        calculateVJointMatrices();
+        Skeletons.setNeutralPoses(skeletonRoots, skinnedMeshList, rootNodes);
+              adaptTranslationVectors(rootJoint);
+              //rootJoint.calculateMatrices(); 
+              gsm.setBindPose();
+              clearJointRotations(); 
+  
+    BlueGuy:
+  
+        removeLinearTransforms(); // optional ? (at least for blueguy not needed)
+            set HAnim pose....
+           // skeletonRoot.calculateMatrices(); // not necessary; added for similariry with seamless loader
+            humanRootGnode.removeLinearTransforms(); // equivalent of setNeutralPose     
+                  float[] localLinear = Mat3f.from4x4(joint.getLocalMatrix());
+                  float[] combinedTransform = Mat3f.getMat3f();
+                  Mat3f.mul(combinedTransform, mat3x3, localLinear);
+                  for (GShape gs : getGShapes()) gs.getGMesh().linearTransform(combinedTransform);
+                  joint.getTranslation(vec);
+                  Mat3f.transform(mat3x3, vec);
+                  joint.setTranslation(vec);
+                  
+                  joint.clearLocalLinearTransform();  
+                  for (GNode child : getChildNodes()) child.removeLinearTransforms(combinedTransform);
+               
+  
+  =====================================
+  DETAILS:
+    
+    
+    in SceneIO: 
+     ....if (postProcess.equals(ARMANDIA))
+        {
+            gscene.setSkeletonHAnimPoses();
+        }
+        
+    /**
+     * Sets all skeletons into HAnim pose
+     */
+    public void setSkeletonHAnimPoses()
+    {
+        for (GNode skeletonRoot : skeletonRoots)
+        {
+            Skeletons.setHAnimPose(skeletonRoot.getVJoint());
+        }
+        calculateVJointMatrices();
+        Skeletons.setNeutralPoses(skeletonRoots, skinnedMeshList, rootNodes);
+    }
+    
+       /**
+     * Calculates the matrices for the VJoint structures.
+     */
+    public void calculateVJointMatrices()
+    {
+        // we may assume that VJoints are linked together.
+        for (GNode root : rootNodes)
+        {
+            root.getVJoint().calculateMatrices();
+        }
+    }
+    
+    
    /**
     * Defines the current pose to be the "neutral pose", i.e. the pose assumed when no joint rotations are set. 
     * This will typically be a pose like the HAnim pose. 
     */
-   public static void Skeletons.setNeutralPoses(List<GNode> skeletonRoots, List<GSkinnedMesh> skinnedMeshList, List<GNode> roots) {  
+   public static void setNeutralPoses(List<GNode> skeletonRoots, List<GSkinnedMesh> skinnedMeshList, List<GNode> roots) {  
       for (GNode skeletonRoot: skeletonRoots) {  
          VJoint rootJoint = skeletonRoot.getVJoint();
     
-         prepareBindPose(rootJoint);
+         adaptTranslationVectors(rootJoint);
          rootJoint.calculateMatrices();  
       }
-      
       
       for (GSkinnedMesh gsm : skinnedMeshList) {
           gsm.setBindPose();
       } 
       for (GNode skelRoot : skeletonRoots) {
          skelRoot.clearJointRotations(); 
-      }
+      }      
    }
-   ======================================
+
    /*
-    * assuming that we have reached the current pose from a bind pose where all rotation was Id, 
-    * we want to prepare a pose that can be used to set the new bind pose. 
+    * Assuming that the (global) matrices contain the $V_i$ matrices that will be (left) multiplied with existing
+    * inverse bind matrices, this method adapts translation vector t_i' = V_{parent(i)}(t_i) 
     */
-   private static void Skeletons.prepareBindPose(VJoint joint) {
+   private static void adaptTranslationVectors(VJoint joint) {
        float[] localTranslation = Vec3f.getVec3f();
        float[] rotations = Mat4f.getMat4f();
        
@@ -47,12 +98,18 @@
           Mat4f.transformVector(rotations, localTranslation);
           joint.setTranslation(localTranslation);
        }
-       for (VJoint child : joint.getChildren()) prepareBindPose(child);
+       for (VJoint child : joint.getChildren()) adaptTranslationVectors(child);
    }
-   ===================================
-    public void GSkinnedMesh.setBindPose() 
+
+   /**
+     * Assuming that the global matrices contain the V_i matrices to be (left) multiplied with the existing
+     * inverse bind matrices, this method actually performs the multiplication. 
+     * Only the rotation/scaling part of the global matrices is used
+     */
+    public void setBindPose() 
     {
-        if (inverseBindMatrices == null) initInverseBindMatrices();       
+        if (inverseBindMatrices == null) initInverseBindMatrices();
+        
         float[] bindTranslation = Vec3f.getVec3f();
         float[] rotations = Mat4f.getMat4f();
         float[] zeroVec = Vec3f.getZero();
@@ -62,7 +119,38 @@
             VJoint joint = jointNodes[i].getVJoint();
             Mat4f.set(rotations, joint.getGlobalMatrix());
             Mat4f.setTranslation(rotations, zeroVec);
-           // Mat4f.clearRotationScale(inverseBindMatrices[i]); // check: this has no effect, so is Id already, after adjustBindPoses
             Mat4f.mul(inverseBindMatrices[i], rotations, inverseBindMatrices[i]);       
-        }
+        }  
     }
+
+=======
+Blueguy:
+ /** Blueguy specific: */ 
+ 
+ if (postProcess.equals(BLUEGUY))
+        {
+            GNode humanRootGnode = gscene.getPartBySid(Hanim.HumanoidRoot);
+            Skeletons.processHAnim(humanRootGnode, Hanim.HumanoidRoot);
+        }
+ 
+   public static void processHAnim(GNode humanRootGnode, String humanoidRootSid)
+   { 
+        humanRootGnode.removeLinearTransforms(); // optional ? (at least for blueguy not needed)
+            VJoint skeletonRoot = humanRootGnode.getVJoint();
+            float[] armDir = Vec3f.getVec3f(0f, -1f, 0f);
+            alignSegment(skeletonRoot, Hanim.r_shoulder, Hanim.r_elbow, armDir);
+            alignSegment(skeletonRoot,Hanim.l_shoulder, Hanim.l_elbow, armDir);
+            if (humanRootGnode.getPartBySid(Hanim.l_thumb1) != null && humanRootGnode.getPartBySid(Hanim.l_thumb2) != null)
+            {
+                float[] thumbDir = Vec3f.getVec3f(0f, -1f, 1f);
+                alignSegment(skeletonRoot, Hanim.l_thumb1, Hanim.l_thumb2, thumbDir);
+                alignSegment(skeletonRoot, Hanim.l_thumb2, Hanim.l_thumb3, thumbDir);
+                alignSegment(skeletonRoot, Hanim.r_thumb1, Hanim.r_thumb2, thumbDir);
+                alignSegment(skeletonRoot, Hanim.r_thumb2, Hanim.r_thumb3, thumbDir);
+            }
+            skeletonRoot.calculateMatrices(); // not necessary; added for similariry with seamless loader
+            humanRootGnode.removeLinearTransforms(); // equivalent of setNeutralPose        
+     }
+
+
+

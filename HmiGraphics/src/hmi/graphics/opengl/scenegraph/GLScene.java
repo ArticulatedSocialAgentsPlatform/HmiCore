@@ -311,14 +311,14 @@ public class GLScene implements GLRenderObject
       return skinnedMeshList;
    }
    
-   /**
-    * Morph all skinned meshes
-    */
-   public void morph(String targetName, float weight) {
-      for (GLSkinnedMesh gsm : skinnedMeshList) {
-          gsm.morph(targetName, weight);
-      }
-   }
+//   /**
+//    * Morph all skinned meshes
+//    */
+//   public void morph(String targetName, float weight) {
+//      for (GLSkinnedMesh gsm : skinnedMeshList) {
+//          gsm.morph(targetName, weight);
+//      }
+//   }
    
    /**
     * Morph all skinned meshes
@@ -329,14 +329,14 @@ public class GLScene implements GLRenderObject
       }
    }
    
-    /**
-    * Morph all skinned meshes
-    */
-   public void morph(int[] targets, float[] weights) {
-      for (GLSkinnedMesh gsm : skinnedMeshList) {
-          gsm.morph(targets, weights);
-      }
-   }
+//    /**
+//    * Morph all skinned meshes
+//    */
+//   public void morph(int[] targets, float[] weights) {
+//      for (GLSkinnedMesh gsm : skinnedMeshList) {
+//          gsm.morph(targets, weights);
+//      }
+//   }
    
 /* ======================================================
      Methods and attributes for maintaining a set of 

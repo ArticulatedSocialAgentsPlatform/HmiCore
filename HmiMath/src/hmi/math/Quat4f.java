@@ -1117,6 +1117,8 @@ public final class Quat4f
 
     /**
      * Rotates a vector with a quaternion, assumes the quaternion is length 1 transforms v, and also returns it.
+     * Efficieny note: for large numbers of vertices, it is more efficient to turn the quaternion into a
+     * transform matrix and use the latter for the transform.
      */
     public static float[] transformVec3f(float[] q, int qIndex, float[] v, int vIndex)
     {
@@ -1135,6 +1137,8 @@ public final class Quat4f
 
     /**
      * Rotates a vector with a quaternion, assumes the quaternion is length 1 transforms v, and also returns it.
+     * Efficieny note: for large numbers of vertices, it is more efficient to turn the quaternion into a
+     * transform matrix and use the latter for the transform.
      */
     public static void transformVec3f(float[] q, int qIndex, float[] src, int srcIndex, float[] dst, int dstIndex)
     {
@@ -1153,6 +1157,8 @@ public final class Quat4f
 
     /**
      * Rotates a vector with a quaternion, assumes the quaternion is length 1 transforms v, and also returns it.
+     * Efficieny note: for large numbers of vertices, it is more efficient to turn the quaternion into a
+     * transform matrix and use the latter for the transform.
      */
     public static float[] transformVec3f(float[] q, float[] v)
     {

@@ -156,7 +156,7 @@
         <javadoc source="1.6" 
             destdir="${javadoc.dir}"
             Overview="javadoc-overview.html" 
-            doctitle="API Documentation for HMI packages, including the Elckerlyc BML Realizer"
+            doctitle="API Documentation for HMI Core packages"
             private="true" 
             use="true"
             author="true"

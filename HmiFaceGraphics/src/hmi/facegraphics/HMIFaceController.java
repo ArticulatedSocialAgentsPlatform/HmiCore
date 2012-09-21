@@ -19,6 +19,7 @@
 package hmi.facegraphics;
 
 import hmi.faceanimation.FaceController;
+import hmi.faceanimation.MorphTargetHandler;
 import hmi.faceanimation.model.FAP;
 import hmi.faceanimation.model.MPEG4;
 import hmi.faceanimation.model.MPEG4Configuration;
@@ -27,6 +28,10 @@ import hmi.graphics.opengl.scenegraph.GLScene;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+
+import com.google.common.collect.ImmutableMap;
+
+import lombok.Delegate;
 
 /**
  * The FaceController is the access point for deforming the face of an avatar, just like VJoints are the accesspoint for deforming its body.
@@ -42,6 +47,11 @@ public class HMIFaceController implements FaceController
     private GLScene theGLScene;
     private Collection<String> possibleFaceMorphTargetNames = new ArrayList<String>();
 
+    @Delegate
+    private MorphTargetHandler morphTargetHandler;
+    
+    private HashMap<String, Float> oldDesiredMorphTargets = new HashMap<String, Float>();
+    
     /** store the current config, for add- and remove-mpeg4configuration */
     private MPEG4Configuration currentConfig = new MPEG4Configuration();
     private GLHead glHead;
@@ -114,6 +124,8 @@ public class HMIFaceController implements FaceController
             i++;
         }
         theGLScene.removeMorphTargets(targetNames, targetWeights);
+        
+        ImmutableMap<String, Float> desiredMorphTargets = morphTargetHandler.getDesiredMorphTargets();
         targetNames = new String[desiredMorphTargets.size()];
         targetWeights = new float[desiredMorphTargets.size()];
         i = 0;
@@ -133,66 +145,7 @@ public class HMIFaceController implements FaceController
      * calling doMorph() ==================================================
      */
 
-    /**
-     * The set of morph targets to be set by doMorph, maintained through addMorphTargets and removeMorphTargets
-     */
-    private HashMap<String, Float> oldDesiredMorphTargets = new HashMap<String, Float>();
-    private HashMap<String, Float> desiredMorphTargets = new HashMap<String, Float>();
-
-    /** Add given weights for given morph targets to the list of desired targets */
-    public synchronized void addMorphTargets(String[] targetNames, float[] weights)
-    {
-        float w = 0;
-        for (int i = 0; i < targetNames.length; i++)
-        {
-            w = weights[i];
-            Float fl = desiredMorphTargets.get(targetNames[i]);
-            if (fl != null)
-            {
-                w += fl.floatValue();
-            }
-            if (w == 0)
-            {
-                desiredMorphTargets.remove(targetNames[i]);
-            }
-            else
-            {
-                desiredMorphTargets.put(targetNames[i], new Float(w));
-            }
-        }
-    }
-
-    @Override
-    public void setMorphTargets(String[] targetNames, float[] weights)
-    {
-        for (int i = 0; i < targetNames.length; i++)
-        {
-            desiredMorphTargets.put(targetNames[i], new Float(weights[i]));
-        }
-    }
-
-    /** Remove given weights for given morph targets from the list of desired targets */
-    public synchronized void removeMorphTargets(String[] targetNames, float[] weights)
-    {
-        float w = 0;
-        for (int i = 0; i < targetNames.length; i++)
-        {
-            w = -weights[i];
-            Float fl = desiredMorphTargets.get(targetNames[i]);
-            if (fl != null)
-            {
-                w += fl.floatValue();
-            }
-            if (w == 0)
-            {
-                desiredMorphTargets.remove(targetNames[i]);
-            }
-            else
-            {
-                desiredMorphTargets.put(targetNames[i], new Float(w));
-            }
-        }
-    }
+    
 
     public void addFaceControllerListener(HMIFaceControllerListener fcl)
     {
