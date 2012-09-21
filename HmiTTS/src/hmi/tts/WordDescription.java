@@ -76,6 +76,15 @@ public final class WordDescription
         {
             duration += p.getDuration();
         }
+        if ((duration==0) && (visimes!=null))
+        {
+        	//XXX: the Fluency voices have no phonemes, but they do have visemes. So here I get the duration from the visemes. /DR
+            for (Visime v : visimes)
+            {
+                duration += v.getDuration();
+            }
+        	
+        }
         return duration;
     }
 
