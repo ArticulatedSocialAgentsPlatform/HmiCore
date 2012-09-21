@@ -45,8 +45,8 @@ public class XMLSkeleton extends XMLStructureAdapter
 {
    private String id;          // id of the Skeleton as a whole. null or an interned String
    
-   private ArrayList<String> jointSids = null; 
-   private ArrayList<VJoint> roots = new ArrayList<>(); // The skeleton roots. Typically of length one. 
+   private List<String> jointSids = null; 
+   private List<VJoint> roots = new ArrayList<>(); // The skeleton roots. Typically of length one. 
    
    // XML related:
    private int jointCount = -1; // value < 0 denotes an  unspecified value.
@@ -92,7 +92,7 @@ public class XMLSkeleton extends XMLStructureAdapter
    /**
     * Sets the List of joint sids.
     */
-   public void setJointSids(ArrayList<String> sids) {
+   public void setJointSids(List<String> sids) {
        this.jointSids = sids;
    }
    
@@ -100,7 +100,7 @@ public class XMLSkeleton extends XMLStructureAdapter
    /**
     * returns the List of joints sids.
     */
-   public ArrayList<String> getJointSids() {
+   public List<String> getJointSids() {
        return jointSids;
    }
    
@@ -108,7 +108,7 @@ public class XMLSkeleton extends XMLStructureAdapter
     * returns the List of root VJoints. 
     * Typically a one element list, with just a single root.
     */
-   public ArrayList<VJoint> getRoots() {
+   public List<VJoint> getRoots() {
        return roots;
    }
    
@@ -118,7 +118,7 @@ public class XMLSkeleton extends XMLStructureAdapter
    /**
     * Sets the List of roots of the VJoint tree(s).
     */
-   public void setRoots(ArrayList<VJoint> roots) {
+   public void setRoots(List<VJoint> roots) {
        this.roots = roots;
    }
    
@@ -336,6 +336,8 @@ public class XMLSkeleton extends XMLStructureAdapter
                                 String boneLine = sectionTokenizer.nextToken(); // complete line
                                 boneTokenizer = new StringTokenizer(boneLine, ATTRIBUTE_TOKEN_DELIMITERS);
                             }
+                            if(!boneTokenizer.hasMoreTokens())continue;
+                            
                             String jointSid =  boneTokenizer.nextToken(); // joint sid
                             if (LINE_BASED && jointSid.startsWith("//")) { 
                               // skip comment
@@ -369,7 +371,7 @@ public class XMLSkeleton extends XMLStructureAdapter
                             }
                         }
                     } catch (NoSuchElementException e) { // when the tokenizer expects some elemenet that isn't there
-                        logger.error("Skeleton Bone XML: erroneous encoding");
+                        logger.error("Skeleton Bone XML: erroneous encoding",e);
                     }
                     // end loop
                     tokenizer.takeETag(); // </bones>
