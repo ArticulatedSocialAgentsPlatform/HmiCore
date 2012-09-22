@@ -13,6 +13,7 @@
 /dist
 /**/*.*~
 /*.*~
+/**/*.swp
 manifest.mf
 /**/manifest.mf
 /HmiTTSSapi5/cpp/sapi5/ttsinterface.ncb

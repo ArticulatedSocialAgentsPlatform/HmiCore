@@ -1,6 +1,7 @@
 <ivy-module version="2.0">
    <info organisation="HMI" module="HmiGraphicsTest"/>
    <dependencies >
-      <dependency org="junit" name="junit-dep"  rev="latest.release" />
+	   <dependency org="junit" name="junit-dep"  rev="latest.release" />
+	   <dependency org="hamcrest" name="hamcrest-all"       rev="latest.release"  />
    </dependencies>
 </ivy-module>
