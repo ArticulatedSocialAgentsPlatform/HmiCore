@@ -48,7 +48,7 @@ public class HMIFaceController implements FaceController
     private Collection<String> possibleFaceMorphTargetNames = new ArrayList<String>();
 
     @Delegate
-    private MorphTargetHandler morphTargetHandler;
+    private MorphTargetHandler morphTargetHandler = new MorphTargetHandler();
     
     private HashMap<String, Float> oldDesiredMorphTargets = new HashMap<String, Float>();
     
