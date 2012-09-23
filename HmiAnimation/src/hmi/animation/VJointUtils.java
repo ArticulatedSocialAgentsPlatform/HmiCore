@@ -8,7 +8,9 @@ import java.util.Set;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 /**
  * Utilities for VJoints
@@ -64,5 +66,38 @@ public final class VJointUtils
             }
         });
         return ImmutableSet.copyOf(j);
+    }
+    
+    public static void setSidToIdOrNameIfNullSid(Collection<VJoint> joints)
+    {
+        for(VJoint vj:joints)
+        {
+            if(vj.getSid()==null)
+            {
+                if(vj.getId()!=null)
+                {
+                    vj.setSid(vj.getId());
+                }
+                else if(vj.getName()!=null)
+                {
+                    vj.setSid(vj.getName());
+                }
+            }
+        }
+    }
+    /**
+     * Create a set of sid strings from a collection of VJoints     
+     */
+    public static List<String> transformToSidList(List<VJoint> joints)
+    {
+        List<String> j = Lists.transform(joints, new Function<VJoint, String>()
+        {
+            @Override
+            public String apply(VJoint joint)
+            {
+                return joint.getSid();
+            }
+        });
+        return ImmutableList.copyOf(j);
     }
 }
