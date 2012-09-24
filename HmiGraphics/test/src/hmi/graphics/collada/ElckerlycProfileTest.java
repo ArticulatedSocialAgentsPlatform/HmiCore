@@ -1,4 +1,4 @@
-package hmi.graphics.scenegraph;
+package hmi.graphics.collada;
 
 import static org.junit.Assert.assertEquals;
 
