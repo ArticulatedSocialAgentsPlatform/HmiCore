@@ -19,6 +19,7 @@
 package hmi.math;
 
 import static org.junit.Assert.*;
+import hmi.testutil.math.Quat4fTestUtil;
 
 import org.junit.Test;
 
@@ -194,6 +195,31 @@ public class Quat4fTest
         Mat4f.setRotation(m, q1);
         Quat4f.setFromMat4f(q2, m);
         assertTrue(Quat4f.epsilonEquals(q1, q2, PRECISION));
+    }
+    
+    private void testFromMat4fIndexed(float x, float y, float z, float angle)
+    {
+        float m[] = new float[17];
+        float q1[] = new float[6];
+        float q2[] = new float[6];        
+        Mat4f.setIdentity(m,1);
+        float aa[] = new float[4];
+        Vec4f.set(aa, 1, 0, 0, (float) Math.PI);
+        Quat4f.setFromAxisAngle4f(q1, 2, aa, 0);
+        Mat4f.setRotation(m,1 , q1,2);
+        Quat4f.setFromMat4f(q2,2,m,1);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(q1, 2, q2, 2, PRECISION);   
+    }
+    /**
+     * Test of setFromMat3f method, of class Quat4f.
+     */
+    @Test
+    public void setFromMat4fIndexed()
+    {
+        testFromMat4fIndexed(1, 0, 0, (float) Math.PI);
+        testFromMat4fIndexed(0, 1, 0, (float) Math.PI);
+        testFromMat4fIndexed(0, 0, 1, (float) Math.PI);
+        testFromMat4fIndexed(0.5f, 0.3f, 0.4f, (float) Math.PI);        
     }
 
     /**

@@ -719,6 +719,19 @@ public final class Mat4f
         m[M22] = 1.0f;
         m[M33] = 1.0f;
     }
+    
+    /**
+     * Resets the 4X4 matrix to the identity matrix.
+     */
+    public static void setIdentity(float[] m, int index)
+    {
+        for (int i = 1; i < MAT4F_SIZE - 1; i++)
+            m[i+index] = 0.0f;
+        m[M00+index] = 1.0f;
+        m[M11+index] = 1.0f;
+        m[M22+index] = 1.0f;
+        m[M33+index] = 1.0f;
+    }
 
     /**
      * Allocates a <em>new</em> 4X4 matrix, initialized to the identity matrix.

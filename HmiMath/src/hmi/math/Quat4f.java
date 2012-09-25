@@ -763,6 +763,61 @@ public final class Quat4f
         Quat4f.normalize(q);
     }
 
+    
+    /**
+     * Calculates the quaternion q elements from a 4X4 or 4X3 matrix m, assuming that the latter does not include scaling and/or skewing. For a 4X4
+     * matrix, we assume that the m33 elements equals 1.0
+     */
+    public static void setFromMat4f(float[] q,int qi, float[] m, int mi)
+    {
+        double ww;
+        ww = 0.25 * (1.0 + m[Mat4f.M00+mi] + m[Mat4f.M11+mi] + m[Mat4f.M22+mi]);
+        if (ww < -EPS2)
+            throw new IllegalArgumentException("Quat4f.setFromMat3f: non-rotation matrix ");
+        if (ww < 0)
+            ww = 0;
+        if (ww >= EPS2)
+        {
+            q[s+qi] = (float) Math.sqrt(ww);
+            ww = 0.25 / q[s+qi];
+            q[x+qi] = (float) ((m[Mat4f.M21+mi] - m[Mat4f.M12+mi]) * ww);
+            q[y+qi] = (float) ((m[Mat4f.M02+mi] - m[Mat4f.M20+mi]) * ww);
+            q[z+qi] = (float) ((m[Mat4f.M10+mi] - m[Mat4f.M01+mi]) * ww);
+        }
+        else
+        {
+            q[s+qi] = 0.0f;
+            ww = -0.5 * (m[Mat4f.M11+mi] + m[Mat4f.M22+mi]);
+            if (ww < 0)
+                ww = 0;
+            if (ww >= EPS2)
+            {
+                q[x+qi] = (float) Math.sqrt(ww);
+                ww = 0.5 / q[x+qi];
+                q[y+qi] = (float) (m[Mat4f.M10+mi] * ww);
+                q[z+qi] = (float) (m[Mat4f.M20+mi] * ww);
+            }
+            else
+            {
+                q[x+qi] = 0.0f;
+                ww = 0.5 * (1.0 - m[Mat4f.M22+mi]);
+                if (ww < 0)
+                    ww = 0;
+                if (ww >= EPS2)
+                {
+                    q[y+qi] = (float) (Math.sqrt(ww));
+                    q[z+qi] = (float) (m[Mat4f.M21+mi] / (2.0 * q[y+qi]));
+                }
+                else
+                {
+                    q[y+qi] = 0.0f;
+                    q[z+qi] = 1.0f;
+                }
+            }
+        }
+        Quat4f.normalize(q,qi);
+    }
+    
     /**
      * Multiplies two quaternions, and puts the result in c: c = a * b
      */
