@@ -1191,7 +1191,6 @@ public final class Mat4f
         // check for affinity of the matrix, i.e. last row should be (0, 0, 0, 1):
         if (m[M30] != 0f || m[M31] != 0f || m[M32] != 0f || m[M33] != 1.0f)
         {
-            // hmi.util.Console.println("Mat4f.affineTransform called for non-affine matrix");
             throw new IllegalArgumentException("Mat4f.invertAffine called for non-affine matrix: " + toString(m));
         }
         // First calculate the adjugate A of the upper left 3X3 matrix R

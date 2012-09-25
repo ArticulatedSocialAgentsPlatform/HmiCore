@@ -36,12 +36,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Job Zwiers
  */
+@Slf4j
 public class GSkinnedMesh extends GMesh implements BinaryExternalizable
 {
 
@@ -520,10 +523,11 @@ public class GSkinnedMesh extends GMesh implements BinaryExternalizable
             Mat4f.getTranslation(bp, bm);
 
             Mat4f.transformPoint(jointMatrices[i], jp, zero);
-
+            /*
             hmi.util.Console.println("joint[ " + i + "] " + jointNames[i] + "\nbind position="
                     + Vec3f.toString(bp, SHOWPOSFIELDWIDTH, SHOWPOSPRECISION) + "\nskel position="
                     + Vec3f.toString(jp, SHOWPOSFIELDWIDTH, SHOWPOSPRECISION));
+                    */
         }
     }
 
@@ -694,7 +698,7 @@ public class GSkinnedMesh extends GMesh implements BinaryExternalizable
             // hmi.util.Console.println("GSkinnedMesh.addVertexWeightColors k= " + k + " indices[k] = " + indices[k]);
             if (indices[k] < 0)
             {
-                hmi.util.Console.println("GSkinnedMesh.addVertexWeightColors joint name  " + names[k] + " not present in skeleton");
+                log.warn("GSkinnedMesh.addVertexWeightColors joint name  " + names[k] + " not present in skeleton");
             }
             else
             {

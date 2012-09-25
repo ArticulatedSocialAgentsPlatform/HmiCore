@@ -28,9 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.media.opengl.*;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * A few static utility methods for loading and compiling  GLSL vertex and fragment shaders
  */
+@Slf4j
 public class GLSL {
 
    private static Logger logger = LoggerFactory.getLogger(GLSL.class.getName());
@@ -115,7 +118,7 @@ public class GLSL {
    public static String loadShaderText(Resources resources, String shaderName) {
       BufferedReader br = resources.getReader(shaderName);
       if (br == null) {
-         hmi.util.Console.println("GLSL: Could not find shader file: " + shaderName + " in resources: " + resources);
+         log.warn("GLSL: Could not find shader file: " + shaderName + " in resources: " + resources);
          return null;
       }
       StringBuilder buf = new StringBuilder();

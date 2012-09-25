@@ -372,7 +372,7 @@ public class GMesh extends XMLStructureAdapter implements BinaryExternalizable, 
         // hmi.util.Console.println("checkMorphTargetConsistency " + morphTarget + ": " + attrName);
         if (basemeshData == null)
         {
-            hmi.util.Console.println("GMesh " + getId() + ": Null basemeshData");
+            //hmi.util.Console.println("GMesh " + getId() + ": Null basemeshData");
             return false;
         }
         if (morphData == null)
@@ -1045,11 +1045,11 @@ public class GMesh extends XMLStructureAdapter implements BinaryExternalizable, 
 
     public void analyze()
     {
-        hmi.util.Console.println("analyse GMesh: " + getId());
+        //hmi.util.Console.println("analyse GMesh: " + getId());
         // ###
         if (attributeList.size() == 0)
         {
-            hmi.util.Console.println(getId() + ": No attributes");
+            //hmi.util.Console.println(getId() + ": No attributes");
             return;
         }
         VertexAttribute firstAttribute = attributeList.get(0);
