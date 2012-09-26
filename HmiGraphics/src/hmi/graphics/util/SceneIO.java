@@ -110,22 +110,32 @@ public final class SceneIO
      */
     public static GLScene readGLScene(String resourceDir, String fileName, String postProcess)
     {
-        GScene gscene = readGScene(resourceDir, fileName, postProcess);
+        GScene gscene = readGScene(resourceDir, fileName, postProcess, true);
         if (gscene == null) return new GLScene("Empty");
         GLScene glScene = ScenegraphTranslator.fromGSceneToGLScene(gscene);
         return glScene;
+    }
+
+    public static GScene readGScene(String resourceDir, String fileName, String postProcess)
+    {
+        return readGScene(resourceDir, fileName, postProcess, true);
     }
 
     /**
      * Reads a GScene from the specified file, within the specified resource directory.
      * postProcess can be one of the predefined processing modes, for setting HAnim poses.
      */
-    public static GScene readGScene(String resourceDir, String fileName, String postProcess)
+    public static GScene readGScene(String resourceDir, String fileName, String postProcess, boolean adjustBindPoses)
 
     {
         String resDir = (resourceDir == null || resourceDir.equals("")) ? "" : resourceDir.replace('\\', '/') + "/";
         String file = resDir + fileName;
-        return readGScene(file, postProcess);
+        return readGScene(file, postProcess, adjustBindPoses);
+    }
+
+    public static GScene readGScene(String file, String postProcess)
+    {
+        return readGScene(file, postProcess, true);
     }
 
     /**
@@ -134,7 +144,7 @@ public final class SceneIO
      * The file type, derived from the postfix, determines whether to read a Collada file
      * (.dae or .DAE) or a binaray file (.bin)
      */
-    public static GScene readGScene(String file, String postProcess)
+    public static GScene readGScene(String file, String postProcess, boolean adjustBindPoses)
     {
         GScene gscene = null;
         try
@@ -151,7 +161,7 @@ public final class SceneIO
                     col = Collada.forResource(file);
                 }
                 if (col == null) throw new RuntimeException("SceneIO.readGScene: null Collada input");
-                gscene = ColladaTranslator.colladaToGSkinnedMeshScene(col);
+                gscene = ColladaTranslator.colladaToGSkinnedMeshScene(col, adjustBindPoses);
 
             }
             else if (file.endsWith(".bin"))

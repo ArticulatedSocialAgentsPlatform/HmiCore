@@ -156,7 +156,7 @@ public class SkeletonPose extends XMLStructureAdapter implements Ident
      */
     public SkeletonPose(String id, Skeleton skeleton, String configType)
     {
-        this(id, skeleton, new ArrayList<String>(), configType);
+        this(id, skeleton, VJointUtils.transformToSidList(skeleton.getRoot().getParts()), configType);
     }
 
     /**

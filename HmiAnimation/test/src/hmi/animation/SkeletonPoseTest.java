@@ -114,6 +114,14 @@ public class SkeletonPoseTest
         assertTrue(pose0.getConfigSize() == 19); // 3 + 4*4
 
     }
+    
+    @Test
+    public void constructorTest2()
+    {
+        Skeleton skel = skTest.createSkeleton("skel");
+        SkeletonPose pose = new SkeletonPose("pose1",skel,"T1R");
+        assertEquals(skel.getRoot().getParts().size()*4+3, pose.getConfigSize());
+    }
 
     @Test
     public void xmlTest() throws IOException
