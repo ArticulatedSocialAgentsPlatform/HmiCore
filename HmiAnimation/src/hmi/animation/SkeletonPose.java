@@ -234,7 +234,7 @@ public class SkeletonPose extends XMLStructureAdapter implements Ident
         for (int i = 0; i < targets.length; i++)
         {
             if (targets[i] == null) logger.error("SkeletonPose.setPartIds, null target for index: " + i);
-            partIds[i] = targets[i].getId();
+            partIds[i] = targets[i].getSid();
         }
     }
 
@@ -433,11 +433,11 @@ public class SkeletonPose extends XMLStructureAdapter implements Ident
     }
 
     @Override
-    public StringBuilder appendAttributeString(StringBuilder buf)
+    public StringBuilder appendAttributeString(StringBuilder buf, XMLFormatting fmt)
     {
         appendAttribute(buf, "encoding", configType);
         appendAttribute(buf, "rotationEncoding", rotationEncoding);
-        appendAttribute(buf, "parts", partIds, ' ', null, 60);
+        appendAttribute(buf, "parts", partIds, ' ', fmt, 60);
         return buf;
     }
 
