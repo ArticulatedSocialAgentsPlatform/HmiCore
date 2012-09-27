@@ -18,10 +18,8 @@
  ******************************************************************************/
 package hmi.math;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 /**
  * Test cases for SpatialTransform
@@ -30,17 +28,6 @@ import org.junit.Test;
  */
 public class SpatialTransformTest
 {
-
-    @Before
-    public void setUp() throws Exception
-    {
-    }
-
-    @After
-    public void tearDown() throws Exception
-    {
-    }
-
     @Test
     public void testSet()
     {
@@ -85,8 +72,6 @@ public class SpatialTransformTest
         SpatialTransform.transformMotion(dsta, transT, v);
         SpatialTransform.transformMotionTranspose(dstb, trans, v);
         
-        //System.out.println("dsta" + SpatialVec.toString(dsta));
-        //System.out.println("dstb" + SpatialVec.toString(dstb));
         assertTrue(SpatialVec.epsilonEquals(dsta, dstb, 0.0005f));
     }
     
@@ -116,8 +101,6 @@ public class SpatialTransformTest
         SpatialTransform.transformMotion(dsta, transT, v);
         SpatialTransform.transformMotionTranspose(dstb, trans, v);
         
-        //System.out.println("dsta" + SpatialVec.toString(dsta));
-        //System.out.println("dstb" + SpatialVec.toString(dstb));
         assertTrue(SpatialVec.epsilonEquals(dsta, dstb, 0.0005f));
     }
     
@@ -137,12 +120,6 @@ public class SpatialTransformTest
         SpatialTransform.setFromMat3fVec3f(trans, m, r);
         SpatialTransform.transpose(transT,trans);
         SpatialTransform.mul(dst, trans, transT);
-        
-        /*
-        System.out.println(SpatialTransform.toString(trans));
-        System.out.println(SpatialTransform.toString(transT));
-        System.out.println(SpatialTransform.toString(dst));
-        */
         
         //transT*trans=I
         assertTrue(SpatialTransform.epsilonEquals(dst, SpatialTransform.ID, 0.0005f));

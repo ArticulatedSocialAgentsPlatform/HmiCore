@@ -22,6 +22,11 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+/**
+ * Unit tests for the QuatCurve
+ * @author hvanwelbergen
+ *
+ */
 public class QuatCurveTest
 {
     @Test
@@ -49,7 +54,6 @@ public class QuatCurveTest
         Vec3f.set(w1,3,1,1);
         QuatCurve.hermite(q0, q1, w0, w1, 1, q);
         assertTrue(Quat4f.epsilonEquals(q, q1, 0.00001f));
-        //System.out.println(Quat4f.toString(q)+" , "+Quat4f.toString(q1));
         
         
         Quat4f.setFromAxisAngle4f(q0, 1f,0f,0f,0.01f);

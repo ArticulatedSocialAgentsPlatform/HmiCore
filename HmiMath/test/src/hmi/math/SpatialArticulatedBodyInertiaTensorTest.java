@@ -43,14 +43,10 @@ public class SpatialArticulatedBodyInertiaTensorTest
         SpatialInertiaTensor.set(I, rotI, pos, 1);        
         float Ia[]=SpatialArticulatedBodyInertiaTensor.getSpatialArticulatedBodyInertiaTensor();
         SpatialArticulatedBodyInertiaTensor.setFromSpatialInertiaTensor(Ia, I);
-        //System.out.println("Idest:\n "+SpatialArticulatedBodyInertiaTensor.toString(Idest));
         
         
         float Idest[]=SpatialArticulatedBodyInertiaTensor.getSpatialArticulatedBodyInertiaTensor();
         SpatialArticulatedBodyInertiaTensor.xstarIXinv(Idest, X, Ia);
-        System.out.println("I:\n "+SpatialInertiaTensor.toString(I));
-        System.out.println("Ia:\n "+SpatialArticulatedBodyInertiaTensor.toString(Ia));
-        System.out.println("Idest:\n "+SpatialArticulatedBodyInertiaTensor.toString(Idest));
         assertTrue(SpatialArticulatedBodyInertiaTensor.epsilonEquals(Idest, Ia, 0.0001f));
     }
 }

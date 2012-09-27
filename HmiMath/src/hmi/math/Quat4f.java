@@ -664,7 +664,14 @@ public final class Quat4f
         double ww;
         ww = 0.25 * (1.0 + m[Mat3f.M00] + m[Mat3f.M11] + m[Mat3f.M22]);
         if (ww < -EPS2)
-            throw new IllegalArgumentException("Quat4f.setFromMat3f: non-rotation matrix, ww= " + ww);
+        {
+            float mRot[] = Mat3f.getMat3f();
+            float mScale[] = Mat3f.getMat3f();
+            Mat3f.polarDecompose(m,mRot,mScale);
+            setFromMat3f(q, mRot);
+            //throw new IllegalArgumentException("Quat4f.setFromMat3f: non-rotation matrix m"+Mat3f.toString(m)+", ww= " + ww);
+        }
+        
         if (ww < 0)
             ww = 0;
         if (ww >= EPS2)
@@ -718,7 +725,15 @@ public final class Quat4f
         double ww;
         ww = 0.25 * (1.0 + m[Mat4f.M00] + m[Mat4f.M11] + m[Mat4f.M22]);
         if (ww < -EPS2)
-            throw new IllegalArgumentException("Quat4f.setFromMat3f: non-rotation matrix ");
+        {    
+            float mRot[] = Mat3f.getMat3f();
+            float mScale[] = Mat3f.getMat3f();
+            float m3[] = Mat3f.from4x4(m);
+            Mat3f.polarDecompose(m3,mRot,mScale);
+            setFromMat3f(q, mRot);            
+            //throw new IllegalArgumentException("Quat4f.setFromMat4f: non-rotation matrix "+Mat4f.toString(m));        
+        }
+        
         if (ww < 0)
             ww = 0;
         if (ww >= EPS2)
