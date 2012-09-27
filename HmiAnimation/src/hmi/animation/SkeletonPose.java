@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
@@ -72,7 +73,7 @@ public class SkeletonPose extends XMLStructureAdapter implements Ident
 
     /**
      * Creates a shallow copy that is not connected to this SkeletonPose's target
-     * The copy shares this SkeletonPose's partIds and config. 
+     * The copy shares this SkeletonPose's partIds and config.
      */
     public SkeletonPose untargettedCopy()
     {
@@ -328,6 +329,108 @@ public class SkeletonPose extends XMLStructureAdapter implements Ident
                     targetParts[i] = targets[j];
                     logger.debug("targetParts[{}]={}", i, partIds[i]);
                 }
+            }
+        }
+    }
+
+    // XXX: duplicate in SkeletonInterpolator.. Perhaps factor out a Signature for both?
+    private int getWidth(int partIndex)
+    {
+        int width = 0;
+        if (hasRootTranslation && partIndex == 0)
+        {
+            width += 3;
+        }
+        else if (hasTranslation)
+        {
+            width += 3;
+        }
+        if (hasRotation)
+        {
+            width += 4;
+        }
+        if (hasScale)
+        {
+            width += 3;
+        }
+        if (hasVelocity)
+        {
+            width += 3;
+        }
+        if (hasAngularVelocity)
+        {
+            width += 3;
+        }
+        return width;
+    }
+
+    private void filterTargetParts(Set<String> joints)
+    {
+        ArrayList<VObject> newParts = new ArrayList<VObject>();        
+        int i=0;
+        for (VObject vj : targetParts)
+        {
+            if (joints.contains(partIds[i]))
+            {
+                newParts.add(vj);
+            }
+            i++;
+        }
+        targetParts = newParts.toArray(new VObject[0]);        
+    }
+    
+    /**
+     * Filter out all parts that are not in joints
+     * @param jointIds
+     */
+    public void filterJoints(Set<String> joints)
+    {
+        int index = 0;
+        ArrayList<String> newPartIds = new ArrayList<String>();
+        int configSize = 0;
+        boolean removeRoot = false;
+        for (int i = 0; i < partIds.length; i++)
+        {
+            if (joints.contains(partIds[i]))
+            {
+                newPartIds.add(partIds[i]);
+                configSize += getWidth(i);                
+            }
+            else if (i == 0)
+            {
+                removeRoot = true;
+
+            }
+            index += getWidth(i);
+        }
+
+        float src[] = config;
+        float dst[] = new float[configSize];
+        int newConfigIndex = 0;
+        index = 0;
+        for (int i = 0; i < partIds.length; i++)
+        {
+            if (joints.contains(partIds[i]))
+            {
+                System.arraycopy(src, index, dst, newConfigIndex, getWidth(i));
+                newConfigIndex += getWidth(i);
+            }
+            index += getWidth(i);
+        }
+        config = dst;
+
+        if (targetParts != null)
+        {
+            filterTargetParts(joints);
+        }
+        setPartIds(newPartIds.toArray(new String[0]));
+        config = dst;
+        if (removeRoot)
+        {
+            hasRootTranslation = false;
+            if (configType.startsWith("T1"))
+            {
+                configType = configType.substring(2);
             }
         }
     }

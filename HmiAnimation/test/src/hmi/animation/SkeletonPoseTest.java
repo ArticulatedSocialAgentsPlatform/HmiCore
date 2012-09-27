@@ -1,9 +1,12 @@
 package hmi.animation;
 
+import static hmi.testutil.math.Quat4fTestUtil.assertQuat4fRotationEquivalent;
 import static org.junit.Assert.*;
 
 import java.io.*;
 
+import hmi.math.Quat4f;
+import hmi.testutil.animation.HanimBody;
 import hmi.xml.XMLTokenizer;
 
 import org.junit.Test;
@@ -191,5 +194,111 @@ public class SkeletonPoseTest
             assertEquals(expected[i], config2[i], PARAMETER_PRECISION);
         }
     }
+    
+    
+    @Test
+    public void testFilter() throws IOException
+    {
+        String str = "<SkeletonPose parts=\"HumanoidRoot r_shoulder l_shoulder\" encoding=\"T1R\">"
+                + "0 1 0 1 0 0 0 0 1 0 0 0 0 1 0\n"+
+              "</SkeletonPose>";
+        SkeletonPose pose = new SkeletonPose(new XMLTokenizer(str));        
 
+        VJoint vHuman = new VJoint();
+        vHuman.setSid("HumanoidRoot");
+        VJoint lSh = new VJoint();
+        lSh.setSid("l_shoulder");
+        VJoint rSh = new VJoint();
+        rSh.setSid("r_shoulder");
+        rSh.setRotation(0, 0, 0, 1);
+        vHuman.addChild(rSh);
+        vHuman.addChild(lSh);
+        pose.setTargets(vHuman.getParts().toArray(new VJoint[0]));
+
+        Set<String> filter = new HashSet<String>();
+        filter.add("l_shoulder");
+        filter.add("HumanoidRoot");
+        pose.filterJoints(filter);
+
+        assertEquals(2, pose.getPartIds().length);
+        assertEquals("HumanoidRoot", pose.getPartIds()[0]);
+        assertEquals("l_shoulder", pose.getPartIds()[1]);
+
+        assertEquals("T1R", pose.getConfigType());
+        assertEquals(11, pose.getConfigSize());
+
+        pose.setToTarget();
+        float[] q = Quat4f.getQuat4f();
+        vHuman.getRotation(q);
+        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, PARAMETER_PRECISION);
+
+        lSh.getRotation(q);
+        assertQuat4fRotationEquivalent(0, 0, 1, 0, q, PARAMETER_PRECISION);
+
+        rSh.getRotation(q);
+        assertQuat4fRotationEquivalent(0, 0, 0, 1, q, PARAMETER_PRECISION);
+    }
+    
+    @Test
+    public void testFilterNonExistingJoint() throws IOException
+    {
+        String str = "<SkeletonPose rotationEncoding=\"quaternions\" parts=\"HumanoidRoot invalid l_shoulder\" encoding=\"T1R\">"
+            + "0 1 0 1 0 0 0 0 1 0 0 0 0 1 0\n"+
+            "</SkeletonPose>";
+        SkeletonPose ski = new SkeletonPose(new XMLTokenizer(str));
+        
+        
+        Set<String> filter = new HashSet<String>();
+        filter.add("invalid");
+        filter.add("l_shoulder");
+        
+        ski.setTargets(HanimBody.getLOA1HanimBody().getParts().toArray(new VJoint[0]));
+        ski.filterJoints(filter);  
+        assertEquals(2, ski.getPartIds().length);
+        assertEquals(8, ski.getConfigSize());
+    }
+    
+    @Test
+    public void testFilterRemoveRoot() throws IOException
+    {
+        String str = "<SkeletonPose rotationEncoding=\"quaternions\" parts=\"HumanoidRoot r_shoulder l_shoulder\" encoding=\"T1R\">"
+                + "0 1 0 1 0 0 0 0 1 0 0 0 0 1 0\n"
+                + "</SkeletonPose>";
+        SkeletonPose ski = new SkeletonPose(new XMLTokenizer(str));        
+
+        VJoint vHuman = new VJoint();
+        vHuman.setRotation(0, 0, 0, 1);
+        vHuman.setSid("HumanoidRoot");
+        VJoint lSh = new VJoint();
+        lSh.setSid("l_shoulder");
+        VJoint rSh = new VJoint();
+        rSh.setSid("r_shoulder");
+        rSh.setRotation(0, 0, 0, 1);
+        vHuman.addChild(rSh);
+        vHuman.addChild(lSh);
+        ski.setTargets(vHuman.getParts().toArray(new VJoint[0]));
+
+        Set<String> filter = new HashSet<String>();
+        filter.add("l_shoulder");
+        filter.add("r_shoulder");
+        ski.filterJoints(filter);
+
+        assertEquals(2, ski.getPartIds().length);
+        assertEquals("r_shoulder", ski.getPartIds()[0]);
+        assertEquals("l_shoulder", ski.getPartIds()[1]);
+
+        assertEquals("R", ski.getConfigType());
+        assertEquals(8, ski.getConfigSize());
+
+        ski.setToTarget();
+        float[] q = Quat4f.getQuat4f();
+        vHuman.getRotation(q);
+        assertQuat4fRotationEquivalent(0, 0, 0, 1, q, 0.0001f);
+
+        lSh.getRotation(q);
+        assertQuat4fRotationEquivalent(0, 0, 1, 0, q, 0.0001f);
+
+        rSh.getRotation(q);
+        assertQuat4fRotationEquivalent(0, 1, 0, 0, q, 0.0001f);
+    }
 }
