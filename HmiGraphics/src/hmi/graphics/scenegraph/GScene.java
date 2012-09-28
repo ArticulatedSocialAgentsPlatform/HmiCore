@@ -19,6 +19,7 @@
 
 package hmi.graphics.scenegraph;
 
+import hmi.animation.VJointUtils;
 import hmi.math.Mat4f;
 import hmi.math.Quat4f;
 import hmi.math.Vec3f;
@@ -334,7 +335,7 @@ public class GScene extends XMLStructureAdapter implements Diff.Differentiable
 
         for (GNode skeletonRoot : skeletonRoots)
         {
-            Skeletons.setHAnimPose(skeletonRoot.getVJoint());
+            VJointUtils.setHAnimPose(skeletonRoot.getVJoint());
         }
         calculateVJointMatrices();
         Skeletons.setNeutralPoses(skeletonRoots, skinnedMeshList, rootNodes);
