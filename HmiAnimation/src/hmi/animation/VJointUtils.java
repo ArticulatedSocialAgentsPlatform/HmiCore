@@ -86,7 +86,7 @@ public final class VJointUtils
         }
     }
     /**
-     * Create a set of sid strings from a collection of VJoints     
+     * Create a set of sid strings from a collection of VJoints. If the sid of a joint in joints is null, its id or name are used respectively.
      */
     public static List<String> transformToSidList(List<VJoint> joints)
     {
@@ -95,7 +95,18 @@ public final class VJointUtils
             @Override
             public String apply(VJoint joint)
             {
-                return joint.getSid();
+                if(joint.getSid()!=null)
+                {
+                    return joint.getSid();
+                }
+                else if(joint.getId()!=null)
+                {
+                    return joint.getId();
+                }
+                else
+                {
+                    return joint.getName();
+                }
             }
         });
         return ImmutableList.copyOf(j);
