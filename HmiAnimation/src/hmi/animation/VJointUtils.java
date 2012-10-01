@@ -218,7 +218,7 @@ public final class VJointUtils
             log.warn("No " + parentSid + " or " + childSid + " for skeleton " + skeletonRoot.getName());
         }
     }
-
+    
     /** 
      * auxiliary method for aligning some body segment inside a skeleton structure with a specified direction vector 
      * The parent joint is rotated 
@@ -247,5 +247,40 @@ public final class VJointUtils
         {
             log.warn("No " + parentSid + " or " + childSid + " for skeleton " + skeletonRoot.getName());
         }
+    }
+    
+    private static VJoint createNullRotationCopyTree(VJoint root, VJoint vj, VJoint vjParent, String prefix)
+    {
+        VJoint v = vj.copy(prefix);
+        float tParent[] = Vec3f.getVec3f(); 
+        float tCurrent[] = Vec3f.getVec3f();
+        vjParent.getPathTranslation(root,tParent);
+        vj.getPathTranslation(root,tCurrent);
+        Vec3f.sub(tCurrent,tParent);
+        
+        v.setRotation(Quat4f.getIdentity());        
+        v.setTranslation(tCurrent);
+        for(VJoint vChild:vj.getChildren())
+        {
+            v.addChild(createNullRotationCopyTree(root, vChild,vj,prefix));
+        }
+        return v;
+    }
+    
+    /**
+     * Creates a new VJoint tree in which all joints are in the same position as in vj, but have 0 rotation.  
+     */
+    public static VJoint createNullRotationCopyTree(VJoint vj, String prefix)
+    {
+        vj.calculateMatrices();
+        VJoint v = vj.copy(prefix);
+        v.setRotation(Quat4f.getIdentity());
+        
+        for(VJoint vChild:vj.getChildren())
+        {
+            v.addChild(createNullRotationCopyTree(vj.getParent(), vChild,vj,prefix));
+        }
+        v.calculateMatrices();
+        return v;
     }
 }
