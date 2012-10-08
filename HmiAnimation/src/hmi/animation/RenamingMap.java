@@ -1,10 +1,14 @@
-package hmi.graphics.util;
+package hmi.animation;
+
+import java.io.IOException;
 
 import com.google.common.base.CharMatcher;
+import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Iterables;
+import com.google.common.io.Resources;
 
 /**
  * Parsers a renaming string (of form "oldname1 newname1"\n"oldname2 newname2") into a oldname->newname bidirectional map. 
@@ -13,6 +17,11 @@ import com.google.common.collect.Iterables;
 public final class RenamingMap
 {
     private RenamingMap(){}
+    
+    public static BiMap<String, String> renamingMapFromFileOnClasspath(String filename) throws IOException
+    {
+        return renamingMap(Resources.toString(Resources.getResource(filename), Charsets.UTF_8));
+    }
     
     public static BiMap<String,String> renamingMap(String renaming)
     {
