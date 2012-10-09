@@ -1,8 +1,8 @@
 package hmi.util;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.hamcrest.collection.*;
 import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
