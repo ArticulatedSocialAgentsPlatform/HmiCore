@@ -39,7 +39,7 @@ public class CollectionUtilsTest
     }
     
     @Test
-    public void getClassesOfType()
+    public void getClassesOfTypeTest()
     {
         class A{};
         class B extends A{};
