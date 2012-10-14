@@ -6,6 +6,11 @@ import static org.junit.Assert.assertEquals;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Test;
 
+/**
+ * Unit tests for ArrayUtils
+ * @author Herwin
+ *
+ */
 public class ArrayUtilsTest
 {
     @Test
