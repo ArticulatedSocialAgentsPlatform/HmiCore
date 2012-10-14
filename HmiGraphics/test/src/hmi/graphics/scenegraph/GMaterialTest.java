@@ -4,8 +4,9 @@
 
 package hmi.graphics.scenegraph;
 
-import static org.junit.Assert.*;
-import org.junit.*;
+import static org.junit.Assert.assertTrue;
+import hmi.util.Resources;
+import hmi.xml.XMLTokenizer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -15,8 +16,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Reader;
-import hmi.util.*;
-import hmi.xml.XMLTokenizer;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * JUnit test for hmi.graphics.scenegraph.GMaterial

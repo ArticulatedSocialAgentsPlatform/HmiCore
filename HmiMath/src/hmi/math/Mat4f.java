@@ -736,6 +736,19 @@ public final class Mat4f
         m[M22] = 1.0f;
         m[M33] = 1.0f;
     }
+    
+    /**
+     * Resets the 4X4 matrix to the identity matrix.
+     */
+    public static void setIdentity(float[] m, int index)
+    {
+        for (int i = 1; i < MAT4F_SIZE - 1; i++)
+            m[i+index] = 0.0f;
+        m[M00+index] = 1.0f;
+        m[M11+index] = 1.0f;
+        m[M22+index] = 1.0f;
+        m[M33+index] = 1.0f;
+    }
 
     /**
      * Allocates a <em>new</em> 4X4 matrix, initialized to the identity matrix.
@@ -1208,7 +1221,6 @@ public final class Mat4f
         // check for affinity of the matrix, i.e. last row should be (0, 0, 0, 1):
         if (m[M30] != 0f || m[M31] != 0f || m[M32] != 0f || m[M33] != 1.0f)
         {
-            // hmi.util.Console.println("Mat4f.affineTransform called for non-affine matrix");
             throw new IllegalArgumentException("Mat4f.invertAffine called for non-affine matrix: " + toString(m));
         }
         // First calculate the adjugate A of the upper left 3X3 matrix R

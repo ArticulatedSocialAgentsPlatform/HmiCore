@@ -18,7 +18,9 @@
  ******************************************************************************/
 package hmi.math;
 
+import static hmi.testutil.math.Quat4fTestUtil.assertQuat4fRotationEquivalent;
 import static org.junit.Assert.*;
+import hmi.testutil.math.Quat4fTestUtil;
 
 import org.junit.Test;
 
@@ -31,7 +33,33 @@ public class Quat4fTest
     private static final float PRECISION = 0.00001f;
     private static final float PRECISION_DIFF = 0.0001f;
     private static final float PRECISION_DIFF2 = 0.02f;
+
+    @Test
+    public void testSetFromMat4f()
+    {
+        float qExpected[] = Quat4f.getQuat4f();        
+        Quat4f.set(qExpected, 0.0f, 0.6427876f, -0.76604456f, -1.0941049E-4f);
+        //Quat4f.set(qExpected, 0, 1, 0,0);
+        float m[] = Mat4f.getMat4f();
+        Mat4f.setFromTR(m,Vec3f.getZero(),qExpected);
+        float q[] = Quat4f.getQuat4f();
+        Quat4f.setFromMat4f(q,m);
+        assertQuat4fRotationEquivalent(qExpected,q,PRECISION);
+    }
     
+    @Test
+    public void testSetFromMat3f()
+    {
+        float qExpected[] = Quat4f.getQuat4f();        
+        Quat4f.set(qExpected, 0.0f, 0.6427876f, -0.76604456f, -1.0941049E-4f);
+        //Quat4f.set(qExpected, 0, 1, 0,0);
+        float m[] = Mat3f.getMat3f();
+        Mat3f.setFromQuatScale(m,qExpected,1);        
+        float q[] = Quat4f.getQuat4f();
+        Quat4f.setFromMat3f(q,m);
+        assertQuat4fRotationEquivalent(qExpected,q,PRECISION);
+    }
+
     @Test
     public void testEpsilonEquivalent()
     {
@@ -71,15 +99,15 @@ public class Quat4fTest
 
         Quat4f.set(aa, 2, 0, 0, 1);
         Quat4f.setFromAxisAngle4f(q, aa);
-        assertEquals(Quat4f.length(q),1,PRECISION);
-        
+        assertEquals(Quat4f.length(q), 1, PRECISION);
+
         Quat4f.set(aa, 2, 0, 0, 10);
         Quat4f.setFromAxisAngle4f(q, aa);
-        assertEquals(Quat4f.length(q),1,PRECISION);
-        
+        assertEquals(Quat4f.length(q), 1, PRECISION);
+
         Quat4f.set(aa, 1, 0, 0, 2f);
         Quat4f.setFromAxisAngle4f(q, aa);
-        assertEquals(Quat4f.length(q),1,PRECISION);
+        assertEquals(Quat4f.length(q), 1, PRECISION);
     }
 
     /**
@@ -196,6 +224,32 @@ public class Quat4fTest
         assertTrue(Quat4f.epsilonEquals(q1, q2, PRECISION));
     }
 
+    private void testFromMat4fIndexed(float x, float y, float z, float angle)
+    {
+        float m[] = new float[17];
+        float q1[] = new float[6];
+        float q2[] = new float[6];
+        Mat4f.setIdentity(m, 1);
+        float aa[] = new float[4];
+        Vec4f.set(aa, 1, 0, 0, (float) Math.PI);
+        Quat4f.setFromAxisAngle4f(q1, 2, aa, 0);
+        Mat4f.setRotation(m, 1, q1, 2);
+        Quat4f.setFromMat4f(q2, 2, m, 1);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(q1, 2, q2, 2, PRECISION);
+    }
+
+    /**
+     * Test of setFromMat3f method, of class Quat4f.
+     */
+    @Test
+    public void setFromMat4fIndexed()
+    {
+        testFromMat4fIndexed(1, 0, 0, (float) Math.PI);
+        testFromMat4fIndexed(0, 1, 0, (float) Math.PI);
+        testFromMat4fIndexed(0, 0, 1, (float) Math.PI);
+        testFromMat4fIndexed(0.5f, 0.3f, 0.4f, (float) Math.PI);
+    }
+
     /**
      * Test of the setFromVectors method
      */
@@ -206,15 +260,15 @@ public class Quat4fTest
         float[] b = Vec3f.getVec3f(0f, 1f, 0f);
         float[] q = Quat4f.getQuat4f();
         Quat4f.setFromVectors(q, a, b);
-        
+
         Quat4f.transformVec3f(q, a);
         assertTrue(Vec3f.epsilonEquals(a, b, PRECISION));
 
         Vec3f.set(a, 0f, 1f, 0f);
         Vec3f.set(b, 0f, 0f, 1f);
         Quat4f.setFromVectors(q, a, b);
-        
-        Quat4f.transformVec3f(q, a);        
+
+        Quat4f.transformVec3f(q, a);
         assertTrue(Vec3f.epsilonEquals(a, b, PRECISION));
 
         Vec3f.set(a, 0f, 0f, 1f);
@@ -225,15 +279,15 @@ public class Quat4fTest
 
         Vec3f.set(a, 1f, 0f, 0f);
         Vec3f.set(b, 0f, -1f, 0f);
-        Quat4f.setFromVectors(q, a, b);        
-        Quat4f.transformVec3f(q, a);        
+        Quat4f.setFromVectors(q, a, b);
+        Quat4f.transformVec3f(q, a);
         assertTrue(Vec3f.epsilonEquals(a, b, PRECISION));
 
         Vec3f.set(a, 0.25f, 0f, 0f);
         Vec3f.set(b, 0f, -1f, 0f);
-        Quat4f.setFromVectors(q, a, b);        
+        Quat4f.setFromVectors(q, a, b);
         Quat4f.transformVec3f(q, a);
-        Vec3f.scale(4f, a);        
+        Vec3f.scale(4f, a);
         assertTrue(Vec3f.epsilonEquals(a, b, PRECISION));
     }
 
@@ -244,11 +298,11 @@ public class Quat4fTest
     public void setXRot()
     {
         float[] q = new float[4];
-        Quat4f.setXRot(q, (float)(Math.PI/2.0));
-        float[] expectedQ = new float[] { (float)Math.cos(Math.PI/4.0), (float)Math.sin(Math.PI/4.0), 0.0f, 0.0f };     
+        Quat4f.setXRot(q, (float) (Math.PI / 2.0));
+        float[] expectedQ = new float[] { (float) Math.cos(Math.PI / 4.0), (float) Math.sin(Math.PI / 4.0), 0.0f, 0.0f };
         assertTrue(Quat4f.epsilonEquals(q, expectedQ, PRECISION));
-    }    
-    
+    }
+
     /**
      * Test of setYRot method
      */
@@ -256,11 +310,11 @@ public class Quat4fTest
     public void setYRot()
     {
         float[] q = new float[4];
-        Quat4f.setYRot(q, (float)(Math.PI/2.0));
-        float[] expectedQ = new float[] { (float)Math.cos(Math.PI/4.0), 0.0f, (float)Math.sin(Math.PI/4.0), 0.0f };     
+        Quat4f.setYRot(q, (float) (Math.PI / 2.0));
+        float[] expectedQ = new float[] { (float) Math.cos(Math.PI / 4.0), 0.0f, (float) Math.sin(Math.PI / 4.0), 0.0f };
         assertTrue(Quat4f.epsilonEquals(q, expectedQ, PRECISION));
-    }    
-    
+    }
+
     /**
      * Test of setZRot method
      */
@@ -268,26 +322,23 @@ public class Quat4fTest
     public void setZRot()
     {
         float[] q = new float[4];
-        Quat4f.setZRot(q, (float)(Math.PI/2.0));
-        float[] expectedQ = new float[] { (float)Math.cos(Math.PI/4.0), 0.0f, 0.0f, (float)Math.sin(Math.PI/4.0) };     
+        Quat4f.setZRot(q, (float) (Math.PI / 2.0));
+        float[] expectedQ = new float[] { (float) Math.cos(Math.PI / 4.0), 0.0f, 0.0f, (float) Math.sin(Math.PI / 4.0) };
         assertTrue(Quat4f.epsilonEquals(q, expectedQ, PRECISION));
-    }    
-    
-    
+    }
+
     /**
      * Test of setFromXYZW method
      */
     @Test
     public void setFromXYZW()
     {
-        float[] qXYZW = new float[] {0.3f, 0.4f, 0.1f, 0.9f};
+        float[] qXYZW = new float[] { 0.3f, 0.4f, 0.1f, 0.9f };
         float[] qWXYZ = new float[4];
         Quat4f.setFromXYZW(qWXYZ, qXYZW);
-        float[] expectedQWXYZ = new float[] { 0.9f, 0.3f, 0.4f, 0.1f  };     
+        float[] expectedQWXYZ = new float[] { 0.9f, 0.3f, 0.4f, 0.1f };
         assertTrue(Quat4f.epsilonEquals(qWXYZ, expectedQWXYZ, PRECISION));
-    }    
-    
-    
+    }
 
     /**
      * Test of add method, of class Quat4f.
@@ -400,19 +451,19 @@ public class Quat4fTest
         float[] result = new float[4];
 
         Quat4f.mul(result, qRotY180, qRotZ180);
-        Quat4f.set(expect, 0f, 1f, 0f, 0f); // rotX180        
+        Quat4f.set(expect, 0f, 1f, 0f, 0f); // rotX180
         assertTrue(Quat4f.epsilonEquals(result, expect, PRECISION));
 
         Quat4f.mul(result, qRotZ180, qRotY180);
         Quat4f.set(expect, 0f, -1f, 0f, 0f); // -rotX180
-        assertTrue(Quat4f.epsilonEquals(result, expect,PRECISION));
+        assertTrue(Quat4f.epsilonEquals(result, expect, PRECISION));
 
         Quat4f.mul(result, qRotY90, qRotZ90);
-        Quat4f.set(expect, 0.5f, 0.5f, 0.5f, 0.5f); // rot 120 around (1,1,1)        
+        Quat4f.set(expect, 0.5f, 0.5f, 0.5f, 0.5f); // rot 120 around (1,1,1)
         assertTrue(Quat4f.epsilonEquals(result, expect, PRECISION));
 
         Quat4f.mul(result, qRotZ90, qRotY90);
-        Quat4f.set(expect, 0.5f, -0.5f, 0.5f, 0.5f); // rot 120 around (-1,1,1)        
+        Quat4f.set(expect, 0.5f, -0.5f, 0.5f, 0.5f); // rot 120 around (-1,1,1)
         assertTrue(Quat4f.epsilonEquals(result, expect, PRECISION));
 
         float[] q1 = new float[] { 1.0f, 2.0f, 3.0f, 4.0f };
@@ -530,7 +581,7 @@ public class Quat4fTest
 
         // length(q^p)=1
         Quat4f.pow(qout, 10, qin);
-        assertEquals(Quat4f.length(qout),1,PRECISION);        
+        assertEquals(Quat4f.length(qout), 1, PRECISION);
         assertTrue(!Quat4f.epsilonEquals(qout, qin, PRECISION));
 
         // (1,0,0,0)^p=(1,0,0,0)
@@ -661,7 +712,5 @@ public class Quat4fTest
             assertTrue(Vec3f.epsilonEquals(aVelDiff, i * 3, aacc, 0, PRECISION_DIFF2));
         }
     }
-
-
 
 }

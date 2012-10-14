@@ -2,6 +2,7 @@ package hmi.animation;
 
 import hmi.math.Mat4f;
 import hmi.math.Vec3f;
+import hmi.util.ExchangeBuffer;
 import hmi.xml.XMLTokenizer;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * in a safe way. Afterwards, the render Thread can freely use the transform matrices,
  * without locking. 
  */
-public class Skeleton 
+public class Skeleton implements ExchangeBuffer
 {
    private String id;          // id of the Skeleton as a whole. null or an interned String
    private ArrayList<VJoint> roots = new ArrayList<>();
@@ -42,6 +43,8 @@ public class Skeleton
  
    
    private float[][] jointMatrices; // transform matrices for all joints, linked to the global matrices within the VJoints.
+   private float[][] jointMatricesBuffer; // matrix buffers, used to copy jointMatrices data.
+   
    private float[][] inverseBindMatrices;
    private float[][] transformMatrices;
    private boolean invalidMatrices = true; // signals "invalid" matrix arrays, due to modifications for roots and/or jointSids
@@ -193,7 +196,9 @@ public class Skeleton
     * *====> TAKE CARE OF DISTINCTION JOINT/NODE
     */
    public final void addRoot(VJoint root) {
-       if (root == null) return;
+       if (root == null) {
+           return;
+       }
        roots.add(root);
        if (jointSidsSpecified) { 
            resolveJoints(root);         
@@ -270,53 +275,145 @@ public class Skeleton
        return id + "-" + sid;
    }
    
-   /**
-    * Calls calculateMatrices for all VJoint roots.
-    * This method is synchronized, so as to prevent reading
-    * jointMatrices while they are being calculated, and to enforce
-    * jointMatrix data to become visible to other Threads that
-    * needs this data after the updateJointMatrices method returns.
-    * Typical caller "animation Thread".
-    */
-   public synchronized void updateJointMatrices() {
-       for (VJoint rt : roots) {
-           rt.calculateMatrices();
-       }
+   
+   private boolean updateOnWriteMatrices = false;
+   
+   public void setUpdateOnWrite(boolean status) {
+       updateOnWriteMatrices = status;
    }
    
-   /**
-    * Calculates the transform matrices, either by copying from the joint matrices,
-    * or by multiplying the latter with inverse bind matrices, if the later are defined.
-    * The method is synchronized, so cooperates well with updateJointmatrices calls.
-    * This updateTransformMatrices method would be called typically by a render
-    * Thread, or some other "user" Thread. 
-    */
-   public synchronized void updateTransformMatrices() {
-       if (transformMatrices != null) {
-           if (inverseBindMatrices ==  null) { // just copy:
-               for (int i=0; i<transformMatrices.length; i++) {
-                   if (transformMatrices[i] != null) {
-                       Mat4f.set(transformMatrices[i], jointMatrices[i]);
-                   }
-               }             
-           } else { // multiply with inverse bind matrices:
-               for (int i=0; i<transformMatrices.length; i++) {
-                   if (transformMatrices[i] != null) {
-                       Mat4f.mul(transformMatrices[i], jointMatrices[i], inverseBindMatrices[i]);
-                   }
-               }            
+    /**
+     * Implements the writeBuffer op from the ExchangeBuffer interface. 
+     * This implementation is not Thread-safe.
+     */
+    @Override
+    public void putData() {
+        //System.out.println("Skeleton.writeBuffer jointMatrices.length= " + jointMatrices.length);
+        if (updateOnWriteMatrices) {
+            updateJointMatrices();           
+        }
+        for (int i=0; i<jointMatrices.length; i++) {
+            
+            Mat4f.set(jointMatricesBuffer[i], jointMatrices[i]);
+        } 
+    }
+   
+   
+  
+    
+     /**
+     * Implements the readBuffer op from the ExchangeBuffer interface. 
+     * This implementation is not Thread-safe.
+     */
+    @Override
+    public void getData() {
+        //System.out.println("Skeleton.readBuffer");
+       updateTransformMatrices();
+    }
+   
+    /**
+     * Calls calculateMatrices for all VJoint roots.
+     * This method is not Thread-safe.
+     */
+    public void updateJointMatrices() {
+        //System.out.println("updateJointMatrices");
+        for (VJoint rt : roots) {
+            rt.calculateMatrices();
+        }
+    }
+   
+    /*
+     * Calculates the transform matrices, either by copying from the joint matrices,
+     * or by multiplying the latter with inverse bind matrices, if the later are defined.
+     * The method is synchronized, so cooperates well with updateJointmatrices calls.
+     * This updateTransformMatrices method would be called typically by a render
+     * Thread, or some other "user" Thread. 
+     */
+    private  void updateTransformMatrices() {
+        if (transformMatrices != null) {
+            if (inverseBindMatrices ==  null) { // just copy:
+                //System.out.println("Skeleton.updateTransformMatrices -- copy");
+                for (int i=0; i<transformMatrices.length; i++) {
+                    if (transformMatrices[i] != null) {
+                        Mat4f.set(transformMatrices[i], jointMatricesBuffer[i]);
+                    }
+                }             
+            } else { // multiply with inverse bind matrices:
+                //System.out.println("Skeleton.updateTransformMatrices -- multiply inverBindMatrices");
+                for (int i=0; i<transformMatrices.length; i++) {
+                    if (transformMatrices[i] != null) {
+                        Mat4f.mul(transformMatrices[i], jointMatricesBuffer[i], inverseBindMatrices[i]);
+                    }
+                }            
+            }
+        }
+    }
+   
+    
+      public void showJointMatrices() {
+        if (jointMatrices == null) {
+            System.out.println("Null jointMatrices");
+        } else {
+            for (int i=0; i<jointMatrices.length; i++) {
+                System.out.println("jointMatrices[" + i + "] " + Mat4f.toString(jointMatrices[i]));
+            }
+        }
+    }
+    
+    public void showJointMatricesBuffer() {
+        if (jointMatrices == null) {
+            System.out.println("Null jointMatricesBuffer");
+        } else {
+            for (int i=0; i<jointMatrices.length; i++) {
+                System.out.println("jointMatricesBuffer[" + i + "] " + Mat4f.toString(jointMatricesBuffer[i]));
+            }
+        }
+    }
+    
+    public void showTransformMatrices() {
+        if (jointMatrices == null) {
+            System.out.println("Null transformMatrices");
+        } else {
+            for (int i=0; i<jointMatrices.length; i++) {
+                System.out.println("transformMatrices[" + i + "] " + Mat4f.toString(transformMatrices[i]));
+            }
+        }
+    }
+    
+    
+    
+    /**
+     * Sets a reference to the specified matrices, to be used as inverse bind matrices
+     * for the calculateMatrices calls later on.
+     */
+    public void setInverseBindMatrices(float[][] matrices) {
+        this.inverseBindMatrices = matrices;
+    }
+   
+    
+    private void allocateJointMatrices() {
+        if ( invalidMatrices) {    
+            //System.out.println("allocateJointMatrices");
+           jointMatrices = new float[joints.size()][];
+           jointMatricesBuffer = new float[joints.size()][];
+           //inverseBindMatrices = new float[jointSids.size()][];
+           transformMatrices = new float[joints.size()][];
+           // inverseBindMatrices are not allocated here.
+           int index = 0;
+           for (VJoint vj : joints) {
+               if (vj != null) {
+                   jointMatrices[index] = vj.getGlobalMatrix();
+                   jointMatricesBuffer[index] = Mat4f.getMat4f();
+                   transformMatrices[index] = Mat4f.getMat4f();
+               } else {
+                   System.out.println("Skeleton.getTransformMatrices: no VJoint found for sid=\"" + jointSids.get(index) + "\"");
+               }
+               index++;
            }
+           invalidMatrices = false;
        }
-   }
-   
-   /**
-    * Sets a reference to the specified matrices, to be used as inverse bind matrices
-    * for the calculateMatrices calls later on.
-    */
-   public void setInverseBindMatrices(float[][] matrices) {
-       this.inverseBindMatrices = matrices;
-   }
-   
+    }
+    
    /**
     * Returns a reference to the array of transform matrices, 
     * including one float matrix for every joint, 
@@ -329,23 +426,7 @@ public class Skeleton
     * by calling calculateMatrices.
     */
    public float[][] getTransformMatricesRef() {    
-       if ( invalidMatrices) {            
-           jointMatrices = new float[joints.size()][];
-           //inverseBindMatrices = new float[jointSids.size()][];
-           transformMatrices = new float[joints.size()][];
-           // inverseBindMatrices are not allocated here.
-           int index = 0;
-           for (VJoint vj : joints) {
-               if (vj != null) {
-                   jointMatrices[index] = vj.getGlobalMatrix();
-                   transformMatrices[index] = Mat4f.getMat4f();
-               } else {
-                   System.out.println("Skeleton.getTransformMatrices: no VJoint found for sid=\"" + jointSids.get(index) + "\"");
-               }
-               index++;
-           }
-           invalidMatrices = false;
-       }
+       allocateJointMatrices();
        return transformMatrices;     
    }
    
@@ -355,7 +436,9 @@ public class Skeleton
    public VJoint getVJoint(String sid) {
        for (VJoint rt : roots) {
            VJoint result = getVJoint(rt, sid);
-           if (result != null) return result;
+           if (result != null) {
+               return result;
+           }
        }
        return null;
    }
@@ -372,7 +455,9 @@ public class Skeleton
        } else {
            for (VJoint child : vj.getChildren()) {
                VJoint result = getVJoint(child, sid);
-               if (result != null) return result;
+               if (result != null) {
+                   return result;
+               }
            }
        }    
        return null;

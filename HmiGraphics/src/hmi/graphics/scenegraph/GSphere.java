@@ -76,7 +76,7 @@ public class GSphere extends GMesh
                 ctheta = (float) Math.cos(theta);
             }
             t = (float) (i * dt);
-            hmi.util.Console.println("========================\ni=" + i + "  stheta = " + stheta + "  ctheta=" + ctheta);
+            //hmi.util.Console.println("========================\ni=" + i + "  stheta = " + stheta + "  ctheta=" + ctheta);
             for (int j = 0; j <= numSlices; j++)
             {
                 if (j == 0 || j == numSlices)
@@ -90,12 +90,12 @@ public class GSphere extends GMesh
                     sphi = (float) Math.sin(phi);
                     cphi = (float) Math.cos(phi);
                 }
-                hmi.util.Console.println("j=" + j + "  sphi = " + sphi + "  cphi=" + cphi);
+                //hmi.util.Console.println("j=" + j + "  sphi = " + sphi + "  cphi=" + cphi);
                 x = -sphi * stheta;
                 y = ctheta;
                 z = -cphi * stheta;
                 s = (float) (j * ds);
-                hmi.util.Console.println("x=" + x + "  y = " + y + " z= " + z);
+                //hmi.util.Console.println("x=" + x + "  y = " + y + " z= " + z);
                 vertexData[VEC3SIZE * vc] = radius * x;
                 vertexData[VEC3SIZE * vc + 1] = radius * y;
                 vertexData[VEC3SIZE * vc + 2] = radius * z;
@@ -129,8 +129,10 @@ public class GSphere extends GMesh
         }
         for (int i = 0; i < nrOfVertices; i++)
         {
+            /*
             hmi.util.Console.println("vertex " + i + " = (" + vertexData[VEC3SIZE * i] + ", " + vertexData[VEC3SIZE * i + 1] + ", "
                     + vertexData[VEC3SIZE * i + 2] + ")");
+                    */
         }
         setVertexData("mcPosition", VEC3SIZE, vertexData);
         setVertexData("mcNormal", VEC3SIZE, normalData);

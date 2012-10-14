@@ -21,19 +21,15 @@
 
 package hmi.animation;
 
-import hmi.math.Quat4f;
-import hmi.math.Vec3f;
-
-import hmi.util.Resources;
-import hmi.xml.XMLFormatting;
 import hmi.xml.XMLStructureAdapter;
-import hmi.xml.XMLTokenizer;
 
-import java.io.*;
-import java.io.Reader;
-import java.util.*;
-import java.util.HashMap;
-import java.util.Set;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

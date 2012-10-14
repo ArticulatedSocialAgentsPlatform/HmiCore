@@ -1,6 +1,6 @@
 <ivy-module version="2.0">
    <info organisation="HMI" module="HmiFaceAnimationTest"/>
    <dependencies >
-      <dependency org="junit" name="junit"  rev="latest.release" />
+      <dependency org="junit" name="junit-dep"  rev="latest.release" />
    </dependencies>
 </ivy-module>

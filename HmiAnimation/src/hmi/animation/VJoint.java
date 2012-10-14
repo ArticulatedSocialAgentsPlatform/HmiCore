@@ -25,10 +25,8 @@ import hmi.math.Mat4f;
 import hmi.math.Quat4f;
 import hmi.math.Vec3f;
 import hmi.util.Diff;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +111,7 @@ public class VJoint implements VObject
     
     public VJoint(String id, String sid, int capacity)
     {
-        children = new ArrayList<VJoint>(capacity);
+        children = new ArrayList<>(capacity);
         setSid(sid);
         setId(id);
     }
@@ -122,26 +120,31 @@ public class VJoint implements VObject
     public String showLocalDiff(String msg, Object vjointObj)
     {
         VJoint vj = (VJoint) vjointObj;
-        if (vj == null)
+        if (vj == null) {
             return "VJoint " + id + ", diff: null VJoint";
+        }
 
         String diff = Diff.showDiff("VJoint, id", id, vj.id);
-        if (diff != "")
+        if (!"".equals(diff)) {
             return diff;
+        }
         diff = Diff.showDiff("VJoint, sid", sid, vj.sid);
-        if (diff != "")
+        if (!"".equals(diff)) {
             return diff;
+        }
         diff = Diff.showDiff("VJoint, name", name, vj.name);
-        if (diff != "")
+        if (!"".equals(diff)) {
             return diff;
+        }
 
         float[] matrix1 = getLocalMatrix();
         float[] matrix2 = vj.getLocalMatrix();
         if (!Mat4f.epsilonEquals(matrix1, matrix2, 0.001f))
         {
             diff = Diff.showDiff("GNode " + id + ", diff Transform matrices", matrix1, matrix2);
-            if (diff != "")
+            if (!"".equals(diff)) {
                 return diff;
+            }
         }
 
         return "";
@@ -150,7 +153,8 @@ public class VJoint implements VObject
     /**
      * Sets the id for this VJoint.
      */
-    public void setId(String id)
+    @Override
+    public final void setId(String id)
     {
         this.id = (id == null) ? null : id.intern();
     }
@@ -158,7 +162,8 @@ public class VJoint implements VObject
     /**
      * Sets the sid for this VJoint.
      */
-    public void setSid(String sid)
+    @Override
+    public final void setSid(String sid)
     {
         this.sid = (sid == null) ? null : sid.intern();
     }
@@ -166,6 +171,7 @@ public class VJoint implements VObject
     /**
      * Sets the name for this VJoint.
      */
+    @Override
     public void setName(String name)
     {
         this.name = (name == null) ? null : name.intern();
@@ -174,6 +180,7 @@ public class VJoint implements VObject
     /**
      * Returns an interned String that specifies the id.
      */
+    @Override
     public String getId()
     {
         return id;
@@ -182,6 +189,7 @@ public class VJoint implements VObject
     /**
      * Returns an interned String that specifies the sid.
      */
+    @Override
     public String getSid()
     {
         return sid;
@@ -190,6 +198,7 @@ public class VJoint implements VObject
     /**
      * Returns an interned String that specifies the name.
      */
+    @Override
     public String getName()
     {
         return name;
@@ -298,8 +307,9 @@ public class VJoint implements VObject
      */
     public VJoint getPart(String partIdent)
     {
-        if (partIdent == null)
+        if (partIdent == null) {
             return null;
+        }
         return searchPart(partIdent.intern());
     }
 
@@ -307,13 +317,15 @@ public class VJoint implements VObject
     @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "ES_COMPARING_PARAMETER_STRING_WITH_EQ", justification = "String is interned")
     private VJoint searchPart(String searchId)
     {
-        if (searchId == this.id || searchId == this.sid || searchId == this.name)
+        if (searchId == this.id || searchId == this.sid || searchId == this.name) {
             return this;
+        }
         for (VJoint vchild : children)
         {
             VJoint childPart = vchild.searchPart(searchId);
-            if (childPart != null)
+            if (childPart != null) {
                 return childPart;
+            }
         }
         return null;
     }
@@ -323,8 +335,9 @@ public class VJoint implements VObject
      */
     public VJoint getPartById(String partId)
     {
-        if (partId == null)
+        if (partId == null) {
             return null;
+        }
         return searchPartById(partId.intern());
     }
 
@@ -332,13 +345,15 @@ public class VJoint implements VObject
     @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "ES_COMPARING_PARAMETER_STRING_WITH_EQ", justification = "String is interned")
     private VJoint searchPartById(String searchId)
     {
-        if (searchId == this.id)
+        if (searchId == this.id) {
             return this;
+        }
         for (VJoint vchild : children)
         {
             VJoint childPart = vchild.searchPartById(searchId);
-            if (childPart != null)
+            if (childPart != null) {
                 return childPart;
+            }
         }
         return null;
     }
@@ -348,8 +363,9 @@ public class VJoint implements VObject
      */
     public VJoint getPartBySid(String partSid)
     {
-        if (partSid == null)
+        if (partSid == null) {
             return null;
+        }
         return searchPartBySid(partSid.intern());
 
     }
@@ -358,18 +374,21 @@ public class VJoint implements VObject
     @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "ES_COMPARING_PARAMETER_STRING_WITH_EQ", justification = "String is interned")
     private VJoint searchPartBySid(String searchSid)
     {
-        if (this.sid == searchSid)
+        if (this.sid == searchSid) {
             return this;
+        }
         for (VJoint vchild : children)
         {
-            if (vchild.sid == searchSid)
+            if (vchild.sid == searchSid) {
                 return vchild;
+            }
         }
         for (VJoint vchild : children)
         {
             VJoint childPart = vchild.searchPartBySid(searchSid);
-            if (childPart != null)
+            if (childPart != null) {
                 return childPart;
+            }
         }
         return null;
     }
@@ -382,7 +401,7 @@ public class VJoint implements VObject
      */
     public List<VJoint> getPartsByIds(List<String> idList) 
     {
-        ArrayList<VJoint> result = new ArrayList<VJoint>(idList.size());
+        ArrayList<VJoint> result = new ArrayList<>(idList.size());
         for (String s : idList) 
         {
            VJoint jnt = getPartById(s);
@@ -400,7 +419,7 @@ public class VJoint implements VObject
      */
     public List<VJoint> getPartsBySids(List<String> sidList) 
     {
-        ArrayList<VJoint> result = new ArrayList<VJoint>(sidList.size());
+        ArrayList<VJoint> result = new ArrayList<>(sidList.size());
         for (String s : sidList) 
         {
            VJoint jnt = getPartBySid(s);
@@ -420,12 +439,16 @@ public class VJoint implements VObject
      */
     public List<VJoint> getParts(List<String> partIdentList) 
     {
-        if (partIdentList == null) return getParts(); // Return all reachable parts
-        ArrayList<VJoint> result = new ArrayList<VJoint>(partIdentList.size());
+        if (partIdentList == null) {
+            return getParts();
+        } // Return all reachable parts
+        ArrayList<VJoint> result = new ArrayList<>(partIdentList.size());
         for (String s : partIdentList) 
         {
            VJoint jnt = getPart(s);
-           if (jnt == null) logger.warn("VJoint.getParts, Could not find " + s);
+           if (jnt == null) {
+                logger.warn("VJoint.getParts, Could not find " + s);
+            }
            result.add(jnt);
         }
         return result;
@@ -451,8 +474,9 @@ public class VJoint implements VObject
 
     public List<VJoint> getParts(VObject.Predicate select, VObject.Predicate prune, ArrayList<VJoint> list)
     {
-        if (select == null || select.valid(this))
+        if (select == null || select.valid(this)) {
             list.add(this);
+        }
         if (prune == null || !prune.valid(this))
         {
             for (VJoint vchild : children)
@@ -740,8 +764,8 @@ public class VJoint implements VObject
         else
         {
             Quat4f.set(qw, q);
-            VJoint parent = getParent();
-            parent.getPathRotation(rootJoint, qp);
+            VJoint par = getParent();
+            par.getPathRotation(rootJoint, qp);
             Quat4f.inverse(qp);
             Quat4f.mul(q2, qp, qw);
             setRotation(q2);
@@ -986,8 +1010,9 @@ public class VJoint implements VObject
 
     public void scale(float sx, float sy, float sz)
     {
-        if (sx == 1.0f && sy == 1.0f && sz == 1.0f)
+        if (sx == 1.0f && sy == 1.0f && sz == 1.0f) {
             return;
+        }
         switch (scalingType)
         {
         case IDENTITY:
@@ -1142,16 +1167,18 @@ public class VJoint implements VObject
         }
 
         // if affine, decompose it into rotation, translation, scaling
-        if (scaleMatrix == null)
+        if (scaleMatrix == null) {
             scaleMatrix = new float[9];
+        }
         Mat4f.decomposeToTRSMat3f(localMatrix, translation, rotation, scaleMatrix);
         float epsilon = 0.0001f; // determines smoothing for the scaling
         Mat3f.smooth(scaleMatrix, epsilon);
         scalingType = Mat3f.getScalingType(scaleMatrix);
         if (scalingType != Mat3f.ScalingType.SKEW)
         {
-            if (scaleVec == null)
+            if (scaleVec == null) {
                 scaleVec = new float[3];
+            }
             Mat3f.getDiagonal(scaleMatrix, scaleVec);
             scaleMatrix = null; // dispose scaleMatrix if not needed.
         }
@@ -1267,8 +1294,9 @@ public class VJoint implements VObject
      */
     public void pathTransform(VJoint rootJoint, float[] pt)
     {
-        if (rootJoint == this)
-            return; // identity transform on pt.
+        if (rootJoint == this) {
+            return;
+        } // identity transform on pt.
         Mat4f.transformPoint(getLocalMatrix(), pt);
         if (parent != null)
         {
@@ -1279,10 +1307,6 @@ public class VJoint implements VObject
             if (rootJoint != null)
             {
                 throw new IllegalArgumentException("Root joint not found " + rootJoint.sid);
-            }
-            else
-            {
-                return;
             }
         }
     }
@@ -1314,7 +1338,7 @@ public class VJoint implements VObject
      */
     public List<VJoint> getPath(VJoint target)
     {
-        List<VJoint> path = new ArrayList<VJoint>();
+        List<VJoint> path = new ArrayList<>();
         getPath(target, path);
         path.add(this);
         return path;
@@ -1333,8 +1357,9 @@ public class VJoint implements VObject
         else if (parent != null)
         {
             parent.getPathRotation(rootJoint, quat);
-            if (rotation[Quat4f.s] < 1.0)
-                Quat4f.mul(quat, rotation); // avoid multiplication if local
+            if (rotation[Quat4f.s] < 1.0) {
+                Quat4f.mul(quat, rotation);
+            } // avoid multiplication if local
                                             // rotation is Id transform.
         }
         else
@@ -1374,8 +1399,9 @@ public class VJoint implements VObject
      */
     public float[] getPosition(float[] positionVec)
     {
-        if (positionVec == null)
+        if (positionVec == null) {
             positionVec = new float[3];
+        }
         Vec3f.set(positionVec, 0f, 0f, 0f);
         pathTransform(null, positionVec);
         return positionVec;
@@ -1501,8 +1527,9 @@ public class VJoint implements VObject
     private void newLine(StringBuilder buf, int tab)
     {
         buf.append('\n');
-        for (int i = 0; i < tab; i++)
+        for (int i = 0; i < tab; i++) {
             buf.append(' ');
+        }
     }
 
 
@@ -1515,16 +1542,22 @@ public class VJoint implements VObject
        buf.append("\"  name=\"");
        buf.append(idts(name));
        buf.append("\"]\n");
-       for (int i=0; i<tab; i++) buf.append(' ');
+       for (int i=0; i<tab; i++) {
+            buf.append(' ');
+        }
        buf.append("translation=");
        buf.append(Vec3f.toString(translation));
        buf.append('\n');
-       for (int i=0; i<tab; i++) buf.append(' ');
+       for (int i=0; i<tab; i++) {
+            buf.append(' ');
+        }
        buf.append("rotation=");
        buf.append(Quat4f.toString(rotation));
        if (scaleVec != null) {
           buf.append('\n');
-          for (int i=0; i<tab; i++) buf.append(' ');
+          for (int i=0; i<tab; i++) {
+               buf.append(' ');
+           }
           buf.append("scalevec=");
           buf.append(Vec3f.toString(scaleVec));
           
@@ -1564,16 +1597,16 @@ public class VJoint implements VObject
         
         newLine(buf, tab);
         buf.append("VJoint[");
-        buf.append("  id=\"" + idts(id));
-        buf.append("\"  sid=\"" + idts(sid));
-        buf.append("\"  name=\"" + idts(name));
+        buf.append("  id=\"").append(idts(id));
+        buf.append("\"  sid=\"").append(idts(sid));
+        buf.append("\"  name=\"").append(idts(name));
         buf.append('\"');
         if (detail >= 1)
         {
             newLine(buf, tab);
-            buf.append("translation=" + Vec3f.toString(translation));
+            buf.append("translation=").append(Vec3f.toString(translation));
             newLine(buf, tab);
-            buf.append("rotation=" + Quat4f.toString(rotation));
+            buf.append("rotation=").append(Quat4f.toString(rotation));
             newLine(buf, tab);
             buf.append((scaleVec == null ? "no scaling" : "scaleVec=" + Vec3f.toString(scaleVec)));
             // newLine(buf, tab);
@@ -1583,9 +1616,9 @@ public class VJoint implements VObject
         if (detail >= 2)
         {
             newLine(buf, tab);
-            buf.append("localMatrix=" + Mat4f.toString(localMatrix, tab));
+            buf.append("localMatrix=").append(Mat4f.toString(localMatrix, tab));
             newLine(buf, tab);
-            buf.append("globalMatrix=" + Mat4f.toString(globalMatrix, tab));
+            buf.append("globalMatrix=").append(Mat4f.toString(globalMatrix, tab));
             newLine(buf, tab);
             buf.append(" validLocalMatrix=");
             buf.append(validLocalMatrix);

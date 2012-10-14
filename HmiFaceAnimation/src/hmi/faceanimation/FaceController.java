@@ -18,9 +18,6 @@
  ******************************************************************************/
 package hmi.faceanimation;
 
-import hmi.faceanimation.model.MPEG4Configuration;
-
-import java.util.Collection;
 
 /**
  * The FaceController is the access point for deforming the face of an avatar,
@@ -45,31 +42,6 @@ import java.util.Collection;
  * 
  * Note: to actually display the face configuration, you need to call copy()
  */
-public interface FaceController
+public interface FaceController extends MorphFaceController, MPEG4FaceController
 {
-
-    /**
-     * Directly set a FAP configuration on the face. FAPs that are assigned NULL
-     * values will not be modified at all. All other FAPs will be completely
-     * overwritten with the new configuration, i.e., no blending is done.
-     */
-    void setMPEG4Configuration(MPEG4Configuration config);
-
-    void addMPEG4Configuration(MPEG4Configuration config);
-
-    void removeMPEG4Configuration(MPEG4Configuration config);
-
-    void setMorphTargets(String[] targetNames, float[] weights);
-    
-    void addMorphTargets(String[] targetNames, float[] weights);
-
-    void removeMorphTargets(String[] targetNames, float[] weights);
-
-    Collection<String> getPossibleFaceMorphTargetNames();
-
-    /**
-     * Do actually apply the current configs and morphs to the face, including
-     * the joint rotations for eye, neck, jaw
-     */
-    void copy();
 }

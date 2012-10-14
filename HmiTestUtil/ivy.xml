@@ -5,7 +5,7 @@
       <dependency org="HMI"   name="HmiAnimation"     rev="latest.${resolve.status}"  />   
       <dependency org="HMI"   name="HmiTTS"           rev="latest.${resolve.status}"  />
       <dependency org="HMI"   name="HmiMath"          rev="latest.${resolve.status}"  />
-      <dependency org="junit" name="junit"            rev="latest.release" />      
+      <dependency org="junit" name="junit-dep"            rev="latest.release" />      
       <dependency org="custommonkey" name="xmlunit"   rev="latest.release" />      
       <dependency org="hamcrest" name="hamcrest-all"  rev="latest.release"  />      
       <dependency org="fest" name="fest-reflect"  rev="latest.release" />

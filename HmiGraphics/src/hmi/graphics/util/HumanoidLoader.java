@@ -83,13 +83,18 @@ public final class HumanoidLoader
     }
     
 
+    public HumanoidLoader(String id, String resourceDir, String fileName, String postProcessing) throws IOException
+    {
+        this(id, resourceDir, fileName, postProcessing,true);
+    }
+    
     /**
      * Load a scene file, either .dae or .bin format
      * postProcessing can be "ARMANDIA", "BLUEGUY", or ""/null/"NONE"
      */
-    public HumanoidLoader(String id, String resourceDir, String fileName, String postProcessing) throws IOException
+    public HumanoidLoader(String id, String resourceDir, String fileName, String postProcessing, boolean adjustBindPoses) throws IOException
     {
-        gscene = SceneIO.readGScene(resourceDir, fileName, postProcessing);
+        gscene = SceneIO.readGScene(resourceDir, fileName, postProcessing, adjustBindPoses);
         glScene = ScenegraphTranslator.fromGSceneToGLScene(gscene);
         avatarAnimationRootJoint = glScene.getVJoint(Hanim.HumanoidRoot); 
         renameRoot(id);

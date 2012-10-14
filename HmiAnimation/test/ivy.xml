@@ -4,6 +4,6 @@
       <dependency org="HMI"     name="HmiTestUtil"   transitive="false" rev="latest.release"  />
       <dependency org="hamcrest" name="hamcrest-all"       rev="latest.release"  />
       <dependency org="google" name="guava"       rev="latest.release"  />
-      <dependency org="junit" name="junit"    rev="latest.release"  />             
+      <dependency org="junit" name="junit-dep"    rev="latest.release"  />             
    </dependencies>
 </ivy-module>

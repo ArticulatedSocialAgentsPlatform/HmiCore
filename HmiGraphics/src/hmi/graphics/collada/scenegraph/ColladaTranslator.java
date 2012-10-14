@@ -66,13 +66,18 @@ public final class ColladaTranslator
     // return colladaToGScene(collada, renamingList, scale, true);
     // }
 
+    public static GScene colladaToGSkinnedMeshScene(Collada collada)
+    {
+        return colladaToGSkinnedMeshScene(collada, true);
+    }
+    
     /**
      * Translates a complete Collada document into a GScene, supposed to define a GSkinnedMesh.
      * It contains the scene graph defined by the Collada scene element, possibly with multiple roots.
      * The renamingList String, if not null, specifies a joint renaming in the form of a number of String pairs: a regular jointname pattern,
      * followed by the replacement, to be used for both joint name and joint sid.
      */
-    public static GScene colladaToGSkinnedMeshScene(Collada collada)
+    public static GScene colladaToGSkinnedMeshScene(Collada collada, boolean adjustBindPoses)
     {
         Scene scene = collada.getScene();
         if (scene == null)
@@ -111,7 +116,10 @@ public final class ColladaTranslator
         float scale = collada.getAsset().getUnitMeter();
         if (scale != 1.0f) gscene.scale(scale);
 
-        gscene.adjustBindPoses();
+        if(adjustBindPoses)
+        {
+            gscene.adjustBindPoses();
+        }
 
         String renamingList = collada.getRenamingList();
         if (renamingList != null)
