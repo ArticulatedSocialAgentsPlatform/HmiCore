@@ -464,6 +464,15 @@ public class Skeleton implements ExchangeBuffer
    }
 
 
+   private void initializeBindMatricesToIdentity()
+   {
+       inverseBindMatrices = new float[joints.size()][];
+       for(int i=0;i<joints.size();i++)
+       {
+           inverseBindMatrices[i] = Mat4f.getMat4f();
+           Mat4f.setIdentity(inverseBindMatrices[i]);
+       }
+   }
    
    /**
     * Defines the current pose to be the "neutral" pose, assumed when all
@@ -485,6 +494,11 @@ public class Skeleton implements ExchangeBuffer
            
 //       float[] localTranslation = Vec3f.getVec3f();
 //       float[] rotations = Mat4f.getMat4f();
+       
+       if(inverseBindMatrices==null)
+       {
+           initializeBindMatricesToIdentity();
+       }
        
        for (int i=0; i<joints.size(); i++) {
                

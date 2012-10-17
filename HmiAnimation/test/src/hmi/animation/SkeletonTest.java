@@ -4,7 +4,9 @@
 
 package hmi.animation;
 
+import static hmi.testutil.math.Quat4fTestUtil.assertQuat4fEquals;
 import static org.junit.Assert.assertTrue;
+import hmi.math.Quat4f;
 import hmi.xml.XMLTokenizer;
 
 import java.io.IOException;
@@ -30,6 +32,7 @@ public class SkeletonTest {
     List<String> sidsInorder;
     List<String> sidsSubset;
     List<String> sidsOutOfOrder;
+    private static final float PRECISION = 0.0001f;
    
     public Skeleton createSkeleton(String id)
     {
@@ -158,6 +161,26 @@ public class SkeletonTest {
  
         
     } 
+    
+    private void assertIdentityRotation(VJoint vj)
+    {
+        float q[]=Quat4f.getQuat4f();
+        vj.getRotation(q);
+        assertQuat4fEquals(Quat4f.getIdentity(),q, PRECISION);
+    }
+    
+    @Test
+    public void testSetNeutralPose()
+    {
+        Skeleton skel = new Skeleton("",vj0);
+        skel.setNeutralPose();
+        assertIdentityRotation(vj0);
+        assertIdentityRotation(vj00);
+        assertIdentityRotation(vj01);
+        assertIdentityRotation(vj010);
+        assertIdentityRotation(vj012);
+        assertIdentityRotation(vj0110);        
+    }
 
   
     @Test
