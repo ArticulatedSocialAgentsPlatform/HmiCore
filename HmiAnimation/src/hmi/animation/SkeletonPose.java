@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author welberge
  */
-public class SkeletonPose extends XMLStructureAdapter implements Ident
+public class SkeletonPose extends XMLStructureAdapter// implements Ident
 {
     private static final String[] empty_PartIds = new String[0];
     private String[] partIds = empty_PartIds;

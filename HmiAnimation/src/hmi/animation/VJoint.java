@@ -827,6 +827,29 @@ public class VJoint implements VObject
     }
 
     /**
+     * returns an array with references to the rotation buffers for
+     * the specified parts. 
+     * The returned array will have the same length as the partSids array.  
+     * Parts are located with this VJoint considered a &quot;root&quot;.
+     * If certain specified parts could not be located, the result will contain null elements.
+     * The parts should preferably be specified by means of their sid, 
+     * but id or name will also work.
+     */
+    public float[][] getRotationBuffers(String[] partIdents) {
+        if (partIdents == null) {
+            return null;
+        }
+        float[][] result = new float[partIdents.length][];
+        for (int i=0; i<partIdents.length; i++) {
+            VJoint part = getPart(partIdents[i]);
+            if (part != null) {
+                result[i] = part.getRotationBuffer();
+            }
+        }     
+        return result;
+    }
+    
+    /**
      * Returns the current rotation buffer, in the form of a float array of length four. The buffer contains a rotation quaternion, used to calculate
      * the rotation matrix for this VJoint. The order of the quaternion elements is (s, x, y, z), where s is the scalar part, and x, y, z are the
      * imaginary parts.
