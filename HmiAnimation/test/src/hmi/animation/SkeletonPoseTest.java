@@ -1,17 +1,28 @@
 package hmi.animation;
 
 import static hmi.testutil.math.Quat4fTestUtil.assertQuat4fRotationEquivalent;
-import static org.junit.Assert.*;
-
-import java.io.*;
-
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import hmi.math.Quat4f;
 import hmi.testutil.animation.HanimBody;
 import hmi.xml.XMLTokenizer;
 
-import org.junit.Test;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Before;
-import java.util.*;
+import org.junit.Test;
 
 /**
  * SkeletonPose unit tests
@@ -159,6 +170,20 @@ public class SkeletonPoseTest
         {
             assertEquals(expected[i], config2[i], PARAMETER_PRECISION);
         }
+    }
+    
+    @Test
+    public void testReadXML() throws IOException
+    {
+        String str = "<SkeletonPose id=\"pose1\" rotationEncoding=\"quaternions\" parts=\"HumanoidRoot r_shoulder l_shoulder\" encoding=\"T1R\">"
+                + "0 1 0 1 0 0 0 0 1 0 0 0 0 1 0\n"
+                + "</SkeletonPose>";
+        SkeletonPose ski = new SkeletonPose(new XMLTokenizer(str));
+        assertEquals("pose1", ski.getId());
+        assertEquals("quaternions", ski.getRotationEncoding());
+        assertThat(new float[]{0,1,0,1,0,0,0,0,1,0,0,0,0,1,0}, equalTo(ski.getConfig()));
+        assertThat(new String[]{"HumanoidRoot","r_shoulder","l_shoulder"}, equalTo(ski.getPartIds()));
+        assertEquals("T1R", ski.getConfigType());
     }
 
     @Test

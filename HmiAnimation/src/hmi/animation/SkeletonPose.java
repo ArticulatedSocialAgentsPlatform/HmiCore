@@ -19,7 +19,6 @@
 package hmi.animation;
 
 import hmi.math.Quat4f;
-import hmi.util.Ident;
 import hmi.xml.XMLFormatting;
 import hmi.xml.XMLStructureAdapter;
 import hmi.xml.XMLTokenizer;
@@ -564,6 +563,7 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
     @Override
     public void decodeAttributes(HashMap<String, String> attrMap, XMLTokenizer tokenizer)
     {
+        id = getOptionalAttribute("id", attrMap, id);
         String parts = getRequiredAttribute("parts", attrMap, tokenizer);
         partIds = decodeStringArray(parts);
         String encoding = getRequiredAttribute("encoding", attrMap, tokenizer);
