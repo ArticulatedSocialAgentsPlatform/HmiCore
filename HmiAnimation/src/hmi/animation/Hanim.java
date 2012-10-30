@@ -153,7 +153,16 @@ public final class Hanim
             r_index0, r_index1, r_index2, r_index3, r_middle0, r_middle1,
             r_middle2, r_middle3, r_ring0, r_ring1, r_ring2, r_ring3, r_pinky0,
             r_pinky1, r_pinky2, r_pinky3 };
-
+    public static final String[] RIGHTHAND_JOINTS = new String[]{r_thumb1, r_thumb2, r_thumb3,
+        r_index0, r_index1, r_index2, r_index3, r_middle0, r_middle1,
+        r_middle2, r_middle3, r_ring0, r_ring1, r_ring2, r_ring3, r_pinky0,
+        r_pinky1, r_pinky2, r_pinky3};
+    
+    public static final String[] LEFTHAND_JOINTS = new String[]{l_thumb1, l_thumb2, l_thumb3,
+        l_index0, l_index1, l_index2, l_index3, l_middle0, l_middle1,
+        l_middle2, l_middle3, l_ring0, l_ring1, l_ring2, l_ring3, l_pinky0,
+        l_pinky1, l_pinky2};
+    
     // HAnim Segments (incomplete
     public static final String sacrum = "sacrum";
     public static final String pelvis = "pelvis";
