@@ -5,6 +5,9 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
+
+import lombok.extern.slf4j.Slf4j;
+
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -15,6 +18,7 @@ import com.google.common.collect.ImmutableSet;
  * </p>
  * @author welberge
  */
+@Slf4j
 public class FindClass
 {
     private List<String> locations = new ArrayList<String>();
@@ -64,32 +68,22 @@ public class FindClass
         }
         return ImmutableSet.copyOf(matches);
     }
-    
-    /** 
+
+    /**
      * Iterate through locations looking for classes
-     * that have a certain package 
+     * that have a certain package
      */
     public ImmutableSet<Class<?>> findClasses(String packageName)
     {
-        this.selectedPackageName = packageName;        
+        this.selectedPackageName = packageName;
         ImmutableSet<Class<?>> allClasses = findClasses();
-        /*
-        List<Class<?>> classes = new ArrayList<Class<?>>();
-        for (Class<?> c:allClasses)
-        {
-            if(c.getPackage().getName().equals(packageName))
-            {
-                classes.add(c);
-            }
-        }
-        */
         return ImmutableSet.copyOf(allClasses);
     }
 
     /** Search for files in the path */
     private void searchFiles()
     {
-        String location;        
+        String location;
         Iterator<String> lit;
 
         lit = locations.iterator();
@@ -117,37 +111,43 @@ public class FindClass
     private void findInArchive(String archive)
     {
         ZipEntry ze;
+        JarFile jf;
+
+        // use a JarFile because it can also read zips
         try
         {
-            // use a JarFile because it can also read zips
-            JarFile jf = new JarFile(archive);
-            Enumeration<JarEntry> enu = jf.entries();
-            while (enu.hasMoreElements())
+            jf = new JarFile(archive);
+        }
+        catch (IOException e)
+        {
+            return;
+        }
+
+        Enumeration<JarEntry> enu = jf.entries();
+        while (enu.hasMoreElements())
+        {
+            ze = enu.nextElement();
+
+            if (ze.getName().endsWith("class"))
             {
-                ze = enu.nextElement();
-                
-                if (ze.getName().endsWith("class"))
+                String className = ze.getName();
+                className = className.substring(0, className.length() - 6);
+                className = className.replace('/', fileSep.charAt(0));
+                Class<?> c = transformToClass(className);
+
+                if (c != null)
                 {
-                    String className = ze.getName();
-                    className = className.substring(0, className.length()-6);
-                    className = className.replace('/',fileSep.charAt(0));
-                    Class<?> c = transformToClass(className);
-                    
-                    //System.out.println("Jar:"+className+" "+c);
-                    if(c!=null)
-                    {
-                        matches.add(c);
-                    }
-                }                                
+                    matches.add(c);
+                }
             }
         }
-        catch (FileNotFoundException fnex)
+        try
         {
-            
+            jf.close();
         }
-        catch (IOException ioex)
+        catch (IOException e)
         {
-            
+            log.warn("Cannot close jar ", e);
         }
     }
 
@@ -158,21 +158,21 @@ public class FindClass
         // packagename is determined by trying to recognize the longest
         // package-name postfix to the path.
         // String fileName = (String)o;
-        //System.out.println("Filename: " + fileName);
+        // System.out.println("Filename: " + fileName);
         String className = fileName.substring(fileName.lastIndexOf(fileSep) + 1);
-        //System.out.println("classname: " + className);
+        // System.out.println("classname: " + className);
         String packageName = fileName.substring(0, fileName.lastIndexOf(fileSep) + 1);
         packageName = packageName.replace(fileSep.charAt(0), '.');
         while (packageName.endsWith("."))
         {
             packageName = packageName.substring(0, packageName.length() - 1);
         }
-        
-        if(selectedPackageName!=null)
+
+        if (selectedPackageName != null)
         {
-            if(!packageName.equals(selectedPackageName))return null;
+            if (!packageName.equals(selectedPackageName)) return null;
         }
-        //System.out.println("Initial packagename: " + packageName);
+        // System.out.println("Initial packagename: " + packageName);
         Class<?> result = null;
         while (result == null)
         {
@@ -181,7 +181,7 @@ public class FindClass
             {
                 fullName = packageName + "." + fullName;
             }
-            //System.out.println("trying fullname: " + fullName);
+            // System.out.println("trying fullname: " + fullName);
             try
             {
                 result = Class.forName(fullName);
@@ -231,11 +231,12 @@ public class FindClass
         }
         return result;
     }
-    
+
     private void findInDirectory(String dir)
     {
         findInDirectory(dir, dir);
     }
+
     /**
      * See if the file exists in the specified directory
      * @param fileName name of the file to look for
@@ -247,7 +248,6 @@ public class FindClass
         File dirEntries[];
         File dirEntry;
         String name;
-        //System.out.println("findInDirectory "+baseDir);
         
         // check directory is valid
         if (!dirFile.exists())
@@ -275,7 +275,7 @@ public class FindClass
 
             if (recurse && dirEntry.isDirectory())
             {
-                findInDirectory(baseDir,dirEntry.getAbsolutePath());
+                findInDirectory(baseDir, dirEntry.getAbsolutePath());
             }
             else if (name.endsWith(JAR) || name.endsWith(ZIP))
             {
@@ -283,11 +283,11 @@ public class FindClass
             }
             else if (name.endsWith("class"))
             {
-                String className = dirEntry.getPath().substring(baseDir.length()+1);
-                className = className.substring(0, className.length()-6);
-                //System.out.println(className);
+                String className = dirEntry.getPath().substring(baseDir.length() + 1);
+                className = className.substring(0, className.length() - 6);
+                // System.out.println(className);
                 Class<?> c = transformToClass(className);
-                if(c!=null)
+                if (c != null)
                 {
                     matches.add(c);
                 }
@@ -394,14 +394,14 @@ public class FindClass
                 else if (arg.equalsIgnoreCase("-r"))
                 {
                     find.setRecurse(true);
-                }                
+                }
             }
         }
         catch (IndexOutOfBoundsException iex)
         {
             System.out.println("Invalid arguments");
             printHelp();
-        }  
+        }
 
         find.findClasses();
     }

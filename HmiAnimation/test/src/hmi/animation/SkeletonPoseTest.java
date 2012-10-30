@@ -326,4 +326,97 @@ public class SkeletonPoseTest
         rSh.getRotation(q);
         assertQuat4fRotationEquivalent(0, 1, 0, 0, q, 0.0001f);
     }
+    
+    @Test
+    public void testMirror() throws IOException
+    {
+        String str = "<SkeletonPose rotationEncoding=\"quaternions\" parts=\"r_shoulder\" encoding=\"R\">"
+                + "0 0 1 0 \n" + "</SkeletonPose>";
+        SkeletonPose ski = new SkeletonPose(new XMLTokenizer(str));
+        ski.readXML(str);
+        VJoint vHuman = HanimBody.getLOA1HanimBody();
+        ski.setTargets(vHuman.getParts().toArray(new VJoint[0]));
+        ski.mirror(vHuman);
+        ski.setToTarget();
+        
+        float q[] = Quat4f.getQuat4f();
+        vHuman.getPart(Hanim.r_shoulder).getRotation(q);
+        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, 0.0001f);
+
+        vHuman.getPart(Hanim.l_shoulder).getRotation(q);
+        assertQuat4fRotationEquivalent(0, 0, -1, 0, q, 0.0001f);
+    }
+    
+    @Test
+    public void testMirrorAfterFilter() throws IOException
+    {
+        String str = "<SkeletonPose rotationEncoding=\"quaternions\" parts=\"r_shoulder l_shoulder\" encoding=\"R\">"
+                + "0 0 1 0 0 0 1 0\n"
+                + "</SkeletonPose>";
+        SkeletonPose ski = new SkeletonPose(new XMLTokenizer(str));
+        VJoint vHuman = HanimBody.getLOA1HanimBody();
+        ski.setTargets(vHuman.getParts().toArray(new VJoint[0]));
+        Set<String> joints = new HashSet<String>();
+        joints.add("r_shoulder");
+        ski.filterJoints(joints);
+        assertEquals(1, ski.getPartIds().length);
+        assertEquals("r_shoulder", ski.getPartIds()[0]);
+
+        ski.mirror(vHuman);
+        ski.setToTarget();
+
+        float q[] = Quat4f.getQuat4f();
+        vHuman.getPart(Hanim.r_shoulder).getRotation(q);
+        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, 0.0001f);
+
+        vHuman.getPart(Hanim.l_shoulder).getRotation(q);
+        assertQuat4fRotationEquivalent(0, 0, -1, 0, q, 0.0001f);
+    }
+
+    @Test
+    public void testMirrorAfterFilterBeforeSetTarget() throws IOException
+    {
+        String str = "<SkeletonPose rotationEncoding=\"quaternions\" parts=\"r_shoulder l_shoulder\" encoding=\"R\">"
+                + "0 0 1 0 0 0 1 0\n"                
+                + "</SkeletonPose>";
+        SkeletonPose ski = new SkeletonPose(new XMLTokenizer(str));        
+        Set<String> joints = new HashSet<String>();
+        joints.add("r_shoulder");
+        ski.filterJoints(joints);
+        assertEquals(1, ski.getPartIds().length);
+        assertEquals("r_shoulder", ski.getPartIds()[0]);
+
+        ski.mirror(null);
+
+        VJoint vHuman = HanimBody.getLOA1HanimBody();
+        ski.setTargets(vHuman.getParts().toArray(new VJoint[0]));
+        ski.setToTarget();
+
+        float q[] = Quat4f.getQuat4f();
+        vHuman.getPart(Hanim.r_shoulder).getRotation(q);
+        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, 0.0001f);
+
+        vHuman.getPart(Hanim.l_shoulder).getRotation(q);
+        assertQuat4fRotationEquivalent(0, 0, -1, 0, q, 0.0001f);
+    }
+
+    @Test
+    public void testMirrorBeforeSetTarget() throws IOException
+    {
+        String str = "<SkeletonPose rotationEncoding=\"quaternions\" parts=\"r_shoulder\" encoding=\"R\">"
+                + "0 0 1 0 \n"+ "</SkeletonPose>";
+        SkeletonPose ski = new SkeletonPose(new XMLTokenizer(str));
+        ski.mirror(null);
+
+        VJoint vHuman = HanimBody.getLOA1HanimBody();
+        ski.setTargets(vHuman.getParts().toArray(new VJoint[0]));
+        ski.setToTarget();
+
+        float q[] = Quat4f.getQuat4f();
+        vHuman.getPart(Hanim.r_shoulder).getRotation(q);
+        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, 0.0001f);
+
+        vHuman.getPart(Hanim.l_shoulder).getRotation(q);
+        assertQuat4fRotationEquivalent(0, 0, -1, 0, q, 0.0001f);
+    }
 }

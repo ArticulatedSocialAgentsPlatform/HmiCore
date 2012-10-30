@@ -141,6 +141,82 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
         setConfig(config);
     }
 
+    private void mirrorParts(int i, VJoint root)
+    {
+        if (targetParts != null && targetParts.length > 0)
+        {
+            if (!targetParts[i].getSid().equals(partIds[i]))
+            {
+                for (int j = 0; j < targetParts.length; j++)
+                {
+                    if (targetParts[j].getSid().equals(partIds[i]))
+                    {
+                        VObject temp = targetParts[i];
+                        targetParts[i] = targetParts[j];
+                        targetParts[j] = temp;
+                        return;
+                    }
+                }
+                targetParts[i] = root.getPart(partIds[i]);
+            }
+        }
+    }
+
+    /**
+     * Mirrors all joint rotations on the XY plane, switches left/right partIds
+     */
+    public void mirror(VJoint root)
+    {
+        int index = 0;
+        if (hasRootTranslation) index += 3;
+        for (int i = 0; i < partIds.length; i++)
+        {
+            if (partIds[i].startsWith("l_"))
+            {
+                partIds[i] = partIds[i].replace("l_", "r_");
+                if(root!=null)
+                {
+                    mirrorParts(i, root);
+                }
+            }
+            else if (partIds[i].startsWith("r_"))
+            {
+                partIds[i] = partIds[i].replace("r_", "l_");
+                if(root!=null)
+                {
+                    mirrorParts(i, root);
+                }
+            }
+
+            if (hasTranslation)
+            {
+                index += 3;
+            }
+            if (hasRotation)
+            {
+                logger.debug("mirroring {}, index {}", partIds[i], index);
+
+                // configs.mirror(index);
+                float q[] = Quat4f.getQuat4f();
+                Quat4f.set(q, 0, config, index);
+                Quat4f.set(config, index, q[Quat4f.s], q[Quat4f.x], -q[Quat4f.y], -q[Quat4f.z]);
+                index += 4;
+            }
+            if (hasScale)
+            {
+                index += 3;
+            }
+            if (hasVelocity)
+            {
+                index += 3;
+            }
+            if (hasAngularVelocity)
+            {
+                index += 3;
+            }
+        }
+    }
+
     /**
      * Creates a new, unnamed, SkeletonPose for all parts reachable from the Skeleton root
      * 
@@ -365,8 +441,8 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
 
     private void filterTargetParts(Set<String> joints)
     {
-        ArrayList<VObject> newParts = new ArrayList<VObject>();        
-        int i=0;
+        ArrayList<VObject> newParts = new ArrayList<VObject>();
+        int i = 0;
         for (VObject vj : targetParts)
         {
             if (joints.contains(partIds[i]))
@@ -375,9 +451,9 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
             }
             i++;
         }
-        targetParts = newParts.toArray(new VObject[0]);        
+        targetParts = newParts.toArray(new VObject[0]);
     }
-    
+
     /**
      * Filter out all parts that are not in joints
      * @param jointIds
@@ -393,7 +469,7 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
             if (joints.contains(partIds[i]))
             {
                 newPartIds.add(partIds[i]);
-                configSize += getWidth(i);                
+                configSize += getWidth(i);
             }
             else if (i == 0)
             {
