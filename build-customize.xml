@@ -153,7 +153,7 @@
 
 
    <target name="docall" description="Generate integrated Javadoc for all HMI/* projects">     
-        <javadoc source="1.6" 
+        <javadoc source="1.7"
             destdir="${javadoc.dir}"
             Overview="javadoc-overview.html" 
             doctitle="API Documentation for HMI Core packages"
