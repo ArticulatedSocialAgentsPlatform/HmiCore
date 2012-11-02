@@ -20,14 +20,14 @@
 package hmi.math;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 
 
 public class Bezier1f { //implements Evaluator1f1f {
 
-    private Logger logger = LoggerFactory.getLogger(Bezier1f.class.getName());
+    //private Logger logger = LoggerFactory.getLogger(Bezier1f.class.getName());
     /** A Bezier curve is specified by 3n+1 points, alternatiing interpolated points P and (non-interpolated)
     * control points C, like: P C C P C C P C C P
     * Internally we complement this by an extra conrol point at the begin and the end of this seqiuence: C P C C P C C P C C P C
@@ -167,7 +167,7 @@ public class Bezier1f { //implements Evaluator1f1f {
          xmid = eval(umid);
          udiff = Math.abs(uhigh - ulow);
       }
-      logger.debug("evalInverse {} = {}",x,umid);
+      //logger.debug("evalInverse {} = {}",x,umid);
       return umid ;
    }
    
