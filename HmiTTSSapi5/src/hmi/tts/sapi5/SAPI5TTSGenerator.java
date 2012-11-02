@@ -58,6 +58,8 @@ public class SAPI5TTSGenerator extends AbstractTTSGenerator
 
     private native String[] SAPIGetVoices();
 
+    private String speaker;
+    
     @GuardedBy("this")
     private boolean initialized;
 
@@ -183,6 +185,11 @@ public class SAPI5TTSGenerator extends AbstractTTSGenerator
         return getAndClearTimingInfo();
     }
 
+    public synchronized String getVoice()
+    {
+        return speaker;
+    }
+    
     @Override
     public synchronized void setVoice(final String speaker)
     {
@@ -198,6 +205,7 @@ public class SAPI5TTSGenerator extends AbstractTTSGenerator
                 return SAPISetSpeaker(speaker);
             }
         });
+        this.speaker = speaker;
     }
 
     @Override

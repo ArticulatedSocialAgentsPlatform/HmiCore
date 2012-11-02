@@ -410,6 +410,11 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
             }
         }
     }
+    
+    public synchronized String getVoice()
+    {
+        return voice.getName();
+    }
 
     @Override
     public synchronized String[] getVoices()

@@ -120,6 +120,12 @@ public abstract class AbstractTTSGenerator
      *            speaker name
      */
     public abstract void setVoice(String speaker);
+    
+    /**
+     * Get the current speaker
+     * @return
+     */
+    public abstract String getVoice();
 
     /**
      * Get the timing of a BML speech behavior
