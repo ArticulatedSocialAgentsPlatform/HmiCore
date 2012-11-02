@@ -1,11 +1,10 @@
 package hmi.util;
 
 import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 /**
- * Unit tests for the circularbuffer
+ * Unit tests for the circularBuffer
  * @author hvanwelbergen
  *
  */
@@ -14,7 +13,7 @@ public class CircularBufferTest
     @Test
     public void testAdd()
     {
-        CircularBuffer<Integer> b = new CircularBuffer<Integer>(2);
+        CircularBuffer<Integer> b = new CircularBuffer<>(2);
         b.add(1);
         b.add(2);
         assertEquals(1,(int)b.get(0));
