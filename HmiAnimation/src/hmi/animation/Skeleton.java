@@ -2,7 +2,7 @@ package hmi.animation;
 
 import hmi.math.Mat4f;
 import hmi.math.Vec3f;
-import hmi.util.ExchangeBuffer;
+//import hmi.util.ExchangeBuffer;
 import hmi.xml.XMLTokenizer;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * in a safe way. Afterwards, the render Thread can freely use the transform matrices,
  * without locking. 
  */
-public class Skeleton implements ExchangeBuffer
+public class Skeleton// implements ExchangeBuffer
 {
    private String id;          // id of the Skeleton as a whole. null or an interned String
    private ArrayList<VJoint> roots = new ArrayList<>();
@@ -286,7 +286,7 @@ public class Skeleton implements ExchangeBuffer
      * Implements the writeBuffer op from the ExchangeBuffer interface. 
      * This implementation is not Thread-safe.
      */
-    @Override
+//    @Override
     public void putData() {
         //System.out.println("Skeleton.writeBuffer jointMatrices.length= " + jointMatrices.length);
         if (updateOnWriteMatrices) {
@@ -305,7 +305,7 @@ public class Skeleton implements ExchangeBuffer
      * Implements the readBuffer op from the ExchangeBuffer interface. 
      * This implementation is not Thread-safe.
      */
-    @Override
+//    @Override
     public void getData() {
         //System.out.println("Skeleton.readBuffer");
        updateTransformMatrices();
