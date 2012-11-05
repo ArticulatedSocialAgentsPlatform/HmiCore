@@ -10,9 +10,25 @@ gl_Vertex            mcPosition               (note: mc denotes "model coordinat
 gl_Normal            mcNormal
 gl_Color             color
 gl_SecondaryColor    secondaryColor
-gl_MultiTexCoordn    texCoordn              (n = 0, 1, 2, ....)
+gl_MultiTexCoordn    texCoordn              (n = 0, 1, 2, ....) in OpenGL this would have GL_TEXTURE0, etc...
 gl_FogCoord          fogCoord
 
 
+GLSL attribute index conventions
+
+POSITION  : 0
+NORMAL    : 1
+TANGENT   : 2
+TEXCOORD0 : 3
+TEXCOORD1 : 4
+TEXCOORD2 : 5
+TEXCOORD3 : 6
+COLOR     : 7
+SECONDARYCOLOR : 8
+
+glGetAttribLocation versus glBindAttribLocation:  the former queries the shader
+for the attribute locations. This implies that GLMesh needs the shaderId, in order to
+do these queries. the latter required a "fixed" assignment of location when compiling (and before linking)
+the shader. 
 
 
