@@ -543,6 +543,20 @@ public class XMLTokenizerTest
     }
 
     @Test
+    public void getEmptyXMLSectionTest() throws IOException
+    {
+        XMLTokenizer tokenizer = new XMLTokenizer("<test/>");
+        assertEquals("<test/>", tokenizer.getXMLSection());
+    }
+    
+    @Test
+    public void getEmptyXMLSectionTestWithClosingTag() throws IOException
+    {
+        XMLTokenizer tokenizer = new XMLTokenizer("<test></test>");
+        assertEquals("<test></test>", tokenizer.getXMLSection());
+    }
+    
+    @Test
     public void getXMLSectionContentTest2() throws IOException
     {
         XMLTokenizer tok = new XMLTokenizer("<tag>blah</tag>");
