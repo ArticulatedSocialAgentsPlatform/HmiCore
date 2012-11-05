@@ -6,10 +6,12 @@ We distinguish the following entities:
 
 1) Collada  TEXCOORD inputs, inside geometry, for example:
 <input semantic="TEXCOORD" source="#hair_C_-mesh-map-channel1" offset="2" set="1"/>
-The offset" is just an internal Collada offset in the encoding of the attribute data; it is removed when compiling the Collada data into scenegraph data.
+The offset" is just an internal Collada offset in the encoding of the attribute data; 
+it is removed when compiling the Collada data into scenegraph data.
 At first sight the "set" attribute looks like a "texture unit" number, but that isn't true in general. 
-It happen to be (more or less) true when every texture for some material has its*own* TEXCOORD input, therefore it own "set". 
-But when two different textures of the same material use the same TEXCOORD, then they will have the same "set", although they will have to use different OpenGL texture units.
+It happens to be (more or less) true when every texture for some material has its*own* TEXCOORD input, therefore it own "set". 
+But when two different textures of the same material use the same TEXCOORD, then they will have the same "set", 
+although they will have to use different OpenGL texture units.
 From the Collada web forum:
 
 | The set attribute distinguishes between multiple inputs that have the same semantic. 
@@ -152,14 +154,14 @@ c) in hmi.grpahics.opengl
     
     1) At the moment we have just one GMaterial, one GLMaterial. This might be enlarged:
     GMaterialType1, GMaterialType 2 etc,
-    2) GMaterial or GLMaterial means bisically a Shader plus uniform settings for that shader.
+    2) GMaterial or GLMaterial means basically a Shader plus uniform settings for that shader.
     3) A Gmaterial can have diffreent shaders, for instance, a basic texturing shader, a shader with a diffuse and an opacity texture
     using one texCoord set, or a similar shader using seprate texCoord sets for diffuse texture and opacity texture, or even a shader
     using diffuse, opacity and bumpmap textures. On top of that, we have "Blinn" type or "Phong" type or ... type lighting equations,
     plus "uniform" settings for those lighting equations like "specular" color etc., and a setting for alpha blending.
     For the same GMaterial class, we assume a fixed order for those possible textures, and it depends on the actual shader which texture
     and texCoords will be "enabled". Still we have a fixed texCoord-n name for every semantic category: diffuse texture -> texCoord1,
-    opacity texture -> texCoord2, bumpmap -> texCoord1, for example, where we woukld have a shader that expects texCoord1 
+    opacity texture -> texCoord2, bumpmap -> texCoord1, for example, where we would have a shader that expects texCoord1 
     for the diffuse texture as well as for the bumpmap, and expects texCoord2 for the opacity map. 
     
     4) This shader choice can be made as soon as we know the particular Collada material/effect for some InstanceController sub-mesh.
