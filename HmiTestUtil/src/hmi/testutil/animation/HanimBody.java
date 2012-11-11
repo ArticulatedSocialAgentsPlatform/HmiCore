@@ -47,7 +47,7 @@ public final class HanimBody
         
         VJoint l_subtalar = new VJoint();
         l_subtalar.setSid(Hanim.l_subtalar);
-        l_ankle.addChild(l_ankle);
+        l_ankle.addChild(l_subtalar);
         
         VJoint l_midtarsal = new VJoint();
         l_midtarsal.setSid(Hanim.l_midtarsal);
