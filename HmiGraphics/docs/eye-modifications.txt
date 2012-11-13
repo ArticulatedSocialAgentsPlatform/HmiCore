@@ -1,0 +1,50 @@
+
+
+resource/Humanoids/armandia/dae/geometry/Eye_L-mesh.xml : 
+   <triangles material="irisModified"
+
+resource/Humanoids/armandia/dae/library_materials.xml:   
+   <material id="iris" name="iris">
+      <instance_effect url="#iris-fx"/>
+    </material>
+    <material id="irisModified" name="irisModified">
+      <instance_effect url="#irisModified-fx"/>
+    </material>
+ 
+ 
+ resource/Humanoids/armandia/dae/library_effects.xml:   
+   <effect id="irisModified-fx" name="irisModified">
+   .....
+    <technique sid="common">
+          <eye>                        (was: <blinn>
+            <ambient>
+              <color>0.172
+          </eye>
+ 
+   
+   
+ resource/Humanoids/armandia/dae/nodes_Bip01-nodes.xml:
+   
+   <instance_geometry url="#Eye_L-mesh">
+                 <bind_material>
+                       <technique_common>
+                   <instance_material symbol="iris" target="#iris">
+                       <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="1"/>
+                   </instance_material>
+                   <instance_material symbol="irisModified" target="#irisModified">
+                       <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="1"/>
+                   </instance_material>
+   
+   
+   
+   
+src/hmi/graphics/collada/FixedFunctionShader:
+   public enum ShaderType {Constant, Lambert, Phong, Blinn, Eye};
+
+src/hmi/graphics/collada/scenegraph/MaterialTranslator:
+ if (type.equals(FixedFunctionShader.ShaderType.Blinn))
+        {
+            prefix = "blinn";
+        } else if (type.equals(FixedFunctionShader.ShaderType.Eye)) {
+            prefix = "blinnEye";
+        }
