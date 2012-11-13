@@ -66,7 +66,9 @@ public class ColladaTestScenePupilSizeSetting  implements GLClockedRenderObject 
       GLShaderProgramLoader.clearShaderPool();
       GLShaderProgramLoader.addShaderDirectory("shaders");
  
-      glScene = SceneIO.readGLScene("Humanoids/armandia/dae", "armandia-toplevel.dae", SceneIO.ARMANDIA) ;
+      //glScene = SceneIO.readGLScene("Humanoids/armandia/dae", "armandia-toplevel.dae", SceneIO.ARMANDIA) ;
+      glScene = SceneIO.readGLScene("Humanoids/armandia/bin", "ArmandiaPupilSizeSetting.bin", SceneIO.NONE) ;
+     
  
       avatarRootJoint = glScene.getToplevelVJoint();
       glScene.sortGLShapeList();
