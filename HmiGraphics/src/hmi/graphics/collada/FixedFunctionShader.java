@@ -49,7 +49,7 @@ public class FixedFunctionShader extends ColladaElement {
    /**
     * A FixedFunction shader has one of the well known types, like Lambert, Phong, Blinn 
     */
-   public enum ShaderType {Constant, Lambert, Phong, Blinn};
+   public enum ShaderType {Constant, Lambert, Phong, Blinn, Eye};
    
    public FixedFunctionShader() {
       super();

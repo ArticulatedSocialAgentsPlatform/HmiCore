@@ -114,16 +114,16 @@ public class GLShader implements GLRenderObject
         int nru = declaredNames.size();
         int nrup = shaderNames.size();
 
-        // hmi.util.Console.println("Shader \"" + shaderProg + "\"");
-        // hmi.util.Console.println("declaredNames:");
-        // for (String s : declaredNames) hmi.util.Console.print( s + "  ");
+         //hmi.util.Console.println("-----Shader \"" + shaderProgName + "\"");
+         //hmi.util.Console.println("declaredNames:");
+         //for (String s : declaredNames) hmi.util.Console.print( s + "  ");
         // hmi.util.Console.println();
         // hmi.util.Console.println("declaredTypes:");
         // for (String s : declaredTypes) hmi.util.Console.print( s + "  ");
         // hmi.util.Console.println();
-        // hmi.util.Console.println("shaderNames:");
+         //hmi.util.Console.println("shaderNames:");
         // for (String s : shaderNames) hmi.util.Console.print( s + "  ");
-        // hmi.util.Console.println();
+        // hmi.util.Console.println("\n=================");
         // hmi.util.Console.println("shaderTypes:");
         // for (String s : shaderTypes) hmi.util.Console.print( s + "  ");
         // hmi.util.Console.println();

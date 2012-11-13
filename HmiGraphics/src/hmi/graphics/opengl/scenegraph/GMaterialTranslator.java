@@ -106,9 +106,13 @@ public final class GMaterialTranslator {
 //         } else {
 //             shader = "textured"; //temporary patch
 //         }
+             //hmi.util.Console.println("GMaterialTranslator glShader " + shader);
              GLShader glShader = new GLShader(shader);
 //          glShader.setValues(0, 1);
           glmaterial.setGLShader(glShader);  
+          if (shader.equals("blinnEyeTextured1")) {
+          	  glmaterial.setPupilSize(0.08f);
+          }
       }
       return glmaterial;
    }   
