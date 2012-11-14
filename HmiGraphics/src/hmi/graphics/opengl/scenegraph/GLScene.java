@@ -159,7 +159,7 @@ public class GLScene implements GLRenderObject
   	        if (glo instanceof GLShape) {
   	     	      GLShape glsh = (GLShape)glo;
   	     	      String name =  glsh.getId();
-  	     	      if (name.equals(id)) {
+  	     	      if (name!=null&&name.equals(id)) {
   	     	          return glsh;  
   	     	      }
   	        }
