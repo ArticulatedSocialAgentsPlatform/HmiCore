@@ -1,5 +1,8 @@
 package hmi.animationui;
 
+import java.awt.Dimension;
+import java.awt.GridLayout;
+
 import hmi.math.Quat4f;
 
 import javax.swing.JLabel;
@@ -24,15 +27,22 @@ public class JointRotationPanel
     private final JSlider rollSlider;
     private final JointView jointView;
 
-    private void setupSlider(JSlider s)
+    private void setupSlider(final JSlider s)
     {
-        panel.add(s);
+        JPanel sliderPanel = new JPanel();
+        final JLabel sliderLabel = new JLabel("0");
+        sliderLabel.setPreferredSize(new Dimension(30, 20));
+        s.setPreferredSize(new Dimension(100, 20));
+        sliderPanel.add(sliderLabel);
+        sliderPanel.add(s);
+        panel.add(sliderPanel);
         s.addChangeListener(new ChangeListener()
         {
             @Override
             public void stateChanged(ChangeEvent e)
             {
                 jointView.update();
+                sliderLabel.setText(""+s.getValue());
             }
         });
     }
@@ -42,11 +52,12 @@ public class JointRotationPanel
         this.jointName = jointName;
         this.jointView = jointView;
         JLabel label = new JLabel(jointName);
+        panel.setLayout(new GridLayout());
         panel.add(label);
 
-        pitchSlider = new JSlider(JSlider.HORIZONTAL, -180, 180);
-        yawSlider = new JSlider(JSlider.HORIZONTAL, -180, 180);
-        rollSlider = new JSlider(JSlider.HORIZONTAL, -180, 180);
+        pitchSlider = new JSlider(JSlider.HORIZONTAL, -180, 180, 0);
+        yawSlider = new JSlider(JSlider.HORIZONTAL, -180, 180, 0);
+        rollSlider = new JSlider(JSlider.HORIZONTAL, -180, 180, 0);
         
         setupSlider(pitchSlider);
         setupSlider(yawSlider);

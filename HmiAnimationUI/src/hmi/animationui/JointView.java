@@ -3,6 +3,7 @@ package hmi.animationui;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 import lombok.Getter;
@@ -17,12 +18,20 @@ public class JointView
     
     @Getter
     private JPanel panel = new JPanel();
+    
+    
     private List<JointRotationPanel> rotPanels = new ArrayList<>();
     
     public JointView(JointController controller, List<String> joints)
     {
         this.controller = controller;
-        
+        panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
+        for(String vj:joints)
+        {
+            JointRotationPanel rp = new JointRotationPanel(vj, this); 
+            rotPanels.add(rp);
+            panel.add(rp.getPanel());
+        }
     }    
     
     public void update()
