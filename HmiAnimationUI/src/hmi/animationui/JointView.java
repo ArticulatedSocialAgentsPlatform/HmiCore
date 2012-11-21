@@ -1,6 +1,7 @@
 package hmi.animationui;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -22,7 +23,7 @@ public class JointView
     
     private List<JointRotationPanel> rotPanels = new ArrayList<>();
     
-    public JointView(JointController controller, List<String> joints)
+    public JointView(JointController controller, Collection<String> joints)
     {
         this.controller = controller;
         panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
