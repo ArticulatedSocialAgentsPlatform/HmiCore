@@ -1,6 +1,7 @@
 package hmi.faceanimationui;
 
 import java.awt.Dimension;
+import java.awt.GridLayout;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,12 +25,14 @@ public class MorphPanel
     public MorphPanel(String morphName, final MorphView morphView)
     {
         this.morphName = morphName;
+        panel.setLayout(new GridLayout());
         morphSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
         JPanel sliderPanel = new JPanel();
         final JLabel sliderLabel = new JLabel("0");
         sliderLabel.setPreferredSize(new Dimension(30, 20));
         sliderPanel.add(sliderLabel);
         sliderPanel.add(morphSlider);
+        panel.add(new JLabel(morphName));
         panel.add(sliderPanel);
         morphSlider.addChangeListener(new ChangeListener()
         {
