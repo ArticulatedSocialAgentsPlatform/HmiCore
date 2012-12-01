@@ -28,6 +28,7 @@ package hmi.graphics.opengl;
 import hmi.math.Mat4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import hmi.graphics.opengl.state.GLMaterial;
 
 /**
  * A GLShape is a GLRenderObject that encapsulates geometry (a GLRenderObject), a transform matrix,
@@ -90,6 +91,29 @@ public class GLShape implements GLRenderObject {
    public void addGLState(GLRenderObject glState) {
       glStateList.add(glState);
    }
+
+
+    /**
+     * Searches for a GLMaterial with the specified id and returns it, or null when not found
+     */
+    public GLMaterial getGLMaterial(String id) {
+     
+        for (int j=0; j< glStateList.size(); j++) {
+            GLRenderObject state = glStateList.get(j);
+             
+            if (state instanceof GLMaterial) {
+                 GLMaterial material = (GLMaterial) state;
+                 String matName = material.getName();
+                // hmi.util.Console.println("material: " + matName);
+                 if (matName.equals(id)) {
+                      return material;
+                 }
+            }
+        } 
+        return null;
+    }
+
+
 
 //   /**
 //    * Sets the transform matrix from a translation vector (a Vec3f) and

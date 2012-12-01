@@ -543,6 +543,43 @@ public class XMLTokenizerTest
     }
 
     @Test
+    public void getEmptyXMLSectionTest() throws IOException
+    {
+        XMLTokenizer tokenizer = new XMLTokenizer("<test/>");
+        assertTrue(tokenizer.atSTag("test"));
+        String skipped = tokenizer.getXMLSection();
+        //System.out.println("Skipped: " + skipped);
+        assertEquals(skipped, "<test/>");
+    }
+    
+    @Test
+    public void getEmptyXMLSectionTestWithAttribute() throws IOException
+    {
+        XMLTokenizer tokenizer = new XMLTokenizer("<test id=\"ident\"/>");
+        assertTrue(tokenizer.atSTag("test"));
+        String skipped = tokenizer.getXMLSection();
+        //System.out.println("Skipped: " + skipped);
+        assertEquals(skipped, "<test id=\"ident\"/>");
+    }
+    
+    @Test
+    public void getEmptyXMLSectionTestWithDangerousAttribute() throws IOException
+    {
+        XMLTokenizer tokenizer = new XMLTokenizer("<test id=\"&gt;ident\"/>"); // escaped > char (unescaped > chars are not allowed)
+        assertTrue(tokenizer.atSTag("test"));
+        String skipped = tokenizer.getXMLSection();
+        //System.out.println("Skipped: " + skipped);
+        assertEquals(skipped, "<test id=\"&gt;ident\"/>");
+    }
+    
+    @Test
+    public void getEmptyXMLSectionTestWithClosingTag() throws IOException
+    {
+        XMLTokenizer tokenizer = new XMLTokenizer("<test></test>");
+        assertEquals("<test></test>", tokenizer.getXMLSection());
+    }
+    
+    @Test
     public void getXMLSectionContentTest2() throws IOException
     {
         XMLTokenizer tok = new XMLTokenizer("<tag>blah</tag>");

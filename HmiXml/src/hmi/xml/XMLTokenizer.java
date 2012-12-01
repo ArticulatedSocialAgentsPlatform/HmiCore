@@ -863,9 +863,20 @@ public class XMLTokenizer
         tokenConsumed = true; // consume the last ETAG
     }
 
+
+    private void setupSectionBuffer() throws IOException {
+        in.reset(); // we are about to begin the first character after the '<'. 
+        setSectionBuffering(true);
+        clearSectionBuffer();
+        sectionBuffer.append('<');
+        while (  ci != '>' && ci != EOS) {
+            nextChar(); // will fill the section buffer
+        }
+    }
+
     /**
-     * assuming that we are at an STag, gets the XML text until the corresponding closing ETag. An Exception is thrown if the ENDOFDOCUMENT is reached
-     * while skipping.
+     * assuming that we are at an STag, gets the XML text up to and including the matching ETag. 
+     * An Exception is thrown if the ENDOFDOCUMENT is reached before the ETag is read.
      */
     public final String getXMLSection() throws IOException
     {
@@ -873,12 +884,7 @@ public class XMLTokenizer
         {
             throw getXMLScanException("The XMLTokenizer was not at an STAG at start of getXMLSection action");
         }
-        in.reset(); // we are about to begin the first character after the '<'. It will be seen as CHARDATA, i.e. will not be pushed again on the
-                    // stack
-        setSectionBuffering(true);
-        clearSectionBuffer();
-        sectionBuffer.append('<');
-        // String sectionTagName = getTagName();
+        setupSectionBuffer();
         int skipStackSize = tagStack.size();
         do
         {
@@ -888,14 +894,12 @@ public class XMLTokenizer
                 if (atEndOfDocument())
                 {
                     throw new XMLScanException("ENDOFDOCUMENT reached");
-                    // logger.warning("ENDOFDOCUMENT reached while extracting XML section for tag: " + sectionTagName);
-                    // token = ENDOFDOCUMENT;
-                    // return null;
                 }
             }
             while (!atETag());
         }
         while (tagStack.size() >= skipStackSize); // || ! getTagName().equals(skipTagName) );
+        
         tokenConsumed = true; // consume the last ETAG
         String result = getSectionBuffer();
         setSectionBuffering(false);
@@ -944,6 +948,8 @@ public class XMLTokenizer
         setSectionBuffering(false);        
         return result;
     }
+
+   
 
     /**
      * Called to move the tokenizer to a next token. Effect depends on current token and settings of several settings.
@@ -1007,18 +1013,15 @@ public class XMLTokenizer
 //            if (debug)       {          showTokenizerState(" XMLTokenizer.parseCharDta, tokenizer state");            }
             if (ci == CONSUMED)
                 nextParsedChar();
-                
-                
             while (isSpaceChar())
             {
                 nextParsedChar();
             }
             setTokenPos();
             in.mark(4096);
-            // use ci, not ch, for classification; ch could be '<' because of &lt; pattern in input stream)
+            // use ci, not ch, for classification; ch could be '<' because of an &lt; pattern in input stream)
             if (ci == '<')
             { // STAG, ETAG, PI, or decl
-
                 int markup = parseMarkup();
                 if (markup > 0)
                 {
@@ -2891,7 +2894,7 @@ public class XMLTokenizer
     {
         TokenizerState currentState = new TokenizerState();
         currentState.copyState();
-        logger.warn(message + currentState);
+        logger.info(message + currentState);
     }
 
     /**

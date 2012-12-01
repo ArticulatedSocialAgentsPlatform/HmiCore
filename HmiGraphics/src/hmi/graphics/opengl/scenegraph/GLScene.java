@@ -150,7 +150,59 @@ public class GLScene implements GLRenderObject
       return shapeList;
    }
    
+   /**
+    * Searches the shapeList for a GLShape with the specifie3d id, and returns it, or null when not found
+    */
+   public GLShape getGLShape(String id) {
+       for (int i=0; i< shapeList.size(); i++) {
+     	     GLRenderObject glo = shapeList.get(i);
+  	        if (glo instanceof GLShape) {
+  	     	      GLShape glsh = (GLShape)glo;
+  	     	      String name =  glsh.getId();
+  	     	      if (name!=null&&name.equals(id)) {
+  	     	          return glsh;  
+  	     	      }
+  	        }
+  	    }
+  	    return null;
+   }
   
+   
+   public GLMaterial getGLMaterial(String glShapeId, String materialId) {
+        GLShape glsh = getGLShape(glShapeId);
+        if (glsh == null) return null;
+        GLMaterial material = glsh.getGLMaterial(materialId);
+        return material;  
+   }
+  
+//   public void x() {
+//      for (int i=0; i< shapeList.size(); i++) {
+//     	   GLRenderObject glo = shapeList.get(i);
+//  	     if (glo instanceof GLShape) {
+//  	     	   GLShape glsh = (GLShape)glo;
+//  	     	   String name =  glsh.getId();
+//  	     	  // hmi.util.Console.println("GLShape: " + name);
+//  	     	   if (name.equals("Eye_L-mesh")) {
+//  	     	   	   hmi.util.Console.println("GLShape: " + name);
+//  	     	   	   GLRenderList stateList = glsh.getStateList();
+//  	     	   	   for (int j=0; j< stateList.size(); j++) {
+//  	     	   	   	    GLRenderObject state = stateList.get(j);
+//  	     	   	   	    
+//  	     	   	   	    if (state instanceof GLMaterial) {
+//  	     	   	   	    	   GLMaterial material = (GLMaterial) state;
+//  	     	   	   	    	   String matName = material.getName();
+//  	     	   	   	    	   hmi.util.Console.println("material: " + matName);
+//  	     	   	   	    	   if (matName.equals("irisModified")) {
+//  	     	   	   	    	   	    material.setPupilSize(0.03f);   // ummodified: 0.0586f
+//  	     	   	   	    	   }
+//  	     	   	   	    }
+//  	     	   	   }
+//  	     	   	   
+//  	     	   }
+//  	     }
+//     }
+//  
+//}
    
   
    public void prependGLShape(GLShape glShape) {
