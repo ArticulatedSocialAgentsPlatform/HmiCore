@@ -136,7 +136,10 @@ public class TechniqueFX extends ColladaElement {
          } else if (tag.equals(Lambert.xmlTag()))  {                
                  shader = new Lambert(getCollada(), tokenizer);     
          } else if (tag.equals(Phong.xmlTag()))  {                
-                 shader = new Phong(getCollada(), tokenizer);      
+                 shader = new Phong(getCollada(), tokenizer);     
+          } else if (tag.equals(Eye.xmlTag()))  {                
+                 shader = new Eye(getCollada(), tokenizer);   
+                  
          } else if (tag.equals(Extra.xmlTag()))  {   
                  if (extras == null)  extras = new ArrayList<Extra>();          
                  extras.add(new Extra(getCollada(), tokenizer));                

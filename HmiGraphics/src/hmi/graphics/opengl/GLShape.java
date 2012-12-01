@@ -55,6 +55,7 @@ public class GLShape implements GLRenderObject {
 
    public GLShape(String name) {
       this.name = name;
+      //hmi.util.Console.println("GLShape " + name);
       transformMatrix = Mat4f.getIdentity(); // 4X4 identity matrix
    }
  

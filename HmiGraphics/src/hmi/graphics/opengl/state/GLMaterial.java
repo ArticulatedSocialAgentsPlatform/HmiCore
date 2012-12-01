@@ -59,6 +59,8 @@ public class GLMaterial implements GLStateComponent {
    
    private boolean debugMode = false;
    
+   private float rp = 0.0f; // pupil size for eye shader
+   
    //private float[] white = new float[]{1f, 1f, 1f, 1f};
    //private float[] black = new float[]{0f, 0f, 0f, 1f};
    
@@ -184,6 +186,14 @@ public class GLMaterial implements GLStateComponent {
    /** Returns the offset for the T coordinate  */
    public float getOffsetT() { return offsetT; }
    
+   /**
+    * Sets the pupil radius for the eye shader
+    * typical value: 0.01 < rp < 0.8
+    */
+   public void setPupilSize(float rp) {
+   	    hmi.util.Console.println("GLMaterial.setPupilSize: " + rp);
+   	    this.rp = rp;
+   }
    
    
    /**
@@ -235,6 +245,10 @@ public class GLMaterial implements GLStateComponent {
          }
          
       }
+//      if (rp > 0.0f) {
+//      	  shader.setValue("rp", rp);
+//      }
+      
       if (shader != null) shader.glInit(glc);
    }
    
@@ -262,6 +276,10 @@ public class GLMaterial implements GLStateComponent {
       if (transparentTexture != null) {
          transparentTexture.glRender(glc);
       }
+      if (shader != null && rp > 0.0f) {
+      	  shader.setValue("rp", rp);
+      }
+      
       if (shader != null) {
          shader.glRender(glc);
       } else {

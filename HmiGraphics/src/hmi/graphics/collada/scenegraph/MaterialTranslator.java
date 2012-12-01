@@ -102,7 +102,9 @@ public final class MaterialTranslator
 
             if (bindMaterial != null)
             {
+                //hmi.util.Console.println("MaterialTranslator.GMaterialPlusChannelBindings, materialId=" + materialId);
                 im = bindMaterial.getInstanceMaterial(materialId);
+                //hmi.util.Console.println( im==null, "null bindMaterial", "bindMaterial OK");
                 String remappedId = im.getTarget();
                 if (remappedId != null) materialId = remappedId;
             }
@@ -421,6 +423,8 @@ public final class MaterialTranslator
         if (type.equals(FixedFunctionShader.ShaderType.Blinn))
         {
             prefix = "blinn";
+        } else if (type.equals(FixedFunctionShader.ShaderType.Eye)) {
+            prefix = "blinnEye";
         }
         String postfix = "Basic";
         if (!transparencyEnabled)
