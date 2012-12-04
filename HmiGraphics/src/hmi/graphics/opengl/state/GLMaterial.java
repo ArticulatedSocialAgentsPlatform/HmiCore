@@ -191,7 +191,7 @@ public class GLMaterial implements GLStateComponent {
     * typical value: 0.01 < rp < 0.8
     */
    public void setPupilSize(float rp) {
-   	    //hmi.util.Console.println("GLMaterial.setPupilSize: " + rp);
+   	    hmi.util.Console.println("GLMaterial.setPupilSize: " + rp);
    	    this.rp = rp;
    }
    
