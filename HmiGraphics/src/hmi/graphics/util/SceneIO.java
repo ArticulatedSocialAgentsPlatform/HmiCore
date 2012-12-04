@@ -56,6 +56,7 @@ public final class SceneIO
     // public enum Postprocess { ArmandiaHAnim, BlueguyHAnim, NONE};
 
     public static final String ARMANDIA = "ARMANDIA";
+    public static final String SETHANIM = "SETHANIM";
     public static final String BLUEGUY = "BLUEGUY";
     public static final String NONE = "NONE";
 
@@ -211,6 +212,10 @@ public final class SceneIO
             // ok, no postprocessing/no HAnim
         }
         else if (postProcess.equals(ARMANDIA))
+        {
+            gscene.setSkeletonHAnimPoses();
+        }
+        else if (postProcess.equals(SETHANIM))
         {
             gscene.setSkeletonHAnimPoses();
         }
