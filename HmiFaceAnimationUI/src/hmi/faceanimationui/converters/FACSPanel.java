@@ -1,4 +1,4 @@
-package hmi.faceanimation.converters.ui;
+package hmi.faceanimationui.converters;
 
 import hmi.faceanimation.converters.FACSConverter;
 import hmi.faceanimation.model.ActionUnit;

@@ -1,4 +1,4 @@
-package hmi.faceanimation.converters.ui;
+package hmi.faceanimationui.converters;
 
 import hmi.faceanimation.FaceController;
 import hmi.faceanimation.converters.EmotionConverter;

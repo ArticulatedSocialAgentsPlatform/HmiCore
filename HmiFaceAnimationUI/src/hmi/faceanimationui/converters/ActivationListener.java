@@ -1,4 +1,4 @@
-package hmi.faceanimation.converters.ui;
+package hmi.faceanimationui.converters;
 
 public interface ActivationListener
 {
