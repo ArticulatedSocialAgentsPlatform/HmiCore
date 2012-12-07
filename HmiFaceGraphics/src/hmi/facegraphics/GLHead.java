@@ -42,9 +42,11 @@ public class GLHead extends XMLStructureAdapter implements Head
     private HashMap<FAP, HashMap<Integer, float[]>> displacements; // XXX could be replaced by a multimap
     private boolean displacementsDirty = false;
     private boolean deformScheduled = false;
-    private float[] vertexData;
-    private float[] neutralVertexData;
-    private GLSkinnedMesh faceMesh;
+	//all vertices of all meshes!
+    private float[] vertexData = new float[0];
+    private float[] neutralVertexData = new float[0];
+    private ArrayList<GLSkinnedMesh> faceMeshes = new ArrayList<GLSkinnedMesh>();
+    private ArrayList<Integer> faceMeshesVertexDataCount = new ArrayList<Integer>();
 
     private enum Operation
     {
@@ -197,6 +199,7 @@ public class GLHead extends XMLStructureAdapter implements Head
         return center;
     }
 
+	//all vertices of all meshes...
     public int getNumVertices()
     {
         return vertexData.length / 3;
@@ -204,8 +207,7 @@ public class GLHead extends XMLStructureAdapter implements Head
 
     public float[] getVertexData()
     {
-        vertexData = faceMesh.getVertexData(0, vertexData);
-        return vertexData;
+		return vertexData;
     }
 
     private void calculateHeadWidth()
@@ -245,10 +247,38 @@ public class GLHead extends XMLStructureAdapter implements Head
         return retval;
     }
 
+	@Deprecated
     public void setFaceMesh(GLSkinnedMesh faceMesh)
     {
-        this.faceMesh = faceMesh;
-        getVertexData();
+		addFaceMesh(faceMesh);
+		prepareVertexData();
+	}
+	//add mesh; prepare length of vertexData array
+	public void addFaceMesh(GLSkinnedMesh faceMesh)
+	{
+        faceMeshes.add(faceMesh);
+		float[] vData = faceMesh.getVertexData(0,null);
+		faceMeshesVertexDataCount.add(new Integer(vData.length));
+		int newLength = vertexData.length+vData.length;
+		vertexData = new float[newLength];
+		neutralVertexData = new float[newLength];
+	}
+	//prepare the vertexdata, neutralvertex data, calculate head width, etcetera. Call this after all face meshes were added
+	public void prepareVertexData()
+	{
+		int i = 0;
+		
+		//reconstruct vertexdata for new situation: all vertex data from all meshes appended
+		for (GLSkinnedMesh gsm: faceMeshes)
+		{
+			float[] gsmVertexData = gsm.getVertexData(0, null);
+			for (int j = 0; j < gsmVertexData.length; j++)
+			{
+				vertexData[i] = gsmVertexData[j];
+				i++;
+			}
+		}
+
         setNeutralVertexData(vertexData.clone());
         calculateHeadWidth();
         calculateVertexWeights();
@@ -257,7 +287,8 @@ public class GLHead extends XMLStructureAdapter implements Head
     public void calculateVertexWeights()
     {
         // Enable GLSkinnedMesh FAP-steering
-        faceMesh.setUseFaps(true);
+		for (GLSkinnedMesh gsm: faceMeshes)
+			gsm.setUseFaps(true);
 
         // Set direction vectors, this is a floar[nrOfFaps][3] array.
         HashMap<Integer, FAP> faps = MPEG4.getFAPs();
@@ -268,7 +299,8 @@ public class GLHead extends XMLStructureAdapter implements Head
             directionVectors[fap.index] = getDeformer(fap).getFullDisplacement();
         }
 
-        faceMesh.setFapDirectionVectors(directionVectors);
+        for (GLSkinnedMesh gsm: faceMeshes)
+			gsm.setFapDirectionVectors(directionVectors);
 
         /*
          * Set vertex-to-fap bindings. Per vertex, we must know: - number of FAPs possibly having an influence on this vertex - indices of these FAPs
@@ -276,53 +308,66 @@ public class GLHead extends XMLStructureAdapter implements Head
          * 
          * We first walk over all the deformers and ask them to give us vertex-indices and corresponding weights.
          */
+		// needed to calculate PER MESH! i.e. translate overall indices somehow back to mesh-specific indices
+		int meshIndex = 0;
+		int firstVertexIndexForMesh = 0;
+        for (GLSkinnedMesh gsm: faceMeshes)
+		{
+			//how many vertices for this gsm?
+			int numVertices = faceMeshesVertexDataCount.get(meshIndex).intValue()/3;
+			int[] fapCount = new int[numVertices]; //for each vertex, how many faps is it connected to? index is mesh specific! (not index in vertexData, which is the "global" list
+			TreeMap<Integer, ArrayList<Integer>> fapIndices = new TreeMap<Integer, ArrayList<Integer>>(); //for each mesh specific vertex the list of indices of faps associated to it
+			TreeMap<Integer, ArrayList<Float>> fapWeights = new TreeMap<Integer, ArrayList<Float>>(); //for each mesh specific vertex the weights for the above faps
+			int numInfluences = 0;
+			HashMap<FAP, HashMap<Integer, Float>> fapDeformerWeights = new HashMap<FAP, HashMap<Integer, Float>>();
+			for (FAP fap : faps.values())
+			{
+				//these are GLOBAL vertex deformer weights, indexing the vertexData array
+				HashMap<Integer, Float> deformerWeights = getDeformer(fap).getVertexWeights();
+				fapDeformerWeights.put(fap, deformerWeights);
+				for (int vertexIndex : deformerWeights.keySet())
+				{
+					//System.out.println("v"+ vertexIndex + "/"+ firstVertexIndexForMesh+"/"+fapCount.length);
+					int meshSpecificVertexIndex = vertexIndex - firstVertexIndexForMesh;
+					
+					if (meshSpecificVertexIndex <0 || meshSpecificVertexIndex >= numVertices) continue; //don't add for indices that don't concern this mesh
+					
+					fapCount[meshSpecificVertexIndex]++;
 
-        int numVertices = getNumVertices();
-        int[] fapCount = new int[numVertices];
-        TreeMap<Integer, ArrayList<Integer>> fapIndices = new TreeMap<Integer, ArrayList<Integer>>();
-        TreeMap<Integer, ArrayList<Float>> fapWeights = new TreeMap<Integer, ArrayList<Float>>();
-        int numInfluences = 0;
-        HashMap<FAP, HashMap<Integer, Float>> fapDeformerWeights = new HashMap<FAP, HashMap<Integer, Float>>();
-        for (FAP fap : faps.values())
-        {
-            HashMap<Integer, Float> deformerWeights = getDeformer(fap).getVertexWeights();
-            fapDeformerWeights.put(fap, deformerWeights);
-            for (int vertexIndex : deformerWeights.keySet())
-            {
-                fapCount[vertexIndex]++;
+					if (fapIndices.get(meshSpecificVertexIndex) == null) fapIndices.put(meshSpecificVertexIndex, new ArrayList<Integer>());
+					fapIndices.get(meshSpecificVertexIndex).add(fap.index);
 
-                if (fapIndices.get(vertexIndex) == null) fapIndices.put(vertexIndex, new ArrayList<Integer>());
-                fapIndices.get(vertexIndex).add(fap.index);
+					float weight = deformerWeights.get(vertexIndex);
+					if (fapWeights.get(meshSpecificVertexIndex) == null) fapWeights.put(meshSpecificVertexIndex, new ArrayList<Float>());
+					fapWeights.get(meshSpecificVertexIndex).add(weight);
 
-                float weight = deformerWeights.get(vertexIndex);
-                if (fapWeights.get(vertexIndex) == null) fapWeights.put(vertexIndex, new ArrayList<Float>());
-                fapWeights.get(vertexIndex).add(weight);
+					numInfluences++;
+				}
+			}
 
-                numInfluences++;
-            }
-        }
+			// Now we have all FAP-indices and weights ordered by vertex-index, we can
+			// flatten this structure to obtain some simple arrays.
+			int[] fapIndex = new int[numInfluences];
+			float[] fapWeight = new float[numInfluences];
 
-        // Now we have all FAP-indices and weights ordered by vertex-index, we can
-        // flatten this structure to obtain some simple arrays.
-        int[] fapIndex = new int[numInfluences];
-        float[] fapWeight = new float[numInfluences];
+			int currentInfluence = 0;
+			for (ArrayList<Integer> indices : fapIndices.values())
+			{
+				for (int meshSpecificIndex : indices)
+					fapIndex[currentInfluence++] = meshSpecificIndex;
+			}
 
-        int currentInfluence = 0;
-        for (ArrayList<Integer> indices : fapIndices.values())
-        {
-            for (int index : indices)
-                fapIndex[currentInfluence++] = index;
-        }
+			currentInfluence = 0;
+			for (ArrayList<Float> weights : fapWeights.values())
+			{
+				for (float weight : weights)
+					fapWeight[currentInfluence++] = weight;
+			}
 
-        currentInfluence = 0;
-        for (ArrayList<Float> weights : fapWeights.values())
-        {
-            for (float weight : weights)
-                fapWeight[currentInfluence++] = weight;
-        }
-
-        faceMesh.setFapVertexWeights(fapCount, fapIndex, fapWeight);
-
+			gsm.setFapVertexWeights(fapCount, fapIndex, fapWeight);
+			meshIndex++;
+			firstVertexIndexForMesh += numVertices;
+		}
         scheduleDeform();
     }
 
@@ -344,8 +389,12 @@ public class GLHead extends XMLStructureAdapter implements Head
             amplitudes[fap2.index] = ((float) getDeformer(fap2).getValue()) / 1024;
         }
 
-        faceMesh.setFapAmplitudes(amplitudes);
-        faceMesh.deform();
+		applyVertexData();
+        for (GLSkinnedMesh gsm: faceMeshes)
+		{
+			gsm.setFapAmplitudes(amplitudes);
+			gsm.deform();
+		}
 
         if (leftEye != null) leftEye.copy();
         if (rightEye != null) rightEye.copy();
@@ -368,8 +417,11 @@ public class GLHead extends XMLStructureAdapter implements Head
             amplitudes[fap2.index] = ((float) getDeformer(fap2).getValue()) / 1024;
         }
 
-        faceMesh.setFapAmplitudes(amplitudes);
-        faceMesh.deform();
+        for (GLSkinnedMesh gsm: faceMeshes)
+		{
+			gsm.setFapAmplitudes(amplitudes);
+        	gsm.deform();
+		}
     }
 
     public void clearDisplacements()
@@ -451,9 +503,27 @@ public class GLHead extends XMLStructureAdapter implements Head
             vertexData[vindex + 2] = npos[2];
         }
 
-        // Apply it to the face
-        faceMesh.setVertexData(0, vertexData);
+		applyVertexData();
     }
+	
+	public void applyVertexData()
+	{
+	    // Apply it to the face meshes
+		//System.out.println("apply vertex data");
+		int j = 0;
+		for (int i = 0; i < faceMeshes.size(); i++)
+		{
+			GLSkinnedMesh gsm = faceMeshes.get(i);
+			float[] newVertexData = new float[faceMeshesVertexDataCount.get(i).intValue()];
+			//copy the right vertex data from main array
+			for (int h = 0; h < newVertexData.length; h++)
+			{
+				newVertexData[h] = vertexData[j];
+				j++;
+			}
+			gsm.setVertexData(0, newVertexData);
+		}
+	}
 
     public void setEyes(Eye leftEye, Eye rightEye)
     {
