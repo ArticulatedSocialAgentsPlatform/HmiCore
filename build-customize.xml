@@ -10,9 +10,9 @@
       <delegate target="resolve" list="rebuildList" verbose="true"/>
    </target>
    
-   <target name="delombokAll">
-      <antcall target="Core.delombok"/>
-      <delegate target="delombok" list="rebuildList" verbose="true"/>
+   <target name="-pre-docAll">
+      <antcall target="Core.-pre-doc"/>
+      <delegate target="-pre-doc" list="rebuildList" verbose="true"/>
    </target>
    
    <!-- targets: -->
@@ -158,7 +158,7 @@
    </target>
 
 
-   <target name="docall" depends="delombokAll" description="Generate integrated Javadoc for all HMI/* projects">     
+   <target name="docall" depends="-pre-docAll" description="Generate integrated Javadoc for all HMI/* projects">     
         <javadoc source="1.7"
             destdir="${javadoc.dir}"
             Overview="javadoc-overview.html" 
