@@ -215,7 +215,7 @@ public final class VJointUtils
         }
         else
         {
-            log.warn("No " + parentSid + " or " + childSid + " for skeleton " + skeletonRoot.getName());
+            log.warn("No " + parentSid + " or " + childSid + " for skeleton " + skeletonRoot.getName() + "(need both for setting hanim pose)");
         }
     }
     
