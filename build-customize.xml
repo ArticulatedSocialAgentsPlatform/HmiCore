@@ -11,7 +11,7 @@
    </target>
    
    <target name="-pre-docAll">
-      <antcall target="Core.-pre-doc"/>
+      <antcall target="-pre-doc"/>
       <delegate target="-pre-doc" list="rebuildList" verbose="true"/>
    </target>
    
