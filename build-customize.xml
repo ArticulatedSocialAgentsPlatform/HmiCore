@@ -9,6 +9,12 @@
       <antcall target="Ivy.resolve"/>
       <delegate target="resolve" list="rebuildList" verbose="true"/>
    </target>
+   
+   <target name="-pre-docAll">
+      <antcall target="-pre-doc"/>
+      <delegate target="-pre-doc" list="rebuildList" verbose="true"/>
+   </target>
+   
    <!-- targets: -->
    
    <target name="nbuild" depends="nightlybuild" description="produce a nightly build of the Hmi project"/>
@@ -152,7 +158,7 @@
    </target>
 
 
-   <target name="docall" description="Generate integrated Javadoc for all HMI/* projects">
+   <target name="docall" depends="-pre-docAll" description="Generate integrated Javadoc for the HMICore projects">
         <javadoc source="1.7"
             destdir="${javadoc.dir}"
             Overview="javadoc-overview.html" 
@@ -181,19 +187,21 @@
                 <group title="HmiUtil" packages="hmi.util*"/>
                 <group title="HmiXml" packages="hmi.xml*"/>
                 <sourcepath>
-                    <pathelement path="HmiAnimation/src/"/>
-                    <pathelement path="HmiFaceAnimation/src/"/>
-                    <pathelement path="HmiFaceGraphics/src/"/>
-                    <pathelement path="HmiGraphics/src/"/>
-                    <pathelement path="HmiMath/src/"/>
-                    <pathelement path="HmiNeurophysics/src/"/>
-                    <pathelement path="HmiPhysics/src/"/>
-                    <pathelement path="HmiTestUtil/src/"/>
-                    <pathelement path="HmiTTS/src/"/>
-                    <pathelement path="HmiTTSMary/src/"/>
-                    <pathelement path="HmiTTSSapi5/src/"/>
-                    <pathelement path="HmiUtil/src/"/>
-                    <pathelement path="HmiXml/src/"/>
+                    <pathelement path="HmiAnimation/${src.doc.dir}"/>
+                    <pathelement path="HmiAnimationUI/${src.doc.dir}"/>
+                    <pathelement path="HmiFaceAnimation/${src.doc.dir}"/>
+                    <pathelement path="HmiFaceAnimationUI/${src.doc.dir}"/>
+                    <pathelement path="HmiFaceGraphics/${src.doc.dir}"/>
+                    <pathelement path="HmiGraphics/${src.doc.dir}"/>
+                    <pathelement path="HmiMath/${src.doc.dir}"/>
+                    <pathelement path="HmiNeurophysics/${src.doc.dir}"/>
+                    <pathelement path="HmiPhysics/${src.doc.dir}"/>
+                    <pathelement path="HmiTestUtil/${src.doc.dir}"/>
+                    <pathelement path="HmiTTS/${src.doc.dir}"/>
+                    <pathelement path="HmiTTSMary/${src.doc.dir}"/>
+                    <pathelement path="HmiTTSSapi5/${src.doc.dir}"/>
+                    <pathelement path="HmiUtil/${src.doc.dir}"/>
+                    <pathelement path="HmiXml/${src.doc.dir}"/>
                 </sourcepath>
         </javadoc>
         <mkdir dir="${dist.dir}"/>
