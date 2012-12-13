@@ -152,7 +152,7 @@
    </target>
 
 
-   <target name="docall" description="Generate integrated Javadoc for all HMI/* projects">     
+   <target name="docall" description="Generate integrated Javadoc for all HMI/* projects">
         <javadoc source="1.7"
             destdir="${javadoc.dir}"
             Overview="javadoc-overview.html" 
@@ -162,7 +162,7 @@
             author="true"
             link="http://java.sun.com/javase/6/docs/api/"
             breakiterator="yes"
-        > 
+        >
 <!--
             header="&lt;a href='http://hmi.ewi.utwente.nl' target='_blank'&gt;HMI Homepage&lt;/a%gt;" 
             footer="&lt;a href='http://hmi.ewi.utwente.nl' target='_blank'&gt;HMI Homepage&lt;/a%gt;" 
