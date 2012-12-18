@@ -315,9 +315,8 @@ public class XMLStructureAdapter implements XMLStructure
                         extraText = ": " + tokenizer.getCharData();
                         if (extraText.length() > 50)
                         {
-
-                        }
-                        extraText = extraText.substring(0, 50) + " ...";
+                             extraText = extraText.substring(0, 50) + " ...";
+                        }                   
                     }
                     throw tokenizer.getXMLScanException("Erroneous XML encoding, expected: " + getXMLTag() + ", encountered: "
                             + tokenizer.currentTokenString() + extraText);
