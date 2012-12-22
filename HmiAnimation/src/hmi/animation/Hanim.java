@@ -163,6 +163,10 @@ public final class Hanim
         l_middle2, l_middle3, l_ring0, l_ring1, l_ring2, l_ring3, l_pinky0,
         l_pinky1, l_pinky2};
     
+    public static final String[] LUMBAR_JOINTS = new String[]{vl1, vl2, vl3, vl4, vl5};
+    public static final String[] THORACIC_JOINTS = new String[]{vt1, vt2, vt3, vt4, vt5, vt6, vt7, vt8, vt9, vt10, vt11, vt12};
+    public static final String[] CERVICAL_JOINTS = new String[]{skullbase, vc1, vc2, vc3, vc4,vc5, vc6, vc7};
+    
     // HAnim Segments (incomplete
     public static final String sacrum = "sacrum";
     public static final String pelvis = "pelvis";

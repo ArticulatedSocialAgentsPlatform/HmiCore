@@ -13,7 +13,7 @@ import lombok.Getter;
  * A user interface to set and update joint rotations
  * @author hvanwelbergen
  */
-public class JointView
+public class JointView implements Viewer
 {
     private final JointController controller;
     

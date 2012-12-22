@@ -25,7 +25,7 @@ public class JointRotationPanel
     private final JSlider pitchSlider;
     private final JSlider yawSlider;
     private final JSlider rollSlider;
-    private final JointView jointView;
+    private final Viewer jointView;
 
     private void setupSlider(final JSlider s)
     {
@@ -47,7 +47,7 @@ public class JointRotationPanel
         });
     }
     
-    public JointRotationPanel(String jointName, JointView jointView)
+    public JointRotationPanel(String jointName, Viewer jointView)
     {
         this.jointName = jointName;
         this.jointView = jointView;
@@ -63,6 +63,21 @@ public class JointRotationPanel
         setupSlider(yawSlider);
         setupSlider(rollSlider);
     }
+    
+    public int getPitch()
+    {
+        return pitchSlider.getValue();
+    }
+    
+    public int getYaw()
+    {
+        return yawSlider.getValue();
+    }
+    
+    public int getRoll()
+    {
+        return rollSlider.getValue();
+    }    
 
     public JointRotationConfiguration getRotationConfiguration()
     {
