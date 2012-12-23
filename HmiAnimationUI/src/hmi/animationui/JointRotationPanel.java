@@ -25,7 +25,7 @@ public class JointRotationPanel
     private final JSlider pitchSlider;
     private final JSlider yawSlider;
     private final JSlider rollSlider;
-    private final Viewer jointView;
+    private final JointView jointView;
 
     private void setupSlider(final JSlider s)
     {
@@ -47,7 +47,7 @@ public class JointRotationPanel
         });
     }
     
-    public JointRotationPanel(String jointName, Viewer jointView)
+    public JointRotationPanel(String jointName, JointView jointView)
     {
         this.jointName = jointName;
         this.jointView = jointView;
@@ -64,25 +64,11 @@ public class JointRotationPanel
         setupSlider(rollSlider);
     }
     
-    public int getPitch()
-    {
-        return pitchSlider.getValue();
-    }
-    
-    public int getYaw()
-    {
-        return yawSlider.getValue();
-    }
-    
-    public int getRoll()
-    {
-        return rollSlider.getValue();
-    }    
-
     public JointRotationConfiguration getRotationConfiguration()
     {
         float q[] = Quat4f.getQuat4f();
-        Quat4f.setFromRollPitchYawDegrees(q, rollSlider.getValue(), pitchSlider.getValue(), yawSlider.getValue());
-        return new JointRotationConfiguration(jointName, q);
+        float rpyDeg[] = new float[]{rollSlider.getValue(), pitchSlider.getValue(), yawSlider.getValue()};
+        Quat4f.setFromRollPitchYawDegrees(q, rpyDeg[0],rpyDeg[1],rpyDeg[2]);
+        return new JointRotationConfiguration(jointName, q, rpyDeg);
     }
 }

@@ -320,6 +320,14 @@ public final class Quat4f
     {
         setFromRollPitchYaw(q, Mat4f.DEGTORADF * roll, Mat4f.DEGTORADF * pitch, Mat4f.DEGTORADF * yaw);
     }
+    
+    /**
+     * Like setFromRollPitchYaw, but with angles specified in degrees, rather than in radians.
+     */
+    public static void setFromRollPitchYawDegrees(float[] q, int index, float roll, float pitch, float yaw)
+    {
+        setFromRollPitchYaw(q, index, Mat4f.DEGTORADF * roll, Mat4f.DEGTORADF * pitch, Mat4f.DEGTORADF * yaw);
+    }
 
     /**
      * calculates a quaternion representation from "roll-pitch-yaw" angles specifies in radians. This is a rotation of the form Ry(yaw) o Rx(pitch) o
@@ -339,6 +347,26 @@ public final class Quat4f
         q[x] = (float) (cx * sy * sz + sx * cy * cz);
         q[y] = (float) (cx * sy * cz - sx * cy * sz);
         q[z] = (float) (cx * cy * sz - sx * sy * cz);
+    }
+    
+    /**
+     * calculates a quaternion representation from "roll-pitch-yaw" angles specifies in radians. This is a rotation of the form Ry(yaw) o Rx(pitch) o
+     * Rz(roll). So, the roll is around the Z axis, pitch around the X axis, and yaw around the Y axis. Informally, roll is in the objects own
+     * coordinate system, pitch is the angle between the objects own axis and the X-Z plane, and yaw is the "heading", obtained by rotating around the
+     * Y-axis. The result (in float precision) is returned in the quaternion array q.
+     */
+    public static void setFromRollPitchYaw(float[] q, int index, float roll, float pitch, float yaw)
+    {
+        double cx = Math.cos(pitch / 2.0);
+        double cy = Math.cos(yaw / 2.0);
+        double cz = Math.cos(roll / 2.0);
+        double sx = Math.sin(pitch / 2.0);
+        double sy = Math.sin(yaw / 2.0);
+        double sz = Math.sin(roll / 2.0);
+        q[s+index] = (float) (cx * cy * cz + sx * sy * sz);
+        q[x+index] = (float) (cx * sy * sz + sx * cy * cz);
+        q[y+index] = (float) (cx * sy * cz - sx * cy * sz);
+        q[z+index] = (float) (cx * cy * sz - sx * sy * cz);
     }
 
     /**
