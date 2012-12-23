@@ -5,6 +5,7 @@
       <dependency org="HMI"      name="HmiUtil"           rev="latest.${resolve.status}"  />
       <dependency org="HMI"      name="HmiXml"            rev="latest.${resolve.status}"  />
       <dependency org="HMI"      name="HmiMath"           rev="latest.${resolve.status}"  />
+      <dependency org="HMI"      name="HmiNeurophysics"           rev="latest.${resolve.status}"  />
 	  <dependency org="lombok"  name="lombok"      rev="latest.release"  />
       <dependency org="slf4j"    name="slf4j-api"         rev="latest.release"  />
       <dependency org="google"   name="guava"             rev="latest.release"  />

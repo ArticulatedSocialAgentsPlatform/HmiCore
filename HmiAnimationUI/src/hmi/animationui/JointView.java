@@ -13,9 +13,9 @@ import lombok.Getter;
  * A user interface to set and update joint rotations
  * @author hvanwelbergen
  */
-public class JointView implements Viewer
+public class JointView
 {
-    private final JointController controller;
+    private final RotationsController controller;
     
     @Getter
     private JPanel panel = new JPanel();
@@ -23,7 +23,7 @@ public class JointView implements Viewer
     
     private List<JointRotationPanel> rotPanels = new ArrayList<>();
     
-    public JointView(JointController controller, Collection<String> joints)
+    public JointView(RotationsController controller, Collection<String> joints)
     {
         this.controller = controller;
         panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
