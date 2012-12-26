@@ -2,11 +2,10 @@ package hmi.animationui;
 
 import hmi.animation.Hanim;
 import hmi.animation.VJoint;
+import hmi.animation.VJointUtils;
 import hmi.neurophysics.Torso;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -20,25 +19,13 @@ public class TorsoController implements RotationsController
     private final ImmutableList<VJoint> thoracicJoints;
     private final ImmutableList<VJoint> torsoJoints;
 
-    private List<VJoint> gatherJoints(String[] spineGroup, VJoint skeleton)
-    {
-        List<VJoint> joints = new ArrayList<>();
-        for (String sid : spineGroup)
-        {
-            if (skeleton.getPartBySid(sid) != null)
-            {
-                joints.add(skeleton.getPart(sid));
-            }
-        }
-        Collections.reverse(joints);
-        return joints;
-    }
+    
 
     public TorsoController(VJoint model)
     {
-        List<VJoint> joints = gatherJoints(Hanim.LUMBAR_JOINTS, model);
-        thoracicJoints = ImmutableList.copyOf(gatherJoints(Hanim.THORACIC_JOINTS, model));
-        joints.addAll(thoracicJoints);
+        List<VJoint> joints = VJointUtils.gatherJoints(Hanim.LUMBAR_JOINTS, model);
+        thoracicJoints = ImmutableList.copyOf(VJointUtils.gatherJoints(Hanim.THORACIC_JOINTS, model));        
+        joints.addAll(thoracicJoints);        
         torsoJoints = ImmutableList.copyOf(joints);
     }
 
