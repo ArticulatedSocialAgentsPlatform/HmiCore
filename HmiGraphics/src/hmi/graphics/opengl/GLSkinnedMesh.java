@@ -534,7 +534,7 @@ public class GLSkinnedMesh extends GLBasicMesh
                 fapIndexBase += fapCount[v];
             }
 
-            // Next, apply skelton based transformations
+            // Next, apply skeleton based transformations
             float accumulatedWeight = 0.0f;
             for (int p = jointIndexBase; p < jointIndexBase + jointCount[v]; p++)
             {
