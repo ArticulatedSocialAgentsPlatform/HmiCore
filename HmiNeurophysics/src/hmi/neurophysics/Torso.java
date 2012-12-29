@@ -18,17 +18,17 @@ public final class Torso
 {
     private Torso(){}
     
-    private static double getUniform(int n)
+    public static double getUniform(int n)
     {
         return 1.0 / (double) n;
     }
 
-    private static double getLinearIncrease(int i, int n)
+    public static double getLinearIncrease(int i, int n)
     {
         return (double) i * (2.0 / ((double) n * ((double) n + 1.0)));
     }
 
-    private static double getLinearDecrease(int i, int n)
+    public static double getLinearDecrease(int i, int n)
     {
         return ((double) n + 1.0 - (double) i) * (2.0 / ((double) n * ((double) n + 1.0)));
     }
