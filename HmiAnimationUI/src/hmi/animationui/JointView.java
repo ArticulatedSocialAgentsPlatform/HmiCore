@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
@@ -26,13 +27,14 @@ public class JointView
     public JointView(RotationsController controller, Collection<String> joints)
     {
         this.controller = controller;
-        panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
+        panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
         for(String vj:joints)
         {
             JointRotationPanel rp = new JointRotationPanel(vj, this); 
             rotPanels.add(rp);
             panel.add(rp.getPanel());
         }
+        panel.add(Box.createVerticalGlue());        
     }    
     
     public void update()
