@@ -1,9 +1,10 @@
 package hmi.animationui;
 
-import java.awt.Dimension;
-import java.awt.GridLayout;
-
 import hmi.math.Quat4f;
+
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -52,8 +53,11 @@ public class JointRotationPanel
         this.jointName = jointName;
         this.jointView = jointView;
         JLabel label = new JLabel(jointName);
+        JPanel pL = new JPanel();
+        pL.setLayout(new FlowLayout(FlowLayout.LEFT));
+        pL.add(label);
         panel.setLayout(new GridLayout());
-        panel.add(label);
+        panel.add(pL);
 
         pitchSlider = new JSlider(JSlider.HORIZONTAL, -180, 180, 0);
         yawSlider = new JSlider(JSlider.HORIZONTAL, -180, 180, 0);

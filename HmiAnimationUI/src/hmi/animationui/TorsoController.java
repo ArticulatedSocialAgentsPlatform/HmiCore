@@ -8,6 +8,7 @@ import hmi.neurophysics.Torso;
 import java.util.Collection;
 import java.util.List;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -18,7 +19,7 @@ public class TorsoController implements RotationsController
 {
     private final ImmutableList<VJoint> thoracicJoints;
     private final ImmutableList<VJoint> torsoJoints;
-
+    
     
 
     public TorsoController(VJoint model)
@@ -31,7 +32,7 @@ public class TorsoController implements RotationsController
 
     public JointView constructTorsoView()
     {
-        return new JointView(this, ImmutableList.of("Torso"));
+        return new JointView(this, ImmutableList.of("Torso ("+Joiner.on(",").join(VJointUtils.transformToSidList(torsoJoints))+")"));
     }
 
     public void setJointRotations(Collection<JointRotationConfiguration> rotations)
