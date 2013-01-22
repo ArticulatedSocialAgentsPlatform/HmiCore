@@ -874,7 +874,7 @@ public class GMesh extends XMLStructureAdapter implements BinaryExternalizable, 
         }
 
         Triangulator triangulator = new Triangulator();
-        indexData = triangulator.triangulate(coordData, VERTEXCOORD_SIZE, indexData, vcounts);
+        indexData = triangulator.triangulate(id, coordData, VERTEXCOORD_SIZE, indexData, vcounts);
 
         vcounts = null;
         meshType = MeshType.Triangles;

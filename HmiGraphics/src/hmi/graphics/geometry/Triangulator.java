@@ -22,13 +22,14 @@
 
 package hmi.graphics.geometry;
 
-//import parlevink.util.Console;
+
 
 /**
  * A utility class for operations on polygons, like triangulation.
  */
 public class Triangulator
 {
+    private String meshId;
     private float[] vertexCoords; // vertex Coordinates. (only part of which it
                                   // might be actually used)
     private int vertexStride; // stride for moving from one vertex to the next
@@ -58,24 +59,19 @@ public class Triangulator
      */
     public Triangulator()
     {
-
     }
-
-    // hmi.util.Console.println("Number of polygons: " + vcounts.length +
-    // " new number of triangles: " + nrOfTris + " coordSize=" + coordSize);
 
     /**
      * triangulates the polygons of this Triangulator object, and returns the
      * result in a new index array.
      */
-    public int[] triangulate(float[] vertexCoords, int vertexStride,
+    public int[] triangulate(String meshId, float[] vertexCoords, int vertexStride,
             int[] indices, int[] vCounts)
     {
+        this.meshId = meshId;
         this.vertexCoords = vertexCoords;
         vertexOffset = 0;
         this.vertexStride = vertexStride;
-        //this.indices = indices;
-        //this.vCounts = vCounts;
         int nrOfTris = 0;
         int maxVCount = 0;
         for (int p = 0; p < vCounts.length; p++)
@@ -85,14 +81,12 @@ public class Triangulator
                 maxVCount = vcount;
             if (vcount < 3)
             {
-                logger.info("Triangulator polygon with only " + vcount
+                logger.warning("Triangulator for " + meshId + ": polygon with only " + vcount
                         + " vertices");
             } else
             {
                 nrOfTris += vcount - 2;
             }
-            // hmi.util.Console.println("triangulate polygon " + p +
-            // " nrOfTris=" + nrOfTris);
         }
         polyIndex = new int[maxVCount];
         int nrOfNewIndices = 3 * nrOfTris;
@@ -102,9 +96,6 @@ public class Triangulator
         int indexOffset = 0;
         for (int p = 0; p < vCounts.length; p++)
         {
-            // hmi.util.Console.println("Triangulate polygon number " + p +
-            // " vcount = " + vCounts[p] + ",  indexOffset = " + indexOffset +
-            // ", triangleOffset = " + triangleOffset);
             polyVCount = vCounts[p];
             for (int i = 0; i < polyVCount; i++)
             {
@@ -113,7 +104,6 @@ public class Triangulator
             }
             calcNormal();
             int triCount = triangulatePolygon(newIndices, triangleOffset);
-            // hmi.util.Console.println("triCount = " + triCount);
             indexOffset += vCounts[p];
             triangleOffset += 3 * triCount;
         }
@@ -165,13 +155,9 @@ public class Triangulator
         }
     }
 
-    // public float getArea() {
-    // return 0.5f * (float) Math.sqrt(nx*nx + ny*ny + nz*nz);
-    // }
-
-    // public Vec3 normal() {
-    // return normal;
-    // }
+     public float getArea() {
+        return 0.5f * (float) Math.sqrt(nx*nx + ny*ny + nz*nz);
+     }
 
     /*
      * is point indexed by ri (strictly) to the left of the line throug vertices
@@ -225,14 +211,17 @@ public class Triangulator
     {
         int jm = prev(pi);
         int jp = next(pi);
-        if (!toLeft(jm, pi, jp))
+        if (!toLeft(jm, pi, jp)) {
             return false;
+        }
         for (int k = 0; k < polyVCount; k++)
         {
-            if (k == jm || k == pi || k == jp)
+            if (k == jm || k == pi || k == jp) {
                 continue;
-            if (insideTriangle(jm, pi, jp, k))
+            }
+            if (insideTriangle(jm, pi, jp, k)) {
                 return false;
+            }
         }
         return true;
     }
@@ -272,12 +261,37 @@ public class Triangulator
     private int triangulatePolygon(int[] triangles, int triangleOffset)
     {
         int triCount = 0;
+        int pcnt = 0;
+        float area = getArea();
+        if (area == 0.0f) {
+           logger.warning("GMesh " + meshId + " triangulate polygon with Area: " + area);
+           return 0;
+               
+        }
         while (polyVCount > 3)
         {
+//            boolean check = (pcnt++ == 5);
+//            if (check) {
+//               hmi.util.Console.println("tri counter=" + pcnt + " polyVCount=" + polyVCount);
+//               for (int pi=0; pi < polyVCount; pi++) {
+//                   int vi = vertexOffset + vertexStride * polyIndex[pi];
+//                   float px = vertexCoords[vi];
+//                   float py = vertexCoords[vi + 1];
+//                   float pz = vertexCoords[vi + 2];
+//                   
+//                   hmi.util.Console.println("Point[" + pi + "] = (" + px + ", " + py + ", " + pz + ")"); 
+//                   
+//                   
+//               }
+//               hmi.util.Console.println("Area: " + getArea());
+//               
+//            }
             int p = 0;
             boolean earFound = false;
+            int cnt = 0;
             while (!earFound && p < polyVCount)
             {
+                
                 earFound = isEar(p);
                 if (earFound)
                 {
