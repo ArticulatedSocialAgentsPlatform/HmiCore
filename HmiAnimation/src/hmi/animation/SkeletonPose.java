@@ -79,6 +79,19 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
         SkeletonPose copy = new SkeletonPose(partIds, config, configType);
         return copy;
     }
+    
+    /**
+     * Creates a shallow copy that is not connected to this SkeletonPose's target
+     * The copy shares copies of this SkeletonPose's partIds and config.
+     */
+    public SkeletonPose untargettedDeepCopy()
+    {
+        String[] newPartIds = new String[partIds.length];
+        System.arraycopy(partIds,0,newPartIds,0,partIds.length);
+        float newConfig[]=new float[config.length];
+        System.arraycopy(config,0,newConfig,0,config.length);
+        return new SkeletonPose(newPartIds, newConfig, configType);
+    }
 
     /**
      * Creates a new SkeletonPose for a specified ConfigList, VParts,
