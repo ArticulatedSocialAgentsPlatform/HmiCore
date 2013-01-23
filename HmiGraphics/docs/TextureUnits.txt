@@ -6,6 +6,10 @@ We distinguish the following entities:
 
 1) Collada  TEXCOORD inputs, inside geometry, for example:
 <input semantic="TEXCOORD" source="#hair_C_-mesh-map-channel1" offset="2" set="1"/>
+
+or in Alyson/Figure2_geometry.xml:
+<input offset="2" semantic="TEXCOORD" source="#Figure_2_geometry-uvs" set="0"/>
+
 The offset" is just an internal Collada offset in the encoding of the attribute data; 
 it is removed when compiling the Collada data into scenegraph data.
 At first sight the "set" attribute looks like a "texture unit" number, but that isn't true in general. 
@@ -24,10 +28,13 @@ From the Collada web forum:
 For example:
 <texture texture="chev3_chatun__jpg-sampler" texcoord="CHANNEL1">
 
+or in Alyson:
+<texture texture="sampler-material-Body" texcoord="UVSET0"/>
+
 This states that the texture coordinates for this texture should come from CHANNEL1.
 
 
-3) The linking between "CHANNELS" and TEXCOORD/set combinations is done within instance_controller/...bind_material.../instance_material/bind_vertex_input:
+3) The linking between texcoord "CHANNELS" and TEXCOORD/set combinations is done within instance_controller/...bind_material.../instance_material/bind_vertex_input:
 
 For instance:
 
@@ -39,6 +46,8 @@ For instance:
                 <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="1"/>
                 
 This links effect CHANNEL1 to the TEXCOORD input set 1, from the geometry.
+
+Note: in Alyson ontbreken de <bind_vertex_input elementen!!!!
 
 4) Translation/Presentation of texture sets, texture channels, texture units etc>
 
