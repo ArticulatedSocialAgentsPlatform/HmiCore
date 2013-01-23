@@ -548,7 +548,6 @@ public class XMLTokenizerTest
         XMLTokenizer tokenizer = new XMLTokenizer("<test/>");
         assertTrue(tokenizer.atSTag("test"));
         String skipped = tokenizer.getXMLSection();
-        //System.out.println("Skipped: " + skipped);
         assertEquals(skipped, "<test/>");
     }
     
@@ -558,7 +557,6 @@ public class XMLTokenizerTest
         XMLTokenizer tokenizer = new XMLTokenizer("<test id=\"ident\"/>");
         assertTrue(tokenizer.atSTag("test"));
         String skipped = tokenizer.getXMLSection();
-        //System.out.println("Skipped: " + skipped);
         assertEquals(skipped, "<test id=\"ident\"/>");
     }
     
@@ -568,7 +566,6 @@ public class XMLTokenizerTest
         XMLTokenizer tokenizer = new XMLTokenizer("<test id=\"&gt;ident\"/>"); // escaped > char (unescaped > chars are not allowed)
         assertTrue(tokenizer.atSTag("test"));
         String skipped = tokenizer.getXMLSection();
-        //System.out.println("Skipped: " + skipped);
         assertEquals(skipped, "<test id=\"&gt;ident\"/>");
     }
     

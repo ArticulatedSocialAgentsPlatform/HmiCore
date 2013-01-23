@@ -28,7 +28,7 @@ import net.jcip.annotations.Immutable;
  * @author welberge
  */
 @Immutable
-public final class Bookmark implements Comparable<Bookmark>
+public final class Bookmark
 {
     private final String name;
 
@@ -50,16 +50,6 @@ public final class Bookmark implements Comparable<Bookmark>
                 + offset;
     }
 
-    @Override
-    public int compareTo(Bookmark o)
-    {
-        if (offset < o.offset)
-            return -1;
-        if (offset > o.offset)
-            return 1;
-        return 0;
-    }
-
     public String getName()
     {
         return name;
@@ -77,22 +67,5 @@ public final class Bookmark implements Comparable<Bookmark>
     public int getOffset()
     {
         return offset;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        // ensures that equal Bookmarks have equal hash codes
-        return offset;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (o instanceof Bookmark)
-        {
-            return ((Bookmark) o).offset == offset;
-        }
-        return super.equals(o);
-    }
+    }    
 }

@@ -9,7 +9,7 @@ import hmi.animation.VJointUtils;
  * The controller handles input from the viewer and updates the vjoint structure
  * @author hvanwelbergen
  */
-public class JointController
+public class JointController implements RotationsController
 {
     private final VJoint model;
     

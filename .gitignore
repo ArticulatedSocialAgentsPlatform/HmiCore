@@ -6,6 +6,9 @@ dist
 .classpath
 .project
 *.*~
+.idea
+*.eml
+*.iml
 *.swp
 manifest.mf
 /HmiTTSSapi5/cpp/sapi5/ttsinterface.ncb

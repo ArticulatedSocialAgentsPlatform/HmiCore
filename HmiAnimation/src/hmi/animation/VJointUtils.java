@@ -283,4 +283,18 @@ public final class VJointUtils
         v.calculateMatrices();
         return v;
     }
+    
+    
+    public static List<VJoint> gatherJoints(String[] sids, VJoint skeleton)
+    {
+        List<VJoint> joints = new ArrayList<>();
+        for (String sid : sids)
+        {
+            if (skeleton.getPartBySid(sid) != null)
+            {
+                joints.add(skeleton.getPart(sid));
+            }
+        }        
+        return joints;
+    }
 }

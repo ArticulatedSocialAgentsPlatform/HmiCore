@@ -10,6 +10,8 @@ import org.junit.*;
 import java.io.IOException;
 import java.util.*;
 
+import lombok.Getter;
+
 import org.hamcrest.collection.IsIterableContainingInOrder;
 
 import com.google.common.primitives.Ints;
@@ -127,7 +129,7 @@ public class XMLStructureAdapterTest
         String xmlEncoding = xa.toXMLString("ns", "http://hmi.ns.test");
 
         String expectedCoding = "<ns:test xmlns:ns=\"http://hmi.ns.test\">\n" + "</ns:test>";
-        //System.out.println("xa3: \n" + xmlEncoding + "\n expected: \n" + expectedCoding);
+        // System.out.println("xa3: \n" + xmlEncoding + "\n expected: \n" + expectedCoding);
         assertTrue(xmlEncoding.equals(expectedCoding));
     }
 
@@ -149,7 +151,7 @@ public class XMLStructureAdapterTest
         String xmlEncoding = xa.toXMLString("ns", "http://hmi.ns.test");
 
         String expectedCoding = "<ns:test xmlns:ns=\"http://hmi.ns.test\">\n" + "</ns:test>";
-        //System.out.println("xa3: \n" + xmlEncoding + "\n expected: \n" + expectedCoding);
+        // System.out.println("xa3: \n" + xmlEncoding + "\n expected: \n" + expectedCoding);
         assertTrue(xmlEncoding.equals(expectedCoding));
     }
 
@@ -230,99 +232,112 @@ public class XMLStructureAdapterTest
         test.readXML("<TestXMLAmp attr=\"&gt;&amp;&amp;&lt;&quot;\"/>");
         assertEquals(">&&<\"", test.attr);
     }
-    
-    
+
     @Test
     public void testAppendXML1()
     {
         XMLStructureAdapter test = new XMLStructureAdapter()
         {
-           public String getXMLTag()  {  return "xmlTag"; }
-          // public String getNamespace() { return "http://hmi.ns2.test"; }     
-           public boolean hasContent() { return false; }        
+            public String getXMLTag()
+            {
+                return "xmlTag";
+            }
+
+            // public String getNamespace() { return "http://hmi.ns2.test"; }
+            public boolean hasContent()
+            {
+                return false;
+            }
         };
         StringBuilder buf = new StringBuilder();
         XMLFormatting fmt = new XMLFormatting(0);
         List<XMLNameSpace> namespaceList = new ArrayList<XMLNameSpace>();
         test.appendXML(buf, fmt, namespaceList);
         String encoded1 = buf.toString();
-        //System.out.println("encoded1=" + encoded1);
-        //System.out.println(hmi.util.StringUtil.showDiff("encoded1", encoded1, "<xmlTag/>"));
+        // System.out.println("encoded1=" + encoded1);
+        // System.out.println(hmi.util.StringUtil.showDiff("encoded1", encoded1, "<xmlTag/>"));
         assertTrue(encoded1.equals("<xmlTag/>"));
-        
+
         buf = new StringBuilder();
         namespaceList.add(new XMLNameSpace("pref1", "http://hmi.ns1.test"));
         test.appendXML(buf, fmt, namespaceList);
         String encoded2 = buf.toString();
-        //System.out.println("encoded2=" + encoded2);
+        // System.out.println("encoded2=" + encoded2);
         assertTrue(encoded2.equals("<xmlTag xmlns:pref1=\"http://hmi.ns1.test\"/>"));
-        
-        
+
         buf = new StringBuilder();
         namespaceList.add(new XMLNameSpace("pref2", "http://hmi.ns2.test"));
         test.appendXML(buf, fmt, namespaceList);
-        String  encoded3 = buf.toString();
-        //System.out.println("encoded3=" + encoded3);
+        String encoded3 = buf.toString();
+        // System.out.println("encoded3=" + encoded3);
         assertTrue(encoded3.equals("<xmlTag xmlns:pref1=\"http://hmi.ns1.test\" xmlns:pref2=\"http://hmi.ns2.test\"/>"));
-         
+
     }
 
-
-   @Test
+    @Test
     public void testAppendXML2()
     {
         XMLStructureAdapter test = new XMLStructureAdapter()
         {
-           public String getXMLTag()  {  return "xmlTag"; }
-           public String getNamespace() { return "http://hmi.ns2.test"; }     
-           public boolean hasContent() { return false; }        
+            public String getXMLTag()
+            {
+                return "xmlTag";
+            }
+
+            public String getNamespace()
+            {
+                return "http://hmi.ns2.test";
+            }
+
+            public boolean hasContent()
+            {
+                return false;
+            }
         };
         StringBuilder buf = new StringBuilder();
         XMLFormatting fmt = new XMLFormatting(0);
         List<XMLNameSpace> namespaceList = new ArrayList<XMLNameSpace>();
         test.appendXML(buf, fmt, namespaceList);
         String encoded1 = buf.toString();
-        //System.out.println("encoded1=" + encoded1);
-        //System.out.println(hmi.util.StringUtil.showDiff("encoded1", encoded1, "<xmlTag/>"));
+        // System.out.println("encoded1=" + encoded1);
+        // System.out.println(hmi.util.StringUtil.showDiff("encoded1", encoded1, "<xmlTag/>"));
         assertTrue(encoded1.equals("<xmlTag xmlns=\"http://hmi.ns2.test\"/>"));
-        
+
         buf = new StringBuilder();
         namespaceList.add(new XMLNameSpace("pref1", "http://hmi.ns1.test"));
         test.appendXML(buf, fmt, namespaceList);
         String encoded2 = buf.toString();
-        //System.out.println("encoded2=" + encoded2);
+        // System.out.println("encoded2=" + encoded2);
         assertTrue(encoded2.equals("<xmlTag xmlns=\"http://hmi.ns2.test\" xmlns:pref1=\"http://hmi.ns1.test\"/>"));
-        
-        
+
         buf = new StringBuilder();
         namespaceList.add(new XMLNameSpace("pref2", "http://hmi.ns2.test"));
         test.appendXML(buf, fmt, namespaceList);
-        String  encoded3 = buf.toString();
-        //System.out.println("encoded3=" + encoded3);
+        String encoded3 = buf.toString();
+        // System.out.println("encoded3=" + encoded3);
         assertTrue(encoded3.equals("<pref2:xmlTag xmlns:pref1=\"http://hmi.ns1.test\" xmlns:pref2=\"http://hmi.ns2.test\"/>"));
-         
-    }    
-    
-    
+
+    }
+
     @Test
     public void testAppendXML3()
     {
-        
+
         StringBuilder buf = new StringBuilder();
         XMLFormatting fmt = new XMLFormatting(0);
-        
+
         fmt.pushXMLNameSpace(new XMLNameSpace("bmlt", "http://hmi.ns1.test"));
         XMLStructureAdapter.appendNamespacedAttribute(buf, fmt, "http://hmi.ns1.test", "bmltattr", "bmltval");
         List<XMLNameSpace> namespaceList = new ArrayList<XMLNameSpace>();
-     
+
         String encoded = buf.toString();
-        //System.out.println("encoded=" + encoded);
-        //System.out.println(hmi.util.StringUtil.showDiff("encoded", encoded, " bmlt:bmltattr=\"bmltval\""));
+        // System.out.println("encoded=" + encoded);
+        // System.out.println(hmi.util.StringUtil.showDiff("encoded", encoded, " bmlt:bmltattr=\"bmltval\""));
         assertEquals(" bmlt:bmltattr=\"bmltval\"", encoded);
-        
+
         buf = new StringBuilder();
     }
-    
+
     @Test
     public void testWriteDefaultNS()
     {
@@ -333,20 +348,55 @@ public class XMLStructureAdapterTest
             {
                 return "http://stubns";
             }
-            
+
             @Override
             public String getXMLTag()
             {
                 return "stub";
             }
         }
-        
+
         StubSA ssaSource = new StubSA();
         StringBuilder buf = new StringBuilder();
-        //This should automatically insert the default namespace in buf
+        // This should automatically insert the default namespace in buf
         ssaSource.appendXML(buf);
-        
+
         StubSA ssaTarget = new StubSA();
         ssaTarget.readXML(buf.toString());
+    }
+
+    
+    final class TestA extends XMLStructureAdapter
+    {
+        @Getter
+        String content;
+
+        @Override
+        public String getXMLTag()
+        {
+            return "TestA";
+        }
+
+        @Override
+        public void decodeContent(XMLTokenizer tokenizer) throws IOException
+        {
+            content = tokenizer.getXMLSection();
+        }
+    }
+    
+    @Test
+    public void testGetEmptyXMLSection()
+    {
+        TestA testA = new TestA();
+        testA.readXML("<TestA><test/></TestA>");
+        assertEquals("<test/>", testA.getContent());
+    }
+    
+    @Test
+    public void testGetEmptyXMLSectionWithClosingTag()
+    {
+        TestA testA = new TestA();
+        testA.readXML("<TestA><test></test></TestA>");
+        assertEquals("<test></test>", testA.getContent());
     }
 }

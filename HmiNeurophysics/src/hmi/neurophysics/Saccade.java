@@ -3,7 +3,7 @@ package hmi.neurophysics;
 /**
  * Saccade information.
  * From http://www.liv.ac.uk/~pcknox/teaching/Eymovs/params.htm<br>
- * se also http://en.wikipedia.org/wiki/Saccade
+ * see also http://en.wikipedia.org/wiki/Saccade
  * @author welberge
  *
  */
