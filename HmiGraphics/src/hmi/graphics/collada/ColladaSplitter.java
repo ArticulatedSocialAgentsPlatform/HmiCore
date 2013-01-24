@@ -42,7 +42,8 @@ public class ColladaSplitter
    String inFilePath;       // path for input file
    String outDirName;       // directory for output results
    String outDirPath;       // directory path for split results
-   String outDirGeometriesPath;       // directory path for geometries
+   String outDirGeometriesPath;  // directory path for geometries
+   String outDirNodesPath;       // directory path for visual scenes nodes
    String baseName;         // base name part of inFileName
    File inFile;             // input File
    BufferedReader in;       // input Reader
@@ -50,6 +51,7 @@ public class ColladaSplitter
    int lineCounter = 0;     // counts number of lines read.
    File outDir;             // directory for output files
    File outDirGeometries;   // directory for geometry files
+   File outDirNodes;        // directory for node files
    String toplevelFileName; // name of top-level dae file for split results
    String toplevelFilePath; // full path for top-level file
    private PrintWriter outToplevel; // Writer for top-level output
@@ -62,6 +64,9 @@ public class ColladaSplitter
    // <geometry id="Kevin-mesh" name="Kevin">
    Pattern startGeometryPattern =  Pattern.compile(".*<geometry.*\\Wid\\s*=\\s*\"([a-zA-Z0-9-_]*)\".*>.*");
    Pattern endGeometryPattern =  Pattern.compile(".*</geometry(.*)>.*");
+  // <node id="Figure_2BODY_2_node" name="Body" sid="Figure_2BODY_2_node" type="JOINT">
+   Pattern startNodePattern =  Pattern.compile(".*<node.*\\Wid\\s*=\\s*\"([a-zA-Z0-9-_]*)\".*>.*");
+   Pattern endNodePattern =  Pattern.compile(".*</node(.*)>.*");
  
    /**
     * Searches for the dae file within the given Resource directory. 
@@ -93,6 +98,7 @@ public class ColladaSplitter
       System.out.println("outDirPath=" + outDirPath);
       
       outDirGeometriesPath = outDirPath + "/geometries";
+      outDirNodesPath = outDirPath + "/nodes";
       
            
       inFile = new File(inFilePath);
@@ -118,6 +124,15 @@ public class ColladaSplitter
                System.out.println("Directory: " + outDirGeometriesPath + " created");
             } else {
                System.out.println("Could not create Directory: " + outDirGeometriesPath);
+               System.exit(0);
+            }   
+         }
+         outDirNodes = new File(outDirNodesPath);
+         if (! (outDirNodes.exists()) ) {
+            if (outDirNodes.mkdir()) {
+               System.out.println("Directory: " + outDirNodesPath + " created");
+            } else {
+               System.out.println("Could not create Directory: " + outDirNodesPath);
                System.exit(0);
             }   
          }
@@ -173,10 +188,41 @@ public class ColladaSplitter
             System.exit(0);
          }
       }
-      boolean isGeometries = (libraryType.equals("geometries"));
-      Matcher startGeom;
-      while(line != null) {
-         if (isGeometries && (startGeom = startGeometryPattern.matcher(line)).matches()) {
+      
+      if (libraryType.equals("geometries")) {
+         System.out.println("Geometries library");
+         splitGeometries(outLibrary);
+      } else if (libraryType.equals("visual_scenes")) {
+         System.out.println("Visual Scenes library");
+         splitVisualScenesLibrary(outLibrary);
+      } else {
+         splitDefaultLibrary(outLibrary);
+      }
+   }
+   
+   /* assumption: we are at the first line of a <library-Type section. 
+    * all library lines are consumed, line is left at the last </library_xyz line
+    */
+   private void splitDefaultLibrary(PrintWriter outLibrary) throws IOException {
+      while(line != null) {       
+         outLibrary.println(line);
+         Matcher endLibraryMatcher = endLibraryPattern.matcher(line);
+         if (endLibraryMatcher.matches()) {
+            return;                  
+         } else {
+            line = in.readLine();
+            lineCounter++;
+         } 
+      }
+   }
+   
+   /* assumption: we are at the first line of a <library_geometries> section. 
+    * all library lines are consumed, line is left at the last </library_geometries> line
+    */
+   private void splitGeometries(PrintWriter outLibrary) throws IOException {
+       Matcher startGeom;
+       while(line != null) {
+         if ((startGeom = startGeometryPattern.matcher(line)).matches()) {
             String geomId= startGeom.group(1);     
             splitGeometry(geomId);
             line = in.readLine();
@@ -193,6 +239,7 @@ public class ColladaSplitter
          }  
       }
    }
+   
    
    /*
     * Assumption: we are on a  <geometry> input line.
@@ -217,6 +264,55 @@ public class ColladaSplitter
             lineCounter++;
          }       
       }  
+   }
+   
+   
+      /* assumption: we are at the first line of a <library_visual_scenes> section. 
+    * all library lines are consumed, line is left at the last </library_visual_scenes> line
+    */
+   private void splitVisualScenesLibrary(PrintWriter outLibrary) throws IOException {
+      PrintWriter outNode = outLibrary;
+      Matcher startNode;
+      Matcher endNode;
+      int nodeLevel = 0;
+      int splitLevel = 1;
+      while(line != null) { 
+         if ((startNode = startNodePattern.matcher(line)).matches()) {   
+             //System.out.println(" node level = " + nodeLevel);
+             nodeLevel++;
+             if (nodeLevel == splitLevel+1) {
+                String nodeId= startNode.group(1); 
+                //System.out.println("split Node " + nodeId);
+                String nodeFileName = nodeId + ".xml";
+                String nodeFilePath = outDirNodesPath + "/" + nodeFileName;
+                outLibrary.println("   <? include file=\"" + outDirName + "/nodes/" + nodeFileName + "\" ?>");  
+                outNode = new PrintWriter(nodeFilePath);
+                           
+             }   
+             outNode.println(line);      
+         } else if ((endNode = endNodePattern.matcher(line)).matches()) {   
+             //System.out.println(" node level = " + nodeLevel);
+             outNode.println(line);
+             nodeLevel--;
+             if (nodeLevel == splitLevel) {
+                
+               //System.out.println("End split Node ");
+               
+               outNode.close();
+               outNode = outLibrary;    
+             }
+         } else {
+            outNode.println(line);
+            Matcher endLibraryMatcher = endLibraryPattern.matcher(line);
+            if (endLibraryMatcher.matches()) {
+               System.out.println(" node level = " + nodeLevel);
+               return;                  
+            }
+         }
+         line = in.readLine();
+         lineCounter++;
+      }
+      
    }
    
    
