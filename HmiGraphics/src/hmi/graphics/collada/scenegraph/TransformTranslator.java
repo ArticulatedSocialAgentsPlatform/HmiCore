@@ -93,7 +93,7 @@ public final class TransformTranslator {
             if (transform instanceof Translate) {
                Translate tr = (Translate) transform;
                switch (stage) {
-                  case STAGE0: Vec3f.set(t, tr.getTranslationVec3f()); break; // set translation vector
+                  case STAGE0: Vec3f.set(t, tr.getTranslationVec3f()); stage = STAGE1;  break; // set translation vector
                   case STAGE1: Vec3f.add(t, tr.getTranslationVec3f()); break; // add translation vector
                   case STAGE2: Vec3f.add(t, Quat4f.transformVec3f(q, tr.getTranslationVec3f())); break; // add rotated vector
                   case STAGE3: case STAGE4: setMatrix();  Mat4f.mul(m, tr.getMat4f()); stage = STAGE5; break;
