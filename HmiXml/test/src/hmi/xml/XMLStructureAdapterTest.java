@@ -10,7 +10,7 @@ import org.junit.*;
 import java.io.IOException;
 import java.util.*;
 
-import lombok.Getter;
+//import lombok.Getter;
 
 import org.hamcrest.collection.IsIterableContainingInOrder;
 
@@ -26,15 +26,7 @@ public class XMLStructureAdapterTest
     {
     }
 
-    @Before
-    public void setUp()
-    { // common initialization, executed for every test.
-    }
-
-    @After
-    public void tearDown()
-    {
-    }
+ 
 
     @Test
     public void basics()
@@ -368,9 +360,11 @@ public class XMLStructureAdapterTest
     
     final class TestA extends XMLStructureAdapter
     {
-        @Getter
-        String content;
+       
+        String section;
 
+        public String getSection() { return section; }
+        
         @Override
         public String getXMLTag()
         {
@@ -380,7 +374,7 @@ public class XMLStructureAdapterTest
         @Override
         public void decodeContent(XMLTokenizer tokenizer) throws IOException
         {
-            content = tokenizer.getXMLSection();
+            section = tokenizer.getXMLSection();
         }
     }
     
@@ -389,7 +383,7 @@ public class XMLStructureAdapterTest
     {
         TestA testA = new TestA();
         testA.readXML("<TestA><test/></TestA>");
-        assertEquals("<test/>", testA.getContent());
+        assertEquals("<test/>", testA.getSection());
     }
     
     @Test
@@ -397,6 +391,6 @@ public class XMLStructureAdapterTest
     {
         TestA testA = new TestA();
         testA.readXML("<TestA><test></test></TestA>");
-        assertEquals("<test></test>", testA.getContent());
+        assertEquals("<test></test>", testA.getSection());
     }
 }
