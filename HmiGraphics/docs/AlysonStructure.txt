@@ -1,0 +1,364 @@
+http://hmisvn.ewi.utwente.nl/trac/hmi/wiki/IssuesForNewVersionsOfArmandia
+
+Manual patching of the alyson Collada file:
+
+1) (Optional) From the commandline, inside the resource dir where we have alyson.dae, use
+ java -cp /JavaProjects/HmiCore/HmiGraphics/build/classes  hmi.graphics.collada.ColladaSplitter   alyson.dae
+ This will produce: a alyson-toplevel.dae plus a directory alyson-libraries. 
+ The latter includes xml files for libraries and subdirs for geometries and nodes.
+ 
+ 
+ 
+ 2) After splitting, alyson has 6 files inside the "nodes" subdir. Three of them are almost identical Node-based skeletons (The Figure_XBODY_X_node.xml files,
+ where X = 2, 3, or 4) The other three (Figure_X_node.xml) are "Instance controllers", that refer to these three skeletons.
+ Problem: geometry attached the first skeleton (so that's Figure_2BODY_2_node.xml in this case) will be shown. 
+ The hair/ponytail is attached to Figure_4BODY_4_node.xml, so this must be corrected. (If you don't use the ColladaSplitter, search for the Figure_4BODY_4_node
+ and the Figure_2BODY_2_node sections inside the original alyson.dae file)
+ 
+   a) Inside Figure_4BODY_4_node.xml there is a "Figure_4figureHair_4_node" node section, to be modified  like this:
+   
+     <node id="Figure_4BODY_4_node" name="Body" sid="Figure_4BODY_4_node" type="JOINT">
+
+               ....................
+
+                               <node id="Figure_4figureHair_4_node" name="PonyTail" sid="Figure_4figureHair_4_node" type="JOINT">
+												<translate sid="origin">3.93189e-005 0.294095 0.0312719</translate>
+												<translate sid="translate">0 0 -0.047183</translate>
+												<rotate sid="rotateZ">0 0 1 0</rotate>
+												<rotate sid="rotateX">1 0 0 0</rotate>
+												<rotate sid="rotateY">0 1 0 0</rotate>
+												<!--instance_geometry url="#Figure_4figureHair_4_geometry">
+													<bind_material>
+														<technique_common>
+															<instance_material symbol="material-tail" target="#material-tail"/>
+															<instance_material symbol="material-head" target="#material-head"/>
+														</technique_common>
+													</bind_material>
+												</instance_geometry-->
+											</node>
+
+
+          ====> Here, I have commented out the <instance_geometry> ... </instance_geometry> block. We still need the node itself, but not the geometry at this place.
+   b) Make a copy of this <node>...</node> above, but with the instance_geometry enabled, and place it at the similar place in Figure_2BODY_2_node.xml, like this:
+   
+      <node id="Figure_2BODY_2_node" name="Body" sid="Figure_2BODY_2_node" type="JOINT">
+                   .................
+                              <node id="Figure_2figureHair_4_node" name="PonyTail" sid="Figure_2figureHair_4_node" type="JOINT">
+												
+												<translate sid="origin">0 0.07 -0.05</translate>
+												
+												<rotate sid="rotateZ">0 0 1 0</rotate>
+												<rotate sid="rotateX">1 0 0 0</rotate>
+												<rotate sid="rotateY">0 1 0 0</rotate>
+												<instance_geometry url="#Figure_4figureHair_4_geometry">
+													<bind_material>
+														<technique_common>
+															<instance_material symbol="material-tail" target="#material-tail"/>
+															<instance_material symbol="material-head" target="#material-head"/>
+														</technique_common>
+													</bind_material>
+												</instance_geometry>
+											</node>
+
+        ===> Note the modified node id and sid. Not sure whether this is needed, but basically it should not conflict with the same id/sid in Figure_4BODY_4_node.xml
+        ===> Note the modified translate setting. For some reason, the hear geometry hovers above the head, at about the translation from Figure_4figureHair_4_node
+              This has to be corrected by means of trial and error. I did adapt both the Y and Z coordinates of the translation (and set the silly 3.93189e-005 for X to 0)
+              It is still not completely correct, but basically I replaced the 29.4 cm of the original Y translation by just 7 cm. 
+              The Z translation (was 3 - 4.7 = -1.7 cm) has been set to -5cm . This needs more patching.
+
+
+
+Next, there is a problem with transparency in the "library_effects" section. (The library_efects.xml file, when using the ColladaSplitter)
+
+Replace the effects for "effect-material-tail" and "effect-material-head" by the following piece of text:
+(What was changed: the original did not use BOTh  image-Pony_Classic_tailtx (the "brown hair texture) 
+and image-Pony_Classic_tailtr (the RGB_ZERO encoded transparency texture). Similar for "sampler-material-tailtx" and "sampler-material-tailtr".
+Basically, it used the same texture for both color and transparency.
+This looks very much like a bug in Poser's  Collada exporter.)
+
+
+   <library_effects>
+   .........
+     <effect id="effect-material-tail" name="effect-material-tail">
+			<profile_COMMON>
+				<newparam sid="surface-material-tailtx">
+					<surface type="2D">
+						<init_from>image-Pony_Classic_tailtx</init_from>
+					</surface>
+				</newparam>
+				<newparam sid="sampler-material-tailtx">
+					<sampler2D>
+						<source>surface-material-tailtx</source>
+					</sampler2D>
+				</newparam>
+				<newparam sid="surface-material-tailtr">
+					<surface type="2D">
+						<init_from>image-Pony_Classic_tailtr</init_from>
+					</surface>
+				</newparam>
+				<newparam sid="sampler-material-tailtr">
+					<sampler2D>
+						<source>surface-material-tailtr</source>
+					</sampler2D>
+				</newparam>
+				<technique sid="technique-material-tail">
+					<phong>
+						<ambient>
+							<color>0 0 0 1</color>
+						</ambient>
+						<diffuse>
+							<texture texture="sampler-material-tailtx" texcoord="UVSET0"/>
+						</diffuse>
+						<specular>
+							<color>0 0 0 1</color>
+						</specular>
+						<transparent opaque="RGB_ZERO">
+							<texture texture="sampler-material-tailtr" texcoord="UVSET0"/>
+						</transparent>
+					</phong>
+				</technique>
+			</profile_COMMON>
+		</effect>
+		<effect id="effect-material-head" name="effect-material-head">
+			<profile_COMMON>
+				<newparam sid="surface-material-headtx">
+					<surface type="2D">
+						<init_from>image-Pony_Classic_headtx</init_from>
+					</surface>
+				</newparam>
+				<newparam sid="sampler-material-headtx">
+					<sampler2D>
+						<source>surface-material-headtx</source>
+					</sampler2D>
+				</newparam>
+				<newparam sid="surface-material-headtr">
+					<surface type="2D">
+						<init_from>image-Pony_Classic_headtr</init_from>
+					</surface>
+				</newparam>
+				<newparam sid="sampler-material-headtr">
+					<sampler2D>
+						<source>surface-material-headtr</source>
+					</sampler2D>
+				</newparam>
+				<technique sid="technique-material-head">
+					<phong>
+						<ambient>
+							<color>0 0 0 1</color>
+						</ambient>
+						<diffuse>
+							<texture texture="sampler-material-headtx" texcoord="UVSET0"/>
+						</diffuse>
+						<specular>
+							<color>0 0 0 1</color>
+						</specular>
+						<transparent opaque="RGB_ZERO">
+							<texture texture="sampler-material-headtr" texcoord="UVSET0"/>
+						</transparent>
+					</phong>
+				</technique>
+			</profile_COMMON>
+		</effect>
+   </library_effects>
+              
+ =========================================================================================================
+ 
+ Shaders/OpenGL
+ 
+ This has nothing to do woth the Collada files as such, but had to be modified in HmiGraphics and DefaultShaders:
+ 
+ 1) backface culling (The gl.glEnable(GL.GL_CULL_FACE);  setting) does not work nicely with the hair as well as the eye lashes.
+ So I did turn it off. 
+ 
+ ===> This is not done in the Elckerlyc loader, so must be corrected
+ 
+ 2) Even with no backface culling, the standard shaders will show no lighting for backfaces. So I adapted the 
+ blinnDiffuseTransparency1.vs shader: (Unclear whether this is needed or improves anything)
+ // LightIntensity = diffuseContribution * max(dot(lightVec, ecNormal), 0.0)
+ //                + specularContribution * spec;
+ LightIntensity = diffuseContribution * abs(dot(lightVec, ecNormal))
+                   + specularContribution * spec;
+ 
+ 
+ 3) The transparemcy shaders (for opaque = RGB_ZERO) like blinnDiffuseTransparency1 and blinnTransparency1 used the
+ alpha from the transparency texture. This was the result of experimenting with Armandia. But basically, this is incorrect,
+ and Armandia seesm to use "inverted" transparancy textures, so with an (imaginary) opaque=RGB_ONE setting. Alyson however, uses the
+ correct interpretation: opaque=RGB_ZERO means: black parts in the transparency texture are opaque, white parts are fully transparant.
+ This is ok if you look, for instance at AlysonLash_EyeTrans.png: the lashes themselves are black, 
+ not white as in Aramdia's cil001.jpg. Similar for Pony_Classic_headtr.jpg : the hair parts are black).
+ 
+ We have corrected this, for the moment, by adapting the shaders.
+ We now have gl_FragColor = vec4(lightColor, 1.0-alpha);
+  rather than gl_FragColor = vec4(lightColor, alpha);
+  
+  Problem: with the Armandia files, this will look exactly wrong. Solution could be to correct the armandia files by color-inverting
+  the transparancy textures. Alternative, allow for RGB_ONE settings in gthe Collada file. (Not standard Collada I think, there is something like ALPHA_ONE)
+ 
+ 
+ 
+ ==================================================
+ 
+Structure of the alyson dae files:
+              
+alyson2-toplevel.dae:
+<?xml version="1.0" encoding="UTF-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+	<asset>
+	</asset>
+   <? include file="alyson2-libraries/library-images.xml" ?>
+   <? include file="alyson2-libraries/library-effects.xml" ?>
+   <? include file="alyson2-libraries/library-materials.xml" ?>
+   <? include file="alyson2-libraries/library-geometries.xml" ?>
+   <? include file="alyson2-libraries/library-controllers.xml" ?>
+   <? include file="alyson2-libraries/library-visual_scenes.xml" ?>
+	<? include file="jointrenaming.xml"        ?>
+	<scene>
+		<instance_visual_scene url="#Poser_scene"/>
+	</scene>
+</COLLADA>
+--------------------------------------------
+  <library_visual_scenes>
+		<visual_scene id="Poser_scene">
+			<node id="Poser_scene_root"> <!-- not essential/no function -->
+   <!-- The Figure2 (first two includes)  model the naked body -->
+   <? include file="alyson2-libraries/nodes/Figure_2BODY_2_node.xml" ?>
+   <? include file="alyson2-libraries/nodes/Figure_2_node.xml" ?>
+   <!-- Figure3: bra -->
+   <? include file="alyson2-libraries/nodes/Figure_3BODY_3_node.xml" ?>
+   <? include file="alyson2-libraries/nodes/Figure_3_node.xml" ?>
+   <!-- Figure4: hair + slip -->
+   <? include file="alyson2-libraries/nodes/Figure_4BODY_4_node.xml" ?>
+   <? include file="alyson2-libraries/nodes/Figure_4_node.xml" ?>
+			</node>
+		</visual_scene>
+	</library_visual_scenes>
+
+  ---------------------------------------------------------
+
+Each of the Figure_XBODY_X_node.xml files includes a complete skeleton copy (with same name, different id/sids)
+
+
+==================================
+Figure_2BODY_2_node.xml
+   Just a Skeletion node file, used for naked body
+
+-----------------------------------
+Figure_2_node.xml: instance controlleer for Naked Body, using Figure_2BODY_2_node skeleton
+
+<node id="Figure_2_node" name="Figure_2_node">
+					<instance_controller url="#Figure_2-skin">
+						<skeleton>#Figure_2BODY_2_node</skeleton>
+						<bind_material>
+							<technique_common>
+								<instance_material symbol="material-EyeSockets" target="#material-EyeSockets"/>
+								<instance_material symbol="material-InnerMouth" target="#material-InnerMouth"/>
+								<instance_material symbol="material-Lacrimals" target="#material-Lacrimals"/>
+								<instance_material symbol="material-TearLine" target="#material-TearLine"/>
+								<instance_material symbol="material-Nostrils" target="#material-Nostrils"/>
+								<instance_material symbol="material-Lips" target="#material-Lips"/>
+								<instance_material symbol="material-Head" target="#material-Head"/>
+								<instance_material symbol="material-Body" target="#material-Body"/>
+								<instance_material symbol="material-EyelashesTop" target="#material-EyelashesTop"/>
+								<instance_material symbol="material-EyeballLeft" target="#material-EyeballLeft"/>
+								<instance_material symbol="material-EyelashesBottom" target="#material-EyelashesBottom"/>
+								<instance_material symbol="material-IrisLeft" target="#material-IrisLeft"/>
+								<instance_material symbol="material-PupilLeft" target="#material-PupilLeft"/>
+								<instance_material symbol="material-CorneaLeft" target="#material-CorneaLeft"/>
+								<instance_material symbol="material-EyeballRight" target="#material-EyeballRight"/>
+								<instance_material symbol="material-IrisRight" target="#material-IrisRight"/>
+								<instance_material symbol="material-PupilRight" target="#material-PupilRight"/>
+								<instance_material symbol="material-CorneaRight" target="#material-CorneaRight"/>
+								<instance_material symbol="material-Teeth" target="#material-Teeth"/>
+								<instance_material symbol="material-Gums" target="#material-Gums"/>
+								<instance_material symbol="material-Tongue" target="#material-Tongue"/>
+								<instance_material symbol="material-Fingernails" target="#material-Fingernails"/>
+								<instance_material symbol="material-Toenails" target="#material-Toenails"/>
+							</technique_common>
+						</bind_material>
+					</instance_controller>
+</node>
+
+===================================
+
+Figure_3BODY_3_node.xml:
+ In essence identical to Figure_2BODY_2_node.xml, execept for renaming 2 into 3.
+ For example, Figure_3hip_3_node instead of Figure_2hip_2_node
+
+--------------------------------
+Figure_3_node.xml: instance controller for Bra, using Figure_3BODY_3_node</skeleton
+
+<node id="Figure_3_node" name="Figure_3_node">
+					<instance_controller url="#Figure_3-skin">
+						<skeleton>#Figure_3BODY_3_node</skeleton>
+						<bind_material>
+							<technique_common>
+								<instance_material symbol="material-bra" target="#material-bra"/>
+								<instance_material symbol="material-breastband" target="#material-breastband"/>
+							</technique_common>
+						</bind_material>
+					</instance_controller>
+</node>
+
+=========================================
+
+Figure_4BODY_4_node.xml:
+ In essence like Figure_2BODY_2_node.xml and Figure_3BODY_3_node.xml, except for the inclusion of HAIR:
+
+           <node id="Figure_4BODY_4_node" name="Body" sid="Figure_4BODY_4_node" type="JOINT">
+					<translate sid="origin">0 1.93975 0</translate>
+					<translate sid="translate">0 -0.830946 -0.0209702</translate>
+					<rotate sid="rotateZ">0 0 1 0</rotate>
+					<rotate sid="rotateX">1 0 0 0</rotate>
+					<rotate sid="rotateY">0 1 0 0</rotate>
+					<node id="Figure_4hip_4_node" name="Hip" sid="Figure_4hip_4_node" type="JOINT">
+						<translate sid="origin">-0 -1.0223 -0.0366979</translate>
+						<translate sid="translate">0 0.830946 0.0209702</translate>
+						<rotate sid="rotateX">1 0 0 0</rotate>
+						<rotate sid="rotateZ">0 0 1 0</rotate>
+						<rotate sid="rotateY">0 1 0 -3.04687</rotate>
+						<node id="Figure_4waist_4_node" name="waist" sid="Figure_4waist_4_node" type="JOINT">
+							<translate sid="translate">0 0.0471831 0.00524256</translate>
+							<rotate sid="rotateX">1 0 0 -0.00859335</rotate>
+							<rotate sid="rotateZ">0 0 1 -0.317052</rotate>
+							<rotate sid="rotateY">0 1 0 0.0817836</rotate>
+							<node id="Figure_4abdomen_4_node" name="Abdomen" sid="Figure_4abdomen_4_node" type="JOINT">
+								<translate sid="translate">0 0.14417 0.0104851</translate>
+								<rotate sid="rotateX">1 0 0 0.0104443</rotate>
+								<rotate sid="rotateZ">0 0 1 0.312325</rotate>
+								<rotate sid="rotateY">0 1 0 7.79479e-005</rotate>
+								<node id="Figure_4chest_4_node" name="Chest" sid="Figure_4chest_4_node" type="JOINT">
+									<translate sid="translate">0 0.107472 0</translate>
+									<rotate sid="rotateX">1 0 0 0.0128782</rotate>
+									<rotate sid="rotateZ">0 0 1 0.534567</rotate>
+									<rotate sid="rotateY">0 1 0 -0.0583331</rotate>
+									<node id="Figure_4neck_4_node" name="Neck" sid="Figure_4neck_4_node" type="JOINT">
+										<translate sid="translate">0 0.233294 -0.0393192</translate>
+										<rotate sid="rotateX">1 0 0 -0.00920496</rotate>
+										<rotate sid="rotateZ">0 0 1 -0.97959</rotate>
+										<rotate sid="rotateY">0 1 0 0.233281</rotate>
+										<node id="Figure_4head_4_node" name="Head" sid="Figure_4head_4_node" type="JOINT">
+											<translate sid="translate">0 0.0419406 0.00786384</translate>
+											<rotate sid="rotateX">1 0 0 -0.00256267</rotate>
+											<rotate sid="rotateZ">0 0 1 0.478509</rotate>
+											<rotate sid="rotateY">0 1 0 1.06989e-005</rotate>
+
+    ====>                        <node id="Figure_4figureHair_4_node" name="PonyTail" sid="Figure_4figureHair_4_node" type="JOINT">
+												<!- -translate sid="origin">3.93189e-005 0.294095 0.0312719</translate- ->
+												<translate sid="origin">0 -2.294095 0.0312719</translate>
+												<!- -translate sid="translate">0 0 -0.047183</translate- ->
+												<rotate sid="rotateZ">0 0 1 0</rotate>
+												<rotate sid="rotateX">1 0 0 0</rotate>
+												<rotate sid="rotateY">0 1 0 0</rotate>
+												<instance_geometry url="#Figure_4figureHair_4_geometry">
+													<bind_material>
+														<technique_common>
+															<instance_material symbol="material-tail" target="#material-tail"/>
+															<instance_material symbol="material-head" target="#material-head"/>
+														</technique_common>
+													</bind_material>
+												</instance_geometry>
+                                 </node>
+
+
+
+ 
