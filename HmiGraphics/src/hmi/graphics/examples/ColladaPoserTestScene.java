@@ -40,20 +40,20 @@ public class ColladaPoserTestScene  implements GLClockedRenderObject {
       openglState = new OpenGLState();      
       
       lights = new LightBox(3);
-      lights.get(0).setDiffuseColor(0.8f, 0.8f, 0.8f);   // The (initial) position of the light
-      lights.get(1).setDiffuseColor(0.7f, 0.0f, 0.0f);   // The (initial) position of the light
-      lights.get(2).setDiffuseColor(0.0f, 0.0f, 0.8f);   // The (initial) position of the light
+      lights.get(0).setDiffuseColor(1.0f, 1.0f, 1.0f);   // The (initial) position of the light
+      lights.get(1).setDiffuseColor(1.0f, 1.0f, 1.0f);   // The (initial) position of the light
+      lights.get(2).setDiffuseColor(1.0f, 1.0f, 0.8f);   // The (initial) position of the light
       lights.get(0).setSpecularColor(0.1f, 0.1f, 0.1f);   // The (initial) position of the light
      
-      lights.get(0).setPosition(1.0f, 1.5f, 1.0f);   // The (initial) position of the light
-      lights.get(1).setPosition(0.0f, 1.0f, 0.0f);   // The (initial) position of the light
-      lights.get(2).setPosition(8.0f, 2.5f, -3.0f);   // The (initial) position of the light
+      lights.get(0).setPosition(3.0f, 2.8f, 2.5f);   // The (initial) position of the light
+      lights.get(1).setPosition(-4.0f, -2.5f, 1.0f);   // The (initial) position of the light
+      lights.get(2).setPosition(0.0f, 3.5f, -6.0f);   // The (initial) position of the light
           
       glNav = new  GLNavigation2(canvas);
    
       lights.setControl(glNav);
       
-      glNav.setPosition(0.0f, 1.65f, 3.0f);   // The (initial) position of the camera 
+      glNav.setPosition(-1.0f, 3f, 3.0f);   // The (initial) position of the camera 
      // glNav.setPosition(0.0f, 1.65f, 0.15f);   // zoomed in on eye region
       glNav.setOrientation(0f, 0.0f, 0f);
        
@@ -68,7 +68,7 @@ public class ColladaPoserTestScene  implements GLClockedRenderObject {
       GLShaderProgramLoader.clearShaderPool();
       GLShaderProgramLoader.addShaderDirectory("shaders");
       hmi.util.Console.println("start reading glScene");
-      glScene = SceneIO.readGLScene("Humanoids/alyson/daealyson", "alyson1-toplevel.dae", SceneIO.ARMANDIA) ;
+      glScene = SceneIO.readGLScene("Humanoids/alyson/daealyson", "alyson2-toplevel.dae", SceneIO.ARMANDIA) ;
       //hmi.util.Console.println("glScene OK");
       //glScene = SceneIO.readGLScene("Humanoids/jessi/daejessi", "jessi.dae", SceneIO.ARMANDIA) ;
       //glScene = SceneIO.readGLScene("Humanoids/alyson/daearmandia", "armandia-toplevel.dae", SceneIO.ARMANDIA) ;

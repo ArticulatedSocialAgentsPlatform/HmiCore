@@ -33,7 +33,7 @@ public class OpenGLState implements GLRenderObject {
      // glc.glCullFace(GLC.GL_FRONT_AND_BACK);
      // glc.glCullFace(GLC.GL_FRONT);
       gl.glCullFace(GL.GL_BACK);
-      gl.glEnable(GL.GL_CULL_FACE);   
+      //gl.glEnable(GL.GL_CULL_FACE);   
       //glc.glDisable(GLC.GL_CULL_FACE);
       gl.glShadeModel(GL2.GL_SMOOTH);       
       //glc.glDisable(GLC.GL_LIGHTING);  
