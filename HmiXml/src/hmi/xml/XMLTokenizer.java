@@ -870,8 +870,9 @@ public class XMLTokenizer
         clearSectionBuffer();
         sectionBuffer.append('<');
         while (  ci != '>' && ci != EOS) {
-            nextChar(); // will fill the section buffer
+            nextChar(); // will fill the section buffer with the STag
         }
+        ci = CONSUMED; // patch, dealing with pending ETAGS
     }
 
     /**
@@ -880,17 +881,22 @@ public class XMLTokenizer
      */
     public final String getXMLSection() throws IOException
     {
+        // System.out.println("getXMLSection, token =" + token + " tagName=" + tagName + " tokenConsumed=" + tokenConsumed + " ci=" + ci + " " + ((char)ci) );
         if (!atSTag())
         {
             throw getXMLScanException("The XMLTokenizer was not at an STAG at start of getXMLSection action");
         }
+        //System.out.println("setupSectionBuffer,  token =" + token + " tagName=" + tagName + " tokenConsumed=" + tokenConsumed + " ci=" + ci + " " + ((char)ci) );
         setupSectionBuffer();
         int skipStackSize = tagStack.size();
+        //System.out.println("Current token for getXMLSection: " + currentTokenString() + " ci=" + ci + " " + ((char)ci) );
+        
         do
         {
             do
             { // skip tokens until ETAG is reached (or until an -illegal- ENDOFDOCUMENT is reached)
                 nextToken();
+                //System.out.println("next token for getXMLSection: " + currentTokenString() + " atETag: " + atETag() );
                 if (atEndOfDocument())
                 {
                     throw new XMLScanException("ENDOFDOCUMENT reached");
@@ -900,9 +906,12 @@ public class XMLTokenizer
         }
         while (tagStack.size() >= skipStackSize); // || ! getTagName().equals(skipTagName) );
         
+        //System.out.println("getXMLSection return, ci =" + ci);
         tokenConsumed = true; // consume the last ETAG
+        //ci = CONSUMED;
         String result = getSectionBuffer();
         setSectionBuffering(false);
+        
         return result;
     }
 
@@ -949,7 +958,7 @@ public class XMLTokenizer
         return result;
     }
 
-   
+   // private boolean returnPending = false;
 
     /**
      * Called to move the tokenizer to a next token. Effect depends on current token and settings of several settings.
@@ -957,6 +966,7 @@ public class XMLTokenizer
      */
     private int nextToken() throws IOException
     {
+        //System.out.println("nextToken, (current)token = " + token + " ci = " + ci + " " + ((char)ci));
         try
         {
             while (true)
@@ -966,6 +976,7 @@ public class XMLTokenizer
 //                    showTokenizerState(" nextToken START "); 
 //                }
                 tokenConsumed = false;
+                //if (returnPending) System.out.println("nextToken returned from Pending.. ci=" + ci);
                 switch (tokenMode)
                 {
                 case CHARDATA_MODE:
@@ -974,6 +985,8 @@ public class XMLTokenizer
                 case PENDING_ETAG_MODE: // empty tag, return ETAG token.
                     token = ETAG;
                     tokenMode = CHARDATA_MODE;
+                    //returnPending = true;
+                    //System.out.println("nextToken return  PENDING_ETAG_MODE.. ci =" + ci + (char)ci);
                     // tagName is still valid
                     popTag(tagName);
                     break;
@@ -1006,13 +1019,14 @@ public class XMLTokenizer
      */
     private int parseCharData() throws IOException
     {
-
+       // if (returnPending) System.out.println("parseCharData return Pending, ci=" + ci + " CONSUMED=" + CONSUMED);
         while (ci != EOS)
         { // iterate until non-ignorable token is returned, or EOS is reached
          
 //            if (debug)       {          showTokenizerState(" XMLTokenizer.parseCharDta, tokenizer state");            }
-            if (ci == CONSUMED)
+            if (ci == CONSUMED) {
                 nextParsedChar();
+            }
             while (isSpaceChar())
             {
                 nextParsedChar();
@@ -1135,8 +1149,9 @@ public class XMLTokenizer
             if (ci == '/')
             { // empty content tag, set tokenMode for pending ETAG.
                 nextChar();
-                if (ci != '>')
+                if (ci != '>') {
                     throw getXMLScanException("\'>\' character after \'/\' expected instead of '" + (char) ci + "'");
+                }
                 tokenMode = PENDING_ETAG_MODE;
             }
             else
@@ -1195,8 +1210,9 @@ public class XMLTokenizer
             }
         }
 
-        if (ci != '>')
+        if (ci != '>') {
             throw getXMLScanException("\'>\' expected at end of XML STAG");
+        }
         ci = CONSUMED;
         // setLogging(logMode);
         token = STAG;
@@ -1206,8 +1222,13 @@ public class XMLTokenizer
         // System.out.println("tagNamespace = " + tagNamespace);
         //pushTag(tagName, namespaceDeclarationCount);
         pushTag(tagName);
-        if (tokenMode != PENDING_ETAG_MODE)
+        if (tokenMode != PENDING_ETAG_MODE) {
             tokenMode = CHARDATA_MODE;
+            //System.out.println("parseSTag return (not pending etag)" + token + " tagName=" + tagName + ", ci = " + ci);
+        } 
+        //else {
+        //    System.out.println("parseSTag return " + token + " tagName=" + tagName + " PENDING_ETAG_MODE, ci = " + ci);
+        //}
         // System.out.println("parseSTagTail, token = " + token);
         return token;
     }
@@ -1262,8 +1283,9 @@ public class XMLTokenizer
             }
         }
 
-        if (ci != '>')
+        if (ci != '>') {
             throw getXMLScanException("\'>\' character at end of ETAG expected, instead of '" + ((char) ci) + "'");
+        }
         ci = CONSUMED;
         token = ETAG;
         // tokenMode remains CHARDATA_MODE
@@ -1466,8 +1488,9 @@ public class XMLTokenizer
         if (ci == '-')
             nextChar();
         // end of comment reached, consume the expected '>' char, but retain a possible EOS
-        if (ci == '>')
+        if (ci == '>') {
             ci = CONSUMED;
+        }
         else
         {
             throw getXMLScanException("'>' expected at end of XML comment instead of '" + (char) ci + "'");
@@ -1502,8 +1525,9 @@ public class XMLTokenizer
             if (ci == '>')
                 brackLevel--;
         }
-        if (ci == '>')
+        if (ci == '>') {
             ci = CONSUMED;
+        }
 
     }
 
@@ -1585,8 +1609,9 @@ public class XMLTokenizer
      */
     private void checkSequence(String seq) throws IOException
     {
-        if (ci == CONSUMED)
+        if (ci == CONSUMED) {
             nextChar();
+        }
         for (int i = 0; i < seq.length(); i++)
         {
             if (ci != seq.charAt(i))
@@ -1616,9 +1641,9 @@ public class XMLTokenizer
             if (ci != '>' && ci != EOS)
                 piDataBuffer.append('?');
         }
-        if (ci == '>')
+        if (ci == '>') {
             ci = CONSUMED;
-            
+        }
        // System.out.println("=====> Pi " + piDataBuffer.toString());
         String piContents = piDataBuffer.toString().trim();
         if (piContents.startsWith("include ")) 
@@ -1798,9 +1823,10 @@ public class XMLTokenizer
      */
     public final boolean atSTag() throws IOException
     {
-        if (tokenConsumed)
+        if (tokenConsumed) {
             nextToken();
-            if (debug) {    showTokenizerState(" atSTag RETURN ");        }
+        }
+        if (debug) {    showTokenizerState(" atSTag RETURN ");        }
         return token == STAG;
     }
 
@@ -1822,10 +1848,11 @@ public class XMLTokenizer
      */
     public final boolean atETag() throws IOException
     {
-        // System.out.println("atETag test1, consumed = " + tokenConsumed + ",token = " + token + ", ci = " + ((char)ci));
-        if (tokenConsumed)
+        // System.out.println("atETag, consumed = " + tokenConsumed + ",token = " + currentTokenString() + ", ci = " + ((char)ci));
+        if (tokenConsumed) {
             nextToken();
-        // System.out.println("atETag test1, token = " + token);
+        }
+        // System.out.println("atETag nextToken result, token = " + currentTokenString());
         return token == ETAG;
     }
 
@@ -1850,8 +1877,9 @@ public class XMLTokenizer
     public final boolean atPI() throws IOException
     {
         // System.out.println("atPI test, consumed = " + tokenConsumed);
-        if (tokenConsumed)
+        if (tokenConsumed) {
             nextToken();
+        }
         // System.out.println("atPi test, token = " + token);
         return token == PI;
     }
@@ -1864,8 +1892,9 @@ public class XMLTokenizer
     public final boolean atComment() throws IOException
     {
         // System.out.println("atComment(), ci =" + ci + "(" + (char)ci + ") tokenConsumed:" + tokenConsumed);
-        if (tokenConsumed)
+        if (tokenConsumed) {
             nextToken();
+        }
         return token == COMMENT;
     }
 
@@ -1876,8 +1905,9 @@ public class XMLTokenizer
      */
     public final boolean atDoctype() throws IOException
     {
-        if (tokenConsumed)
+        if (tokenConsumed) {
             nextToken();
+        }
         return token == DOCTYPE;
     }
 
@@ -1888,8 +1918,9 @@ public class XMLTokenizer
      */
     public final boolean atCDSect() throws IOException
     {
-        if (tokenConsumed)
+        if (tokenConsumed) {
             nextToken();
+        }
         return token == CDSECT;
     }
 
@@ -1908,8 +1939,9 @@ public class XMLTokenizer
      */
     public final boolean atCharData() throws IOException
     {
-        if (tokenConsumed)
+        if (tokenConsumed) {
             nextToken();
+        }
         return token == CHARDATA;
     }
 
@@ -1920,8 +1952,9 @@ public class XMLTokenizer
      */
     public final boolean atEndOfDocument() throws IOException
     {
-        if (tokenConsumed)
+        if (tokenConsumed) {
             nextToken();
+        }
         return token == ENDOFDOCUMENT;
     }
 
@@ -1934,8 +1967,9 @@ public class XMLTokenizer
      */
     public final int getToken() throws IOException
     {
-        if (tokenConsumed)
+        if (tokenConsumed) {
             nextToken();
+        }
         return token;
     }
 
@@ -1946,8 +1980,9 @@ public class XMLTokenizer
      */
     public final String getTokenString() throws IOException
     {
-        if (tokenConsumed)
+        if (tokenConsumed) {
             nextToken();
+        }
         return tokenString(token);
     }
 
