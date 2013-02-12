@@ -120,7 +120,10 @@ public class OdeMass extends Mass
         mass.setFromSphere(radius, density);
     }
 
-    @Override
+    /**
+     * @param direction direction of the long axis of the cylinder: 1=x, 2=y, 3=z
+     */
+    @Override    
     public void setFromCapsule(float radius, float height, int direction, float density)
     {
         mass.setFromCapsule(2, radius, height, density);

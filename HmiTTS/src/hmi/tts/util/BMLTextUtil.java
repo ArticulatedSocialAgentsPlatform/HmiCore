@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
+
 /**
  * Various utils to manipulate BML text in the speech behaviour
  * @author Herwin
@@ -43,7 +46,6 @@ public final class BMLTextUtil
         List<SyncAndOffset> syncAndOffsetList = new ArrayList<SyncAndOffset>(); 
         
         int index = text.indexOf("<sync");      
-        int wordOffset = 0;
         while(index!=-1)
         {
             String str = text.substring(0,index);
@@ -54,17 +56,16 @@ public final class BMLTextUtil
             //replace syncs before
             String strNoSync2 = str.replaceAll("<sync\\s+id\\s*=\\s*\"[a-zA-Z][a-zA-Z0-9\\-_]*\"\\s*/?>", "");
             strNoSync2 = strNoSync2.replaceAll("</sync>", "");
-            String strSplit[] = strNoSync2.split(" ");
+            String strSplit[] = Iterables.toArray(Splitter.on(" ").omitEmptyStrings().split(strNoSync2), String.class);
             
             if(strSplit.length==numberOfWords)
             {
-                syncAndOffsetList.add(new SyncAndOffset(syncId,wordOffset+strSplit.length-1));
+                syncAndOffsetList.add(new SyncAndOffset(syncId,strSplit.length));
             }
             else
             {
-                syncAndOffsetList.add(new SyncAndOffset(syncId,wordOffset+strSplit.length));                                
+                syncAndOffsetList.add(new SyncAndOffset(syncId,strSplit.length));                                
             }
-            wordOffset+=strSplit.length;
             index = text.indexOf("<sync",index+1);
         }
         return syncAndOffsetList;
