@@ -39,7 +39,7 @@ public class FaceControllerPose implements FaceController
         }
     }
     
-    public void toTarget()
+    public synchronized void toTarget()
     {
         for(Entry<String,Float> entry: morphs.entrySet())
         {
@@ -49,7 +49,7 @@ public class FaceControllerPose implements FaceController
     }
     
     @Override
-    public void copy()
+    public synchronized void copy()
     {
         targetFc.copy();        
     }
