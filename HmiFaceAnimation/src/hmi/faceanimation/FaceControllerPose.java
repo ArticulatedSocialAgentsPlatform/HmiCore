@@ -36,22 +36,25 @@ public class FaceControllerPose implements FaceController
         for(int i=0;i<mpeg4config.getValues().length;i++)
         {
             mpeg4config.setValue(i, 0);
-        }
+        }        
     }
     
     public synchronized void toTarget()
     {
+        synchronized(targetFc)
+        {
         for(Entry<String,Float> entry: morphs.entrySet())
         {
             targetFc.setMorphTargets(new String[]{entry.getKey()}, new float[]{entry.getValue()});
         }
         targetFc.setMPEG4Configuration(mpeg4config);
+        }
     }
     
     @Override
     public synchronized void copy()
     {
-        targetFc.copy();        
+        targetFc.copy();
     }
 
     @Override
@@ -90,8 +93,7 @@ public class FaceControllerPose implements FaceController
     @Override
     public void setMorphTargets(String[] targets, float[] values)
     {
-        int i=0;
-        for(i=0;i<targets.length;i++)
+        for(int i=0;i<targets.length;i++)
         {
             morphs.put(targets[i], values[i]);
         }        
