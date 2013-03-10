@@ -472,10 +472,7 @@ public class GLScene implements GLRenderObject
       for (int i = 0; i < targetNames.length; i++) 
       {
          w = weights[i];
-         if (w!=0)
-         {
-            desiredMorphTargets.put(targetNames[i],new Float(w));
-         }
+         desiredMorphTargets.put(targetNames[i],new Float(w));         
       }
    }
    

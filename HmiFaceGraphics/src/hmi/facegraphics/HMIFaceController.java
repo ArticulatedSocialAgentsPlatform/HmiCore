@@ -27,11 +27,10 @@ import hmi.graphics.opengl.scenegraph.GLScene;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-
-import com.google.common.collect.ImmutableMap;
 
 import lombok.Delegate;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * The FaceController is the access point for deforming the face of an avatar, just like VJoints are the accesspoint for deforming its body.
@@ -49,8 +48,6 @@ public class HMIFaceController implements FaceController
 
     @Delegate
     private MorphTargetHandler morphTargetHandler = new MorphTargetHandler();
-    
-    private HashMap<String, Float> oldDesiredMorphTargets = new HashMap<String, Float>();
     
     /** store the current config, for add- and remove-mpeg4configuration */
     private MPEG4Configuration currentConfig = new MPEG4Configuration();
@@ -113,30 +110,17 @@ public class HMIFaceController implements FaceController
             glHead.deformWhenScheduled();
         }
 
-        // on copy, send the current morph targets to the face...
-        String[] targetNames = new String[oldDesiredMorphTargets.size()];
-        float[] targetWeights = new float[oldDesiredMorphTargets.size()];
-        int i = 0;
-        for (String targetName : oldDesiredMorphTargets.keySet())
-        {
-            targetNames[i] = targetName;
-            targetWeights[i] = oldDesiredMorphTargets.get(targetName);
-            i++;
-        }
-        theGLScene.removeMorphTargets(targetNames, targetWeights);
-        
         ImmutableMap<String, Float> desiredMorphTargets = morphTargetHandler.getDesiredMorphTargets();
-        targetNames = new String[desiredMorphTargets.size()];
-        targetWeights = new float[desiredMorphTargets.size()];
-        i = 0;
+        String[] targetNames = new String[desiredMorphTargets.size()];
+        float[] targetWeights = new float[desiredMorphTargets.size()];
+        int i = 0;
         for (String targetName : desiredMorphTargets.keySet())
         {
             targetNames[i] = targetName;
             targetWeights[i] = desiredMorphTargets.get(targetName);
             i++;
         }
-        theGLScene.addMorphTargets(targetNames, targetWeights);
-        oldDesiredMorphTargets = new HashMap<String, Float>(desiredMorphTargets);
+        theGLScene.setMorphTargets(targetNames, targetWeights);
     }
 
     /*

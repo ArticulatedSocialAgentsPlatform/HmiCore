@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Convert Action Units from Ekmans Facial ACtion Coding System to MPEG4 configurations.
  * 
@@ -22,6 +24,7 @@ import java.util.HashMap;
  * @author reidsma
  * @author paulrc
  */
+@Slf4j
 public class FACSConverter
 {
     private static class Influence
@@ -123,6 +126,7 @@ public class FACSConverter
     {
         for (FAP key : influencesByFAP.keySet())
         {
+            log.info("Converting FAPS {}", key.number);
             ArrayList<Influence> influences = influencesByFAP.get(key);
             int numInfluences = influences.size();
             if (numInfluences == 0) continue;
@@ -136,6 +140,10 @@ public class FACSConverter
                 float portion = (auValue - influence.auBegin) / (influence.auEnd - influence.auBegin);
                 if (portion < 0 || portion > 1)
                 {
+                    /*
+                    log.warn("Invalid influence portion {} for AU {}, auValue={} auBegin={} auEnd={}",
+                            new Object[]{portion, influence.au.getNumber(), auValue, influence.auBegin, influence.auEnd});
+                    */
                     numInfluences--;
                     continue;
                 }
