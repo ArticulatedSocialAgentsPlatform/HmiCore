@@ -26,6 +26,7 @@ import hmi.faceanimation.model.MPEG4Configuration;
 import hmi.graphics.opengl.scenegraph.GLScene;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import lombok.Delegate;
@@ -67,7 +68,7 @@ public class HMIFaceController implements FaceController
 
     public synchronized void setMPEG4Configuration(MPEG4Configuration config)
     {
-        currentConfig = config;
+        currentConfig.setValues(Arrays.copyOf(config.getValues(),config.getValues().length));
         notifyFaceControllerListeners();
     }
 

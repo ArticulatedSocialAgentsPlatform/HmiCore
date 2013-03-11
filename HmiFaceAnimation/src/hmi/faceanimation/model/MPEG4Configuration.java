@@ -62,7 +62,7 @@ public class MPEG4Configuration extends XMLStructureAdapter implements Configura
     {
         if (values.length == this.values.length)
         {
-            this.values = values;
+            System.arraycopy(values, 0, this.values, 0, values.length);            
         }
         else
         {
