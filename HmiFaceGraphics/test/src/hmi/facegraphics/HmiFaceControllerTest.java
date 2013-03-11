@@ -25,6 +25,6 @@ public class HmiFaceControllerTest
         float weights[]={0.1f,0.2f,0.3f};
         fc.addMorphTargets(targetNames, weights);
         fc.copy();
-        verify(mockScene).addMorphTargets(any(String[].class),any(float[].class));
+        verify(mockScene).setMorphTargets(any(String[].class),any(float[].class));
     }
 }
