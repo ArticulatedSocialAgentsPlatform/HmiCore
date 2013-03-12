@@ -226,7 +226,10 @@ public class GLNavigation2 implements GLRenderObject, ClockListener {
     */
    public void printInfo() {
       hmi.util.Console.println("Position: (" + translation[0] + ", " + translation[1] + ", " + translation[2] + ")"); 
+      System.out.println("Position: (" + translation[0] + ", " + translation[1] + ", " + translation[2] + ")");
       hmi.util.Console.println("Oriention (Pitch, Yaw, Roll) : (" + orientation[0] + ", " + orientation[1] + ", " + orientation[2] + ")"); 
+      System.out.println("Oriention (Pitch, Yaw, Roll) : (" + orientation[0] + ", " + orientation[1] + ", " + orientation[2] + ")");
+      
       for (int i=0; i<MAX_NUM_LIGHTS; i++) {
           if (lights[i] != null) {
             float[] lp = lights[i].getPosition();
