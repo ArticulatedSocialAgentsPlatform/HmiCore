@@ -1,10 +1,9 @@
 package hmi.animationui;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import hmi.animation.VJoint;
 import hmi.animation.VJointUtils;
+
+import java.util.Collection;
 
 /**
  * The controller handles input from the viewer and updates the vjoint structure
