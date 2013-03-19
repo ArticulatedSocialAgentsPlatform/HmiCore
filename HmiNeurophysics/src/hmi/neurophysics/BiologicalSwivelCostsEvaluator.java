@@ -18,6 +18,11 @@ public class BiologicalSwivelCostsEvaluator
     private final boolean considerBiologicalCosts = true;
     private final boolean considerDeviationCosts = true;
     
+    public BiologicalSwivelCostsEvaluator(double minFeasibleElbowSwivel, double maxFeasibleElbowSwivel,
+            double freedomOfTheGaussianMean)
+    {
+        this(minFeasibleElbowSwivel, maxFeasibleElbowSwivel, 0.45, freedomOfTheGaussianMean);
+    }
     
     public BiologicalSwivelCostsEvaluator(double minFeasibleElbowSwivel, double maxFeasibleElbowSwivel,
             double sigmaOfGaussianCostsDistribution, double freedomOfTheGaussianMean)
