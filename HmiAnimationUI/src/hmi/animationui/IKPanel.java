@@ -2,11 +2,15 @@ package hmi.animationui;
 
 import hmi.math.Vec3f;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,7 +29,12 @@ public class IKPanel
 
     private final JFormattedTextField xField, yField, zField, swivelField;
     private final AnalyticalIKController ikController;
-
+    private final JCheckBox autoSwivel = new JCheckBox("auto swivel");
+    private final JButton applyButton = new JButton("Apply");
+    
+    private final AutoSwivelPanel autoSwivelPanel = new AutoSwivelPanel();
+    
+    
     private JPanel setupPosBox(String coord, JFormattedTextField field)
     {
         JPanel posPanel = new JPanel();
@@ -36,7 +45,6 @@ public class IKPanel
 
         field.addPropertyChangeListener("value", new PropertyChangeListener()
         {
-
             @Override
             public void propertyChange(PropertyChangeEvent evt)
             {
@@ -48,11 +56,17 @@ public class IKPanel
 
     private void update()
     {
-        ikController.setJointRotations(getPosition(), getSwivel());
+        float swivel = getSwivel();
+        autoSwivelPanel.setFormerSwivel(swivel);
+        ikController.setJointRotations(getPosition(), swivel);
     }
-
+    
+    
+    
     public IKPanel(String limbName, AnalyticalIKController c, float[] startPos, float startSwivel)
     {
+        
+        
         this.ikController = c;
         JLabel label = new JLabel(limbName);
         
@@ -71,7 +85,43 @@ public class IKPanel
         panel.add(setupPosBox("x:", xField));
         panel.add(setupPosBox("y:", yField));
         panel.add(setupPosBox("z:", zField));
-        panel.add(setupPosBox("swivel:", swivelField));
+        panel.add(autoSwivel);
+        
+        final JPanel manualSwivelPanel = setupPosBox("swivel:", swivelField);
+        final JPanel autoSwivP = autoSwivelPanel.getJPanel();
+        
+        autoSwivel.addActionListener(new ActionListener()
+        {
+            
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                if(autoSwivel.isSelected())
+                {
+                    manualSwivelPanel.setVisible(false);
+                    autoSwivP.setVisible(true);
+                }                
+                else
+                {
+                    manualSwivelPanel.setVisible(true);
+                    autoSwivP.setVisible(false);
+                }
+            }
+        });
+        autoSwivP.setVisible(false);
+        panel.add(autoSwivP);
+        panel.add(manualSwivelPanel);
+        applyButton.addActionListener(new ActionListener()
+        {
+            
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                update();                
+                autoSwivelPanel.update();
+            }
+        });
+        panel.add(applyButton);
     }
 
     private float getSwivel()
@@ -85,7 +135,15 @@ public class IKPanel
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return ((Number) swivelField.getValue()).floatValue();
+        
+        if(autoSwivel.isSelected())
+        {
+            return (float)autoSwivelPanel.getSwivel();
+        }
+        else
+        {
+            return ((Number) swivelField.getValue()).floatValue();            
+        }
     }
 
     private float[] getPosition()
