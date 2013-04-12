@@ -12,7 +12,7 @@ import org.fest.swing.fixture.FrameFixture;
  */
 public final class FestUtils
 {
-    private GenericTypeMatcher<JButton> getButtonMatcher(final String id)
+    private static GenericTypeMatcher<JButton> getButtonMatcher(final String id)
     {
         GenericTypeMatcher<JButton> buttonMatcher = new GenericTypeMatcher<JButton>(JButton.class){
             protected boolean isMatching(JButton jb)
@@ -24,7 +24,7 @@ public final class FestUtils
     }
     
     
-    public void clickButton(String name, FrameFixture window)
+    public static void clickButton(String name, FrameFixture window)
     {
         window.button(getButtonMatcher(name)).click();
     }
