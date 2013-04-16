@@ -33,8 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Contains a single pose in a config and a configType describing what the
@@ -43,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author welberge
  */
+@Slf4j
 public class SkeletonPose extends XMLStructureAdapter// implements Ident
 {
     private static final String[] empty_PartIds = new String[0];
@@ -59,8 +59,7 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
     private VObject[] targetParts; // references to the target VObjects.
     private String id;
 
-    private static Logger logger = LoggerFactory.getLogger(SkeletonPose.class.getName());
-
+    
     /**
      * Creates a new, uninitialized, SkeletonPose
      */
@@ -207,7 +206,7 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
             }
             if (hasRotation)
             {
-                logger.debug("mirroring {}, index {}", partIds[i], index);
+                log.debug("mirroring {}, index {}", partIds[i], index);
 
                 // configs.mirror(index);
                 float q[] = Quat4f.getQuat4f();
@@ -259,16 +258,19 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
 
     /**
      * Creates a new SkeletonPose for a list of VJoints, specified as parts reachable from
-     * the specified root, with specified ids or sids. The latter specified as a String Lis
+     * the specified root, with specified ids or sids. The latter specified as a String List
      */
     public SkeletonPose(String id, Skeleton skeleton, List<String> partIdents, String configType)
     {
         super();
         setId(id);
         List<VJoint> joints = skeleton.getRoot().getParts(partIdents);
+        
+        int i=0;
         for (VJoint jnt : joints)
         {
-            if (jnt == null) logger.error("Null VJoint");
+            if (jnt == null) log.error("Null VJoint {}",i);
+            i++;
         }
 
         targetParts = (skeleton.getRoot().getParts(partIdents)).toArray(new VObject[partIdents.size()]);
@@ -322,7 +324,7 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
         partIds = new String[targets.length];
         for (int i = 0; i < targets.length; i++)
         {
-            if (targets[i] == null) logger.error("SkeletonPose.setPartIds, null target for index: " + i);
+            if (targets[i] == null) log.error("SkeletonPose.setPartIds, null target for index: " + i);
             partIds[i] = targets[i].getSid();
         }
     }
@@ -415,7 +417,7 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
                         || (targets[j].getSid() != null && targets[j].getSid().equals(partIds[i])))
                 {
                     targetParts[i] = targets[j];
-                    logger.debug("targetParts[{}]={}", i, partIds[i]);
+                    log.debug("targetParts[{}]={}", i, partIds[i]);
                 }
             }
         }

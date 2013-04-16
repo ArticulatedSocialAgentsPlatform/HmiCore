@@ -508,9 +508,9 @@ public class VJoint implements VObject
     public VJoint copy(String newId)
     {
         VJoint copy = new VJoint();
-        copy.id = newId;
-        copy.sid = sid;
-        copy.name = name;
+        copy.setId(newId);
+        copy.setSid(sid);
+        copy.setName(name);
         copy.setTranslation(translation);
         copy.setRotation(rotation);
         // ...
