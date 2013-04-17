@@ -409,6 +409,9 @@ public class GLNavigation2 implements GLRenderObject, ClockListener
     public void setRollPitchYaw(float roll, float pitch, float yaw)
     {
         Quat4f.setFromRollPitchYawDegrees(rotation, roll, pitch, yaw);
+        orientation[0] = -pitch;
+        orientation[1] = -yaw;
+        orientation[2] = -roll;
     }
 
     public void setTranslation(float tx, float ty, float tz)
