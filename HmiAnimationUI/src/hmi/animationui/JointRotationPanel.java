@@ -44,7 +44,7 @@ public class JointRotationPanel {
 				jointView.update();
 				sliderLabel.setText("" + s.getValue());
 				useInKeyFrameCheckBox.setSelected(true);
-				
+
 			}
 		});
 	}
@@ -98,5 +98,12 @@ public class JointRotationPanel {
 
 	public boolean useInKeyFrame() {
 		return useInKeyFrameCheckBox.isSelected();
+	}
+
+	public void reset() {
+		rollSlider.setValue(0);
+		pitchSlider.setValue(0);
+		yawSlider.setValue(0);
+		useInKeyFrameCheckBox.setSelected(false);
 	}
 }

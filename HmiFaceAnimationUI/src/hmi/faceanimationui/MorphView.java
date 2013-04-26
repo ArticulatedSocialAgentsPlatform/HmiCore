@@ -20,6 +20,7 @@ public class MorphView {
 	@Getter
 	private final JPanel panel = new JPanel();
 	private final MorphController morphController;
+	@Getter
 	private Map<String, MorphPanel> morphPanels = new HashMap<>();
 
 	public MorphView(MorphController mc, Collection<String> morphs) {
@@ -41,6 +42,7 @@ public class MorphView {
 	}
 
 	public void setMorphConfiguration(Collection<MorphConfiguration> rotations) {
+		reset();
 		for (MorphConfiguration j : rotations) {
 			MorphPanel rp = morphPanels.get(j.getName());
 			rp.setMorphConfiguration(j);
@@ -63,5 +65,11 @@ public class MorphView {
 			}
 		}
 		return rotationConfigurations;
+	}
+
+	public void reset() {
+		for (MorphPanel m : morphPanels.values()) {
+			m.reset();
+		}
 	}
 }

@@ -17,67 +17,65 @@ import lombok.Getter;
  * 
  * @author hvanwelbergen
  */
-public class JointView
-{
-    private final RotationsController controller;
+public class JointView {
+	private final RotationsController controller;
 
-    @Getter
-    private JPanel panel = new JPanel();
+	@Getter
+	private JPanel panel = new JPanel();
 
-    private Map<String, JointRotationPanel> rotPanels = new HashMap<>();
+	@Getter
+	private Map<String, JointRotationPanel> rotationPanels = new HashMap<>();
 
-    public JointView(RotationsController controller, Collection<String> joints)
-    {
-        this.controller = controller;
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        for (String vj : joints)
-        {
-            JointRotationPanel rp = new JointRotationPanel(vj, this);
-            rotPanels.put(vj, rp);
-            panel.add(rp.getPanel());
-        }
-        panel.add(Box.createVerticalGlue());
-    }
+	public JointView(RotationsController controller, Collection<String> joints) {
+		this.controller = controller;
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		for (String vj : joints) {
+			JointRotationPanel rp = new JointRotationPanel(vj, this);
+			rotationPanels.put(vj, rp);
+			panel.add(rp.getPanel());
+		}
+		panel.add(Box.createVerticalGlue());
+	}
 
-    public Collection<JointRotationConfiguration> getJointRotationConfigurations()
-    {
-        Collection<JointRotationConfiguration> rotationConfigurations = new ArrayList<JointRotationConfiguration>();
-        for (JointRotationPanel rp : rotPanels.values())
-        {
-            rotationConfigurations.add(rp.getRotationConfiguration());
-        }
-        return rotationConfigurations;
-    }
+	public Collection<JointRotationConfiguration> getJointRotationConfigurations() {
+		Collection<JointRotationConfiguration> rotationConfigurations = new ArrayList<JointRotationConfiguration>();
+		for (JointRotationPanel rp : rotationPanels.values()) {
+			rotationConfigurations.add(rp.getRotationConfiguration());
+		}
+		return rotationConfigurations;
+	}
 
-    public Collection<JointRotationConfiguration> getSelectedJointRotationConfigurations()
-    {
-        Collection<JointRotationConfiguration> rotationConfigurations = new ArrayList<JointRotationConfiguration>();
-        for (JointRotationPanel rp : rotPanels.values())
-        {
-            if (rp.useInKeyFrame())
-            {
-                rotationConfigurations.add(rp.getRotationConfiguration());
-            }
-        }
-        return rotationConfigurations;
-    }
+	public Collection<JointRotationConfiguration> getSelectedJointRotationConfigurations() {
+		Collection<JointRotationConfiguration> rotationConfigurations = new ArrayList<JointRotationConfiguration>();
+		for (JointRotationPanel rp : rotationPanels.values()) {
+			if (rp.useInKeyFrame()) {
+				rotationConfigurations.add(rp.getRotationConfiguration());
+			}
+		}
+		return rotationConfigurations;
+	}
 
-    public void setJointRotationConfiguration(Collection<JointRotationConfiguration> rotationConfigurations)
-    {
-        for (JointRotationConfiguration j : rotationConfigurations)
-        {
-            JointRotationPanel rp = rotPanels.get(j.getJointName());
-            rp.setJointRotationConfiguration(j);
-        }
-    }
+	public void setJointRotationConfiguration(
+			Collection<JointRotationConfiguration> rotationConfigurations) {
+		reset();
+		for (JointRotationConfiguration j : rotationConfigurations) {
+			JointRotationPanel rp = rotationPanels.get(j.getJointName());
+			rp.setJointRotationConfiguration(j);
+		}
+	}
 
-    public void update()
-    {
-        List<JointRotationConfiguration> jrcList = new ArrayList<>();
-        for (JointRotationPanel rp : rotPanels.values())
-        {
-            jrcList.add(rp.getRotationConfiguration());
-        }
-        controller.setJointRotations(jrcList);
-    }
+	public void update() {
+		List<JointRotationConfiguration> jrcList = new ArrayList<>();
+		for (JointRotationPanel rp : rotationPanels.values()) {
+			jrcList.add(rp.getRotationConfiguration());
+		}
+		controller.setJointRotations(jrcList);
+	}
+
+	public void reset() {
+		for (JointRotationPanel j : rotationPanels.values()) {
+			j.reset();
+		}
+	}
+
 }

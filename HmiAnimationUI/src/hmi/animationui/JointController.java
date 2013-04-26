@@ -31,7 +31,10 @@ public class JointController implements RotationsController {
 	 */
 	public void setJointRotations(
 			Collection<JointRotationConfiguration> rotations) {
+		System.out.println("setJointRotations");
+
 		for (JointRotationConfiguration rotConf : rotations) {
+			System.out.println("Setting for " + rotConf.getJointName());
 			model.getPart(rotConf.getJointName()).setRotation(rotConf.getQ());
 		}
 	}

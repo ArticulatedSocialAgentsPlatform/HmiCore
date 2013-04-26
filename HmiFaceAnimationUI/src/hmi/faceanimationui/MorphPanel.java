@@ -70,4 +70,9 @@ public class MorphPanel {
 	public boolean useInKeyFrame() {
 		return useInKeyFrameCheckBox.isSelected();
 	}
+
+	public void reset() {
+		morphSlider.setValue(0);
+		useInKeyFrameCheckBox.setSelected(false);
+	}
 }
