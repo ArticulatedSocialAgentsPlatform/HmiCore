@@ -1,9 +1,10 @@
 package hmi.animationui;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import hmi.animation.VJoint;
 import hmi.animation.VJointUtils;
-
-import java.util.Collection;
 
 /**
  * The controller handles input from the viewer and updates the vjoint structure
@@ -34,9 +35,10 @@ public class JointController implements RotationsController {
 		System.out.println("setJointRotations");
 
 		for (JointRotationConfiguration rotConf : rotations) {
-			System.out.println("Setting for " + rotConf.getJointName());
+			System.out.print("Setting for " + rotConf.getJointName() + "; ");
 			model.getPart(rotConf.getJointName()).setRotation(rotConf.getQ());
 		}
+		System.out.println();
 	}
 
 	/**
