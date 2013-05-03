@@ -93,9 +93,9 @@ public abstract class PhysicalJoint
     /**
      * Add a torque to this joint
      * 
-     * @param x
-     * @param y
-     * @param z
+     * @param x torque on 1st joint axis
+     * @param y torque on 2nd joint axis
+     * @param z torque on 3rd joint axis
      */
     public abstract void addTorque(float x, float y, float z);
 
