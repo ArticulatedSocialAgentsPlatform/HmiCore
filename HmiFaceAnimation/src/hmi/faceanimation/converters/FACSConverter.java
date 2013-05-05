@@ -126,7 +126,6 @@ public class FACSConverter
     {
         for (FAP key : influencesByFAP.keySet())
         {
-            log.info("Converting FAPS {}", key.number);
             ArrayList<Influence> influences = influencesByFAP.get(key);
             int numInfluences = influences.size();
             if (numInfluences == 0) continue;
