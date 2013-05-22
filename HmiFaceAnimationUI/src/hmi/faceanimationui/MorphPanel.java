@@ -1,11 +1,19 @@
 package hmi.faceanimationui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.font.TextAttribute;
+import java.util.Map;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -13,6 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import com.google.common.util.concurrent.MoreExecutors;
 
 import lombok.Getter;
 
@@ -26,8 +36,14 @@ public class MorphPanel {
 	private final JPanel panel = new JPanel();
 	private final String morphName;
 	private final JSlider morphSlider;
+	private final MorphView morphView;
 	private final JCheckBox useInKeyFrameCheckBox;
 	private final JButton undoButton;
+	private static final int SLIDER_VALUE_WIDTH = 35;
+	private static final int SLIDER_WIDTH = 200;
+	private static final int LABEL_PANEL_WIDTH = 350;
+	private static final int DEFAULT_HEIGHT = 20;
+	private static final int CHECKBOX_WIDTH = DEFAULT_HEIGHT;
 
 	/**
 	 * Class used to implement und-functionality for these sliders (and
@@ -44,6 +60,7 @@ public class MorphPanel {
 	}
 
 	private State panelState;
+	private MouseWheelListener mouseWheelListener;
 
 	private static final String UNDO_BUTTON_TOOL_TIP = "sets slider to previous value";
 	private static final String CHECKBOX_TOOL_TIP = "if checked, this joint is\n"
@@ -51,21 +68,41 @@ public class MorphPanel {
 
 	public MorphPanel(String morphName, final MorphView morphView) {
 		this.morphName = morphName;
-		panel.setLayout(new GridLayout());
-		morphSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
-		JPanel sliderPanel = new JPanel();
+		this.morphView = morphView;
+		this.mouseWheelListener = new MouseWheelListener() {
+
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent arg0) {
+				if (arg0.getSource() instanceof JSlider) {
+//					JSlider slider = (JSlider) arg0.getSource();
+//					slider.setValue(slider.getValue() + arg0.getUnitsToScroll());
+				}
+			}
+		};
+		panel.setLayout(new BoxLayout(panel,BoxLayout.LINE_AXIS));
 		undoButton = new JButton();
 		panelState = new State();
+		morphSlider = new JSlider(JSlider.HORIZONTAL, -100, 100, 0);
+
+		setupLabel(morphName);
+		setupSlider();
+		useInKeyFrameCheckBox = new JCheckBox();
+		setupCheckbox(useInKeyFrameCheckBox);
+		setupUndoButton();
+	}
+
+	private void setupSlider() {
+
+		JPanel sliderPanel = new JPanel();
 		final JLabel sliderLabel = new JLabel("0");
-		sliderLabel.setPreferredSize(new Dimension(50, 20));
+		sliderLabel.setPreferredSize(new Dimension(SLIDER_VALUE_WIDTH,
+				DEFAULT_HEIGHT));
+		morphSlider
+				.setPreferredSize(new Dimension(SLIDER_WIDTH, DEFAULT_HEIGHT));
 		sliderPanel.add(sliderLabel);
 		sliderPanel.add(morphSlider);
-		JPanel pL = new JPanel();
-		pL.setLayout(new FlowLayout(FlowLayout.LEFT));
-		pL.add(new JLabel(morphName));
-		pL.add(undoButton);
-		panel.add(pL);
 		panel.add(sliderPanel);
+		morphSlider.addMouseWheelListener(mouseWheelListener);
 		morphSlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -83,14 +120,33 @@ public class MorphPanel {
 				sliderLabel.setText("" + morphSlider.getValue());
 			}
 		});
-		useInKeyFrameCheckBox = new JCheckBox();
-		setupCheckbox(useInKeyFrameCheckBox);
-		setupUndoButton();
+	}
+
+	private void setupLabel(String jointName) {
+		JLabel label = new JLabel(jointName);
+		JPanel labelPanel = new JPanel();
+		labelPanel.setPreferredSize(new Dimension(LABEL_PANEL_WIDTH,
+				DEFAULT_HEIGHT));
+		labelPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		labelPanel.add(label);
+		labelPanel.add(undoButton);
+		// panel.setLayout(new GridLayout());
+		panel.add(labelPanel);
 	}
 
 	private void setupUndoButton() {
 		// undoButton.setIcon(new ImageIcon(UNDO_ICON_FILENAME));
-		undoButton.setText("undo");
+		undoButton.setText("(undo)");
+		undoButton.setForeground(Color.blue);
+		Font original = undoButton.getFont();
+		Map attributes = original.getAttributes();
+		attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+		undoButton.setFont(original.deriveFont(attributes));
+		// undoButton.setFocusPainted(false);
+		undoButton.setMargin(new Insets(0, 0, 0, 0));
+		undoButton.setContentAreaFilled(false);
+		undoButton.setBorderPainted(false);
+		undoButton.setOpaque(false);
 		// undoButton.setPreferredSize(new Dimension(50, 50));
 		undoButton.setToolTipText(UNDO_BUTTON_TOOL_TIP);
 		undoButton.addActionListener(new ActionListener() {
@@ -121,7 +177,7 @@ public class MorphPanel {
 		c.setToolTipText(CHECKBOX_TOOL_TIP);
 		// final JLabel checkboxLabel = new JLabel("use:");
 		// checkboxLabel.setPreferredSize(new Dimension(40, 20));
-		c.setPreferredSize(new Dimension(20, 20));
+		c.setPreferredSize(new Dimension(CHECKBOX_WIDTH, DEFAULT_HEIGHT));
 		// checkboxPanel.add(checkboxLabel);
 		checkboxPanel.add(c);
 		panel.add(checkboxPanel);
