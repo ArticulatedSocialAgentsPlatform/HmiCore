@@ -15,46 +15,46 @@ import java.util.Map.Entry;
 public class FaceControllerPose implements FaceController
 {
     private final FaceController targetFc;
-    private Map<String,Float> morphs = new HashMap<String,Float>();
+    private Map<String, Float> morphs = new HashMap<String, Float>();
     private MPEG4Configuration mpeg4config = new MPEG4Configuration();
-    
+
     public FaceControllerPose(FaceController fc)
     {
         targetFc = fc;
-        for (String morph:fc.getPossibleFaceMorphTargetNames())
+        for (String morph : fc.getPossibleFaceMorphTargetNames())
         {
             morphs.put(morph, 0f);
         }
     }
-    
+
     public void clear()
     {
-        for(Entry<String,Float> entry: morphs.entrySet())
+        for (Entry<String, Float> entry : morphs.entrySet())
         {
             entry.setValue(0f);
         }
-        for(int i=0;i<mpeg4config.getValues().length;i++)
+        for (int i = 0; i < mpeg4config.getValues().length; i++)
         {
             mpeg4config.setValue(i, 0);
-        }        
+        }
     }
-    
+
     public synchronized void toTarget()
     {
-        synchronized(targetFc)
+        synchronized (targetFc)
         {
-        for(Entry<String,Float> entry: morphs.entrySet())
-        {
-            targetFc.setMorphTargets(new String[]{entry.getKey()}, new float[]{entry.getValue()});
-        }
-        targetFc.setMPEG4Configuration(mpeg4config);
+            for (Entry<String, Float> entry : morphs.entrySet())
+            {
+                targetFc.setMorphTargets(new String[] { entry.getKey() }, new float[] { entry.getValue() });
+            }
+            targetFc.setMPEG4Configuration(mpeg4config);
         }
     }
-    
+
     @Override
     public synchronized void copy()
     {
-        targetFc.copy();
+
     }
 
     @Override
@@ -65,55 +65,55 @@ public class FaceControllerPose implements FaceController
 
     private void addMorphTarget(String target, float value)
     {
-        if(morphs.containsKey(target))
+        if (morphs.containsKey(target))
         {
-            value+=morphs.get(target);
+            value += morphs.get(target);
         }
         morphs.put(target, value);
     }
-    
+
     @Override
     public void removeMorphTargets(String[] targets, float[] values)
     {
-        for(int i=0;i<targets.length;i++)
+        for (int i = 0; i < targets.length; i++)
         {
-            addMorphTarget(targets[i], -values[i]);            
-        }        
+            addMorphTarget(targets[i], -values[i]);
+        }
     }
-    
+
     @Override
     public void addMorphTargets(String[] targets, float[] values)
     {
-        for(int i=0;i<targets.length;i++)
+        for (int i = 0; i < targets.length; i++)
         {
-            addMorphTarget(targets[i], values[i]);            
+            addMorphTarget(targets[i], values[i]);
         }
     }
 
     @Override
     public void setMorphTargets(String[] targets, float[] values)
     {
-        for(int i=0;i<targets.length;i++)
+        for (int i = 0; i < targets.length; i++)
         {
             morphs.put(targets[i], values[i]);
-        }        
+        }
     }
 
     @Override
     public void addMPEG4Configuration(MPEG4Configuration mpeg4Config)
     {
-        mpeg4config.addValues(mpeg4Config);        
+        mpeg4config.addValues(mpeg4Config);
     }
 
     @Override
     public void removeMPEG4Configuration(MPEG4Configuration mpeg4Config)
     {
-        mpeg4config.removeValues(mpeg4Config);        
+        mpeg4config.removeValues(mpeg4Config);
     }
 
     @Override
     public void setMPEG4Configuration(MPEG4Configuration mpeg4Config)
     {
-        mpeg4config.setValues(mpeg4Config.getValues());        
+        mpeg4config.setValues(mpeg4Config.getValues());
     }
 }

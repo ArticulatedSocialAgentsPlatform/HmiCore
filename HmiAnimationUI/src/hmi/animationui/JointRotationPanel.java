@@ -110,7 +110,8 @@ public class JointRotationPanel {
 			public void mouseWheelMoved(MouseWheelEvent arg0) {
 				if (arg0.getSource() instanceof JSlider) {
 					// JSlider slider = (JSlider) arg0.getSource();
-					// slider.setValue(slider.getValue() + arg0.getUnitsToScroll());
+					// slider.setValue(slider.getValue() +
+					// arg0.getUnitsToScroll());
 				}
 			}
 		};
