@@ -548,8 +548,60 @@ public class Quat4fTest
      * Test of interpolate method, of class Quat4f.
      */
     @Test
-    public void interpolate()
+    public void testInterpolateEdges()
     {
+        float q1[] = Quat4f.getQuat4f();
+        float q2[] = Quat4f.getQuat4f();
+        float qr[] = Quat4f.getQuat4f();
+        Quat4f.setFromAxisAngle4f(q1,1,1,0,1);
+        Quat4f.setFromAxisAngle4f(q2,0,0,1,-2f);
+        
+        Quat4f.interpolate(qr, q1, q2, 0);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr,q1,PRECISION);
+        Quat4f.interpolate(qr, q1, q2, 1);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr,q2,PRECISION);
+    }
+    
+    @Test
+    public void testSquadEdges()
+    {
+        float q1[] = Quat4f.getQuat4f();
+        float q2[] = Quat4f.getQuat4f();
+        float a[] = Quat4f.getQuat4f();
+        float b[] = Quat4f.getQuat4f();
+        float qr[] = Quat4f.getQuat4f();
+        Quat4f.setFromAxisAngle4f(q1,1,1,0,1);
+        Quat4f.setFromAxisAngle4f(q2,0,0,1,-2f);
+        Quat4f.setFromAxisAngle4f(a,1,1,1,0.5f);
+        Quat4f.setFromAxisAngle4f(b,1,0,1,2f);
+        
+        Quat4f.squad(qr, q1, q2, a, b, 0);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr,q1,PRECISION);
+        Quat4f.squad(qr, q1, q2,a,b, 1);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr,q2,PRECISION);
+    }
+    
+    @Test
+    public void testSquadEdgesIndexed()
+    {
+        float q1[] = new float[7];
+        float q2[] = new float[7];
+        float a[] = Quat4f.getQuat4f();
+        float b[] = Quat4f.getQuat4f();
+        float qr[] = new float[7];
+        int Q1_INDEX = 1;
+        int Q2_INDEX = 2;
+        int QR_INDEX = 3;
+        
+        Quat4f.setFromAxisAngle4f(q1,Q1_INDEX, 1,1,0,1);
+        Quat4f.setFromAxisAngle4f(q2,Q2_INDEX, 0,0,1,-2f);
+        Quat4f.setFromAxisAngle4f(a,1,1,1,0.5f);
+        Quat4f.setFromAxisAngle4f(b,1,0,1,2f);
+        
+        Quat4f.squad(qr, QR_INDEX, q1, Q1_INDEX, q2, Q2_INDEX,a, b, 0);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr,QR_INDEX,q1,Q1_INDEX, PRECISION);
+        Quat4f.squad(qr, QR_INDEX, q1, Q1_INDEX, q2, Q2_INDEX,a, b, 1);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr,QR_INDEX,q2,Q2_INDEX, PRECISION);
     }
 
     /**
