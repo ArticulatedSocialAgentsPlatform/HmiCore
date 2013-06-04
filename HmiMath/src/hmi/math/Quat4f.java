@@ -1098,6 +1098,20 @@ public final class Quat4f
         }
     }
 
+    
+    /**
+     * Performs a spherical cubic interpolation between q1 and q2, with a and b as the de Casteljau control points.<br>
+     * squad(qr, q1, q2, a, b, alpha)=slerp(slerp(p,q,alpha), slerp(a,b,alpha), 2t(1-t))  
+     */
+    public static void squad(float[] qr, float q1[], float q2[], float[] a, float[] b, float alpha)
+    {
+        float qTemp1[] = Quat4f.getQuat4f();
+        interpolate(qTemp1,q1,q2,alpha);
+        float qTemp2[] = Quat4f.getQuat4f();
+        interpolate(qTemp2,a,b,alpha);
+        interpolate(qr, qTemp1, qTemp2, 2*alpha*(1-alpha));
+    }
+    
     /**
      * Performs a great circle interpolation (slerp) between two quaternions q1 and q2, and places the result in quaternion qr.
      */
