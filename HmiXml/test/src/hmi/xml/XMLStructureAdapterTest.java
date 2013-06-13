@@ -4,17 +4,24 @@
 
 package hmi.xml;
 
-import static org.junit.Assert.*;
-import org.junit.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.*;
-
-//import lombok.Getter;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import org.hamcrest.collection.IsIterableContainingInOrder;
+import org.junit.Test;
 
+import com.google.common.base.Charsets;
 import com.google.common.primitives.Ints;
+//import lombok.Getter;
 
 /**
  * JUnit test for hmi.xml.XMLStructureAdapter
@@ -395,10 +402,15 @@ public class XMLStructureAdapterTest
     }
     
     @Test
-    public void testBOM()
+    public void testBOM() throws IOException
     {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        os.write(0xEF);
+        os.write(0xBB);
+        os.write(0xBF);
+        os.write("<TestA><test></test></TestA>".getBytes(Charsets.UTF_8));
         TestA testA = new TestA();
-        testA.readXML("ï»¿<TestA><test></test></TestA>");
+        testA.readXML(os.toString(Charsets.UTF_8.toString()));
         assertEquals("<test></test>", testA.getSection());
     }
     
