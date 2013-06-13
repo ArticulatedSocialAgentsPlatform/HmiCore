@@ -305,6 +305,17 @@ public class XMLStructureAdapter implements XMLStructure
         String tag = getXMLTag();
         try
         {
+            //ignore UTF-8 byte order marks
+            if (tokenizer.atCharData())
+            {
+                String data = tokenizer.takeCharData();
+                byte[] bytes = data.getBytes("ISO-8859-1");
+                if(bytes.length!=3 || (bytes[0]& 0xFF) != 0xEF || (bytes[1]& 0xFF) != 0xBB || (bytes[2]& 0xFF) != 0xBF)
+                {
+                    throw tokenizer.getXMLScanException("Erroneous XML encoding, expected: " + getXMLTag() + " or Byte Order Mark, encountered: "
+                            + tokenizer.currentTokenString() + data);
+                }                
+            }
             if (!tokenizer.atSTag(tag))
             {
                 if (!tokenizer.atSTag())

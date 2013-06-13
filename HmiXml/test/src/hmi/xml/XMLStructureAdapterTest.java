@@ -393,4 +393,20 @@ public class XMLStructureAdapterTest
         testA.readXML("<TestA><test></test></TestA>");
         assertEquals("<test></test>", testA.getSection());
     }
+    
+    @Test
+    public void testBOM()
+    {
+        TestA testA = new TestA();
+        testA.readXML("ï»¿<TestA><test></test></TestA>");
+        assertEquals("<test></test>", testA.getSection());
+    }
+    
+    @Test(expected=XMLScanException.class)
+    public void testNonBOMAtStart()
+    {
+        TestA testA = new TestA();
+        testA.readXML("xyz<TestA><test></test></TestA>");
+        assertEquals("<test></test>", testA.getSection());
+    }
 }
