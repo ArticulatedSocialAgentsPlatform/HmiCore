@@ -139,7 +139,10 @@ public abstract class XSDValidationTest
         {
             LOGGER.debug("validateXML for "+currentFile);
             // Parse an XML document into a DOM tree.
-            DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilderFactory df = DocumentBuilderFactory.newInstance();
+            df.setNamespaceAware(true);
+            DocumentBuilder parser = df.newDocumentBuilder();
+            
             Document document = parser.parse(currentFile);
 
             // Create a SchemaFactory capable of understanding WXS schemas.
