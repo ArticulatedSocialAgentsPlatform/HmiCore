@@ -37,6 +37,8 @@ import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+
 /**
  * XMLStructureAdapter is an implementation of XMLStructure that is intended
  * to be a base class that must be extended. There are two different approaches:
@@ -305,6 +307,22 @@ public class XMLStructureAdapter implements XMLStructure
         String tag = getXMLTag();
         try
         {
+            //ignore UTF-8 byte order marks
+            if (tokenizer.atCharData())
+            {
+                String data = tokenizer.takeCharData();
+                byte[] bytes = data.getBytes(Charsets.UTF_8);
+                if(bytes.length!=3 || (bytes[0]& 0xFF) != 0xEF || (bytes[1]& 0xFF) != 0xBB || (bytes[2]& 0xFF) != 0xBF)
+                {
+                    StringBuffer hex = new StringBuffer();
+                    for(int h:bytes)
+                    {
+                        hex.append(Integer.toHexString(h&0xff));
+                    }
+                    throw tokenizer.getXMLScanException("Erroneous XML encoding, expected: " + getXMLTag() + " or Byte Order Mark, encountered: "
+                            + tokenizer.currentTokenString() + data + " hex: "+hex);
+                }
+            }
             if (!tokenizer.atSTag(tag))
             {
                 if (!tokenizer.atSTag())
