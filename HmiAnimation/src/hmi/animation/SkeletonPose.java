@@ -332,14 +332,14 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
     /* calculate the length, in # floats, of a config for this SkeletonPose type */
     private void calculateConfigSize()
     {
-        stride = 0;
+        stride = 0;        
         if (hasTranslation) stride += 3;
         if (hasRotation) stride += 4;
         if (hasScale) stride += 3;
         if (hasVelocity) stride += 3;
         if (hasAngularVelocity) stride += 3;
         configSize = stride * partIds.length;
-        if (hasRootTranslation) configSize += 3;
+        if (hasRootTranslation) configSize += 3;        
     }
 
     /**
@@ -493,7 +493,6 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
             }
             index += getWidth(i);
         }
-
         float src[] = config;
         float dst[] = new float[configSize];
         int newConfigIndex = 0;
@@ -508,7 +507,8 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
             index += getWidth(i);
         }
         config = dst;
-
+        this.configSize = configSize;
+        
         if (targetParts != null)
         {
             filterTargetParts(joints);
@@ -523,6 +523,7 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
                 configType = configType.substring(2);
             }
         }
+        
     }
 
     /* Deprecated name for toSkeleton */
@@ -591,35 +592,29 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
         }
         for (int i = 0; i < targetParts.length; i++)
         {
-            // System.out.println("Setting target part "+targetParts[i].getId());
             if (hasTranslation)
             {
                 targetParts[i].getTranslation(config, index);
-                // System.out.println("Translation: "+Vec3f.toString(config,index));
                 index += 3;
             }
             if (hasRotation)
             {
                 targetParts[i].getRotation(config, index);
-                // System.out.println("Rotation: "+Vec4f.toString(config,index));
                 index += 4;
             }
             if (hasScale)
             {
                 targetParts[i].getScale(config, index);
-                // System.out.println("Scale: "+Vec3f.toString(config,index));
                 index += 3;
             }
             if (hasVelocity)
             {
                 targetParts[i].getVelocity(config, index);
-                // System.out.println("Velocity: "+Vec3f.toString(config,index));
                 index += 3;
             }
             if (hasAngularVelocity)
             {
                 targetParts[i].getAngularVelocity(config, index);
-                // System.out.println("Angular Velocity: "+Vec3f.toString(config,index));
                 index += 3;
             }
         }
@@ -639,6 +634,7 @@ public class SkeletonPose extends XMLStructureAdapter// implements Ident
 
         buf.append('\n');
         appendSpaces(buf, fmt);
+        
         buf.append(config[0]);
         for (int i = 1; i < configSize; i++)
         {
