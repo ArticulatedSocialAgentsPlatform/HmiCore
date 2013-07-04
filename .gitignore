@@ -20,3 +20,4 @@ nbproject
 /docs/HmiCore
 nbbuild.xml
 /myDocs/
+findbugs.xml
