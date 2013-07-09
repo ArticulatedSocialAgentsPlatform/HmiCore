@@ -68,7 +68,7 @@ public final class Torso
             }
             else
             {
-                currentYaw = yaw * (float) getLinearIncrease(i, m);
+                currentYaw = yaw * (float) getLinearIncrease(i-nrOfLumbarJoint, m);
             }
             Quat4f.setFromRollPitchYaw(qRes, (i-1)*4,roll * (float) getUniform(n), pitch * (float) getLinearDecrease(i, n), currentYaw);            
         }
