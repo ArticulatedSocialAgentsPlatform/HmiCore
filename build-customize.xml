@@ -15,6 +15,14 @@
       <delegate target="-pre-doc" list="rebuildList" verbose="true"/>
    </target>
    
+   <target name="ivyxmlreportAll">
+    <delegate target="ivyxmlreport" list="rebuildList" verbose="true"/>
+   </target>
+
+   <target name="ivyreportAll">
+    <delegate target="ivyreport" list="rebuildList" verbose="true"/>
+   </target>
+   
    <!-- targets: -->
    
    <target name="nbuild" depends="nightlybuild" description="produce a nightly build of the Hmi project"/>
