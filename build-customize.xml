@@ -2,6 +2,10 @@
    xmlns:ac="antlib:net.sf.antcontrib"   
 >
  
+ <property name="build.test.results.dir" location="${build.dir}/test/results" />
+ <property name="test.report.dir"        value="${test.dir}/report" />
+ 
+ 
  <filelist id="rebuildList" dir="${shared.project.root}" files="${rebuild.list}" />
  <!--filelist id="nbList" dir="${shared.project.root}" files="${nb.list}" /-->
    
@@ -130,10 +134,19 @@
         <delegate target="-junit" list="rebuildList"/>
    </target>
  
-    <target name="junitreportAll"  description="Runs junit tests on all HMI projects">     
-        <!--antcall target="Core.junit"/--> 
-        <delegate target="junitreport" list="rebuildList"/>
+    <target name="junitreportAll"  depends="junitAll" description="Runs junit tests on all HMI projects and produces html report">     
+      <delete dir="${test.report.dir}" failonerror="false"/>
+      <mkdir dir="${test.report.dir}"/>
+      <mkdir dir="${build.test.results.dir}"/>
+      <echo message="${build.test.results.dir}/TEST"/>
+      <junitreport todir="${build.test.results.dir}" >
+         <fileset dir=".">
+            <include name="**/build/test/results/TEST-*.xml"/>
+         </fileset>
+         <report format="frames" todir="${test.report.dir}"/>
+      </junitreport>
    </target>
+   
     <target name="eclipseAll"  description="Create eclipse projects for all HMI projects">   
 		<delegate target="eclipseproject" list="rebuildList"/>
 	</target>
