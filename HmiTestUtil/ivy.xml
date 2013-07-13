@@ -1,7 +1,7 @@
 <ivy-module version="2.0">
    <info organisation="HMI" module="HmiTestUtil" />
    <dependencies>
-   	<dependency org="saiba"   name="saibabml"     rev="latest.${resolve.status}"  />   
+   	<dependency org="saiba"   name="openbmlparser"     rev="latest.${resolve.status}"  />   
       <dependency org="HMI"   name="HmiAnimation"     rev="latest.${resolve.status}"  />   
       <dependency org="HMI"   name="HmiTTS"           rev="latest.${resolve.status}"  />
       <dependency org="HMI"   name="HmiMath"          rev="latest.${resolve.status}"  />
