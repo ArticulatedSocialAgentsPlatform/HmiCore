@@ -487,4 +487,23 @@ public class Vec3fTest {
     {
         assertEquals((float)Math.sqrt(1+4+9), Vec3f.distanceBetweenPoints(Vec3f.getVec3f(1,2,3), Vec3f.getVec3f(2,4,6)), PRECISION);
     }  
+    
+    @Test
+    public void testFindOrthogonal()
+    {
+        float result[]=Vec3f.getVec3f();
+        float v[]=Vec3f.getVec3f(0f,1f,0f);
+        Vec3f.findOrthogonal(result, v);
+        assertEquals(0, Vec3f.dot(result,v), PRECISION);
+    }
+    
+    @Test
+    public void testFindOrthogonal2()
+    {
+        float result[]=Vec3f.getVec3f();
+        float v[]=Vec3f.getVec3f(1f,1f,1f);
+        Vec3f.normalize(v);
+        Vec3f.findOrthogonal(result, v);
+        assertEquals(0, Vec3f.dot(result,v), PRECISION);
+    }
 }

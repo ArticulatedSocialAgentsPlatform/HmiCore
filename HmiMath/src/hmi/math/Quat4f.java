@@ -1241,6 +1241,24 @@ public final class Quat4f
     }
 
     /**
+     * Get the angle of q when projected to a rotation around axis (unit vector)
+     */
+    public static float getTwist(float q[], float axis[])
+    {
+        float ortho[]=Vec3f.getVec3f();
+        Vec3f.findOrthogonal(ortho,axis);
+        float transformed[] = Vec3f.getVec3f(ortho);
+        Quat4f.transformVec3f(q, transformed);
+        
+        float flattened[]=Vec3f.getVec3f();
+        Vec3f.scale(Vec3f.dot(transformed,axis), flattened, axis);
+        Vec3f.sub(flattened, transformed, flattened);
+        Vec3f.normalize(flattened);
+        
+        return (float)Math.acos(Vec3f.dot(ortho,flattened));
+    }
+    
+    /**
      * Rotates a vector with a quaternion, assumes the quaternion is length 1 transforms v, and also returns it.
      * Efficieny note: for large numbers of vertices, it is more efficient to turn the quaternion into a
      * transform matrix and use the latter for the transform.

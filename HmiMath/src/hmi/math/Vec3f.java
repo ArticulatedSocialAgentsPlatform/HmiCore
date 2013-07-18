@@ -689,6 +689,24 @@ public final class Vec3f {
       u[2] = u[2] * v[2];
    } 
    
+   /**
+    * Find an orthogonal vector to normalized vector v
+    */
+   public static void findOrthogonal(float ortho[], float v[])
+   {
+       int minIndex = 0;
+       if(v[1]<v[minIndex])minIndex = 1;
+       if(v[2]<v[minIndex])minIndex = 2;
+       float tmp[]=Vec3f.getVec3f();
+       switch(minIndex)
+       {
+       case 0: Vec3f.set(tmp,1,0,0);
+       case 1: Vec3f.set(tmp,0,1,0);
+       case 2: Vec3f.set(tmp,0,0,1);
+       }
+       Vec3f.cross(ortho, tmp, v);
+   }
+   
    
 //    /**
 //     * Determines the Mat3f scaling type of a scaling vector

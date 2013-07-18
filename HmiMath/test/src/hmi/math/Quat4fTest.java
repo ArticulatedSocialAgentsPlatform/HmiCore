@@ -764,5 +764,22 @@ public class Quat4fTest
             assertTrue(Vec3f.epsilonEquals(aVelDiff, i * 3, aacc, 0, PRECISION_DIFF2));
         }
     }
-
+    
+    @Test
+    public void testGetTwistAroundSameAxis()
+    {
+        assertEquals(3, Quat4f.getTwist(Quat4f.getQuat4fFromAxisAngle(1,0,0,3), Vec3f.getUnitX()), PRECISION);
+    }
+    
+    @Test
+    public void testGetTwistAroundOrthogonalAxis()
+    {
+        assertEquals(0, Quat4f.getTwist(Quat4f.getQuat4fFromAxisAngle(1,0,0,1), Vec3f.getUnitY()), PRECISION);
+    }
+    
+    @Test
+    public void testGetTwistNoRotation()
+    {
+        assertEquals(0, Quat4f.getTwist(Quat4f.getQuat4fFromAxisAngle(1,0,0,0), Vec3f.getUnitY()), PRECISION);
+    }
 }

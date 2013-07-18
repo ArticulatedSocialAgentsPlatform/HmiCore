@@ -222,6 +222,17 @@ public class AnalyticalIKSolver
     }
 
     /**
+     * Calculate the swivel angle, given the shoulder rotation and the goal in shoulder coordinates.
+     * This is more accurate than the getTwist based on elbow position when the arm is fully stretched
+     */
+    public double getSwivelFromShoulderAndGoal(float qSho[], float goal[])
+    {
+        float n[]=Vec3f.getVec3f(goal);
+        Vec3f.normalize(n);        
+        return Quat4f.getTwist(qSho,n);
+    }
+    
+    /**
      * Calculate the swivel angle, given an elbow/wrist position and a goal
      * 
      * @param e
