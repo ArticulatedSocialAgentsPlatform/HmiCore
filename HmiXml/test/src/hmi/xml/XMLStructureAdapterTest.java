@@ -10,17 +10,18 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import lombok.Getter;
 
 import org.hamcrest.collection.IsIterableContainingInOrder;
 import org.junit.Test;
 
 import com.google.common.base.Charsets;
 import com.google.common.primitives.Ints;
+
 //import lombok.Getter;
 
 /**
@@ -32,8 +33,6 @@ public class XMLStructureAdapterTest
     public XMLStructureAdapterTest()
     {
     }
-
- 
 
     @Test
     public void basics()
@@ -364,14 +363,16 @@ public class XMLStructureAdapterTest
         ssaTarget.readXML(buf.toString());
     }
 
-    
     final class TestA extends XMLStructureAdapter
     {
-       
+
         String section;
 
-        public String getSection() { return section; }
-        
+        public String getSection()
+        {
+            return section;
+        }
+
         @Override
         public String getXMLTag()
         {
@@ -384,7 +385,7 @@ public class XMLStructureAdapterTest
             section = tokenizer.getXMLSection();
         }
     }
-    
+
     @Test
     public void testGetEmptyXMLSection()
     {
@@ -392,7 +393,7 @@ public class XMLStructureAdapterTest
         testA.readXML("<TestA><test/></TestA>");
         assertEquals("<test/>", testA.getSection());
     }
-    
+
     @Test
     public void testGetEmptyXMLSectionWithClosingTag()
     {
@@ -400,7 +401,7 @@ public class XMLStructureAdapterTest
         testA.readXML("<TestA><test></test></TestA>");
         assertEquals("<test></test>", testA.getSection());
     }
-    
+
     @Test
     public void testBOM() throws IOException
     {
@@ -413,12 +414,47 @@ public class XMLStructureAdapterTest
         testA.readXML(os.toString(Charsets.UTF_8.toString()));
         assertEquals("<test></test>", testA.getSection());
     }
-    
-    @Test(expected=XMLScanException.class)
+
+    @Test(expected = XMLScanException.class)
     public void testNonBOMAtStart()
     {
         TestA testA = new TestA();
         testA.readXML("xyz<TestA><test></test></TestA>");
         assertEquals("<test></test>", testA.getSection());
+    }
+
+    @Test
+    public void testAppendWithNamespace()
+    {
+        class TestXMLAdapter extends XMLStructureAdapter
+        {
+            @Getter
+            private String testVal;
+
+            public StringBuilder appendAttributeString(StringBuilder buf, XMLFormatting fmt)
+            {
+                appendNamespacedAttribute(buf, fmt, "http://test.com", "testatr", "testval");
+                return buf;
+            }
+
+            public void decodeAttributes(HashMap<String, String> attrMap, XMLTokenizer tokenizer)
+            {
+                testVal = getRequiredAttribute("http://test.com:testatr", attrMap, tokenizer);
+            }
+
+            @Override
+            public String getXMLTag()
+            {
+                return "Test";
+            }
+        }
+        ;
+        StringBuilder buf = new StringBuilder();
+        TestXMLAdapter sIn = new TestXMLAdapter();
+        sIn.appendXML(buf);        
+        
+        TestXMLAdapter sOut = new TestXMLAdapter();
+        sOut.readXML(buf.toString());
+        assertEquals("testval",sOut.getTestVal());
     }
 }

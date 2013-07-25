@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -307,20 +308,20 @@ public class XMLStructureAdapter implements XMLStructure
         String tag = getXMLTag();
         try
         {
-            //ignore UTF-8 byte order marks
+            // ignore UTF-8 byte order marks
             if (tokenizer.atCharData())
             {
                 String data = tokenizer.takeCharData();
                 byte[] bytes = data.getBytes(Charsets.UTF_8);
-                if(bytes.length!=3 || (bytes[0]& 0xFF) != 0xEF || (bytes[1]& 0xFF) != 0xBB || (bytes[2]& 0xFF) != 0xBF)
+                if (bytes.length != 3 || (bytes[0] & 0xFF) != 0xEF || (bytes[1] & 0xFF) != 0xBB || (bytes[2] & 0xFF) != 0xBF)
                 {
                     StringBuffer hex = new StringBuffer();
-                    for(int h:bytes)
+                    for (int h : bytes)
                     {
-                        hex.append(Integer.toHexString(h&0xff));
+                        hex.append(Integer.toHexString(h & 0xff));
                     }
-                    throw tokenizer.getXMLScanException("Erroneous XML encoding, expected: " + getXMLTag() + " or Byte Order Mark, encountered: "
-                            + tokenizer.currentTokenString() + data + " hex: "+hex);
+                    throw tokenizer.getXMLScanException("Erroneous XML encoding, expected: " + getXMLTag()
+                            + " or Byte Order Mark, encountered: " + tokenizer.currentTokenString() + data + " hex: " + hex);
                 }
             }
             if (!tokenizer.atSTag(tag))
@@ -333,8 +334,8 @@ public class XMLStructureAdapter implements XMLStructure
                         extraText = ": " + tokenizer.getCharData();
                         if (extraText.length() > 50)
                         {
-                             extraText = extraText.substring(0, 50) + " ...";
-                        }                   
+                            extraText = extraText.substring(0, 50) + " ...";
+                        }
                     }
                     throw tokenizer.getXMLScanException("Erroneous XML encoding, expected: " + getXMLTag() + ", encountered: "
                             + tokenizer.currentTokenString() + extraText);
@@ -1173,7 +1174,7 @@ public class XMLStructureAdapter implements XMLStructure
         buf.append("/>");
         return buf;
     }
-    
+
     /**
      * This method appends an "empty element" XML STag with specified tag name to buf.
      * The string appended is of the form &lt;tagName/&gt; and is indented according to the specified XMLFormatting.
@@ -1387,13 +1388,30 @@ public class XMLStructureAdapter implements XMLStructure
         return buf;
     }
 
+    /**
+     * Constructs a unique namespace prefix for ns when none is there yet
+     */
+    public static void constructNSPrefix(String ns, XMLFormatting fmt, StringBuilder buf)
+    {
+        if (fmt.getNamespacePrefix(ns.intern()) == null)
+        {
+            String prefix = "ns" + UUID.randomUUID().toString();
+            XMLNameSpace n = new XMLNameSpace(prefix, ns);
+            fmt.pushXMLNameSpace(n);
+            buf.append(" xmlns:" + prefix + "=\"" + ns + "\" ");
+        }
+    }
+
     public static StringBuilder appendNamespacedAttribute(StringBuilder buf, XMLFormatting fmt, String nameSpace, String attrName,
             String attrValue)
     {
         if (attrValue == null) return buf;
         buf.append(' ');
+
+        constructNSPrefix(nameSpace, fmt, buf);
         String pref = fmt.getNamespacePrefix(nameSpace.intern());
         if (pref == null) throw new RuntimeException("appendnamespacedAttribute: no prefix found for " + nameSpace + " (Context:\n " + buf);
+
         buf.append(pref);
         buf.append(":");
         buf.append(attrName);
