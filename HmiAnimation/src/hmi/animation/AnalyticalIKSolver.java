@@ -18,7 +18,6 @@
  ******************************************************************************/
 package hmi.animation;
 
-import hmi.math.Mat3f;
 import hmi.math.Mat4f;
 import hmi.math.Quat4f;
 import hmi.math.Vec3f;
@@ -67,7 +66,7 @@ public class AnalyticalIKSolver
     private float[] elbowRotAxis = new float[3];
 
     /**
-     * Defines the type of Limb 
+     * Defines the type of Limb
      * @author Herwin
      */
     public enum LimbPosition
@@ -111,8 +110,7 @@ public class AnalyticalIKSolver
 
         if (l1 + l2 > l3)
         {
-            elbowStartRotation = (float) Math
-                    .acos((l1 * l1 + l2 * l2 - l3 * l3) / (2 * l1 * l2));
+            elbowStartRotation = (float) Math.acos((l1 * l1 + l2 * l2 - l3 * l3) / (2 * l1 * l2));
         }
         else
         {
@@ -155,8 +153,7 @@ public class AnalyticalIKSolver
             Vec3f.normalize(y);
             Vec3f.cross(z, x, y);
 
-            Mat4f.set(sewT, x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2],
-                    y[2], z[2], 0, 0, 0, 0, 1);
+            Mat4f.set(sewT, x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0, 0, 0, 0, 1);
         }
         else
         {
@@ -167,8 +164,7 @@ public class AnalyticalIKSolver
             }
             else if (limbPosition == LimbPosition.LEG)
             {
-                Mat4f.set(sewT, 0, 0, -1, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0,
-                        1);
+                Mat4f.set(sewT, 0, 0, -1, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1);
             }
         }
         Mat4f.transpose(sewT);
@@ -185,8 +181,7 @@ public class AnalyticalIKSolver
      *            arm or leg
      * @param projectionLength
      */
-    public AnalyticalIKSolver(float[] sv, float[] tv,
-            LimbPosition limbPosition, float projectionLength)
+    public AnalyticalIKSolver(float[] sv, float[] tv, LimbPosition limbPosition, float projectionLength)
     {
         this(sv, tv, limbPosition);
         project = true;
@@ -223,15 +218,23 @@ public class AnalyticalIKSolver
 
     /**
      * Calculate the swivel angle, given the shoulder rotation and the goal in shoulder coordinates.
-     * This is more accurate than the getTwist based on elbow position when the arm is fully stretched
+     * This provides an accurate swivel for the stretched arm.
      */
-    public double getSwivelFromShoulderAndGoal(float qSho[], float goal[])
+    public double getSwivelFromShoulderElbowAndGoal(float qSho[], float qElb[], float goal[])
     {
-        float n[]=Vec3f.getVec3f(goal);
-        Vec3f.normalize(n);        
-        return Quat4f.getTwist(qSho,n);
+        float l3 = Vec3f.length(goal);
+
+        if (l1 + l2 < l3 - 0.01f || Quat4f.epsilonEquals(Quat4f.getIdentity(), qElb, 0.01f))
+        {
+            float n[] = Vec3f.getVec3f(goal);
+            Vec3f.normalize(n);
+            return Quat4f.getTwist(qSho, n);
+        }
+        float[] elbVec = Vec3f.getVec3f(Tv);
+        Quat4f.transformVec3f(qSho, elbVec);        
+        return getSwivel(elbVec, goal);
     }
-    
+
     /**
      * Calculate the swivel angle, given an elbow/wrist position and a goal
      * 
@@ -240,64 +243,26 @@ public class AnalyticalIKSolver
      * @param g
      *            the goal position
      * @return the swivel angle
+     * @throws RunTimeException when the arm is fully stretched.
      */
     public double getSwivel(float[] e, float[] g)
     {
-        double sw = 0;
         Vec3f.set(goal, g);
 
         Vec3f.normalize(n, goal);
-
-        double rem;
         if (limbPosition == LimbPosition.ARM)
         {
-            Vec3f.set(forward, g[0], 0, g[2]);
-            rem = g[1];
-            Vec3f.set(axis, 0, -1, 0);
-            Vec3f.set(backAxis, 0, 0, -1);
+            float q[] = Quat4f.getFromVectors(new float[] { 0, 0, 1 }, n);
+            Vec3f.set(a, 0, -1, 0);
+            Quat4f.transformVec3f(q, a);
         }
         else
         {
-            Vec3f.set(forward, g[0], g[1], 0);
-            rem = g[2];
-            Vec3f.set(axis, 0, 0, 1);
-            Vec3f.set(backAxis, 0, 1, 0);
+            float q[] = Quat4f.getFromVectors(new float[] { 0, -1, 0 }, n);
+            Vec3f.set(a, 0, 0, 1);
+            Quat4f.transformVec3f(q, a);
         }
-
-        if (rem * rem < 0.0000001)
-        {
-            Vec3f.set(a, axis);
-        }
-        else if (Vec3f.length(forward) < 0.00001)
-        {
-            Vec3f.set(a, backAxis);
-        }
-        else
-        {
-            Vec3f.cross(planeNormal, g, forward);
-            Vec3f.normalize(planeNormal);
-
-            double rotAngle;
-            if (limbPosition == LimbPosition.ARM)
-            {
-                if (g[1] < 0)
-                    rotAngle = -Math.PI * 0.5;
-                else
-                    rotAngle = Math.PI * 0.5;
-            }
-            else
-            {
-                if (g[2] < 0)
-                    rotAngle = Math.PI * 0.5;
-                else
-                    rotAngle = -Math.PI * 0.5;
-            }
-            Mat3f.setFromAxisAngleScale(aRot, planeNormal, (float) rotAngle, 1);
-            Vec3f.set(a, n);
-            Mat3f.transformVec3f(aRot, a);
-            // Vec3f.normalize(a);
-        }
-
+        
         float l3 = Vec3f.length(goal);
 
         if (project)
@@ -307,23 +272,32 @@ public class AnalyticalIKSolver
                 l3 = projectionLength;
                 Vec3f.set(goal, n);
                 Vec3f.scale(l3, goal);
-                // System.out.println("Projecting!");
             }
         }
-        float cosAlpha = (l3 * l3 + l1 * l1 - l2 * l2) / (2 * l3 * l1);
+        if (l1 + l2 >= l3)
+        {
+            float cosAlpha = (l3 * l3 + l1 * l1 - l2 * l2) / (2 * l3 * l1);
 
-        // C = cos(alpha)L1n, circle center
-        Vec3f.set(C, n);
-        Vec3f.scale(cosAlpha * l1, C);
+            // C = cos(alpha)L1n, circle center
+            Vec3f.set(C, n);
+            Vec3f.scale(cosAlpha * l1, C);
+            Vec3f.set(eNorm, e);
+            Vec3f.sub(eNorm, C);
+            Vec3f.normalize(eNorm);
+            Vec3f.set(u, a);
 
-        Vec3f.set(u, a);
-
-        Vec3f.set(eNorm, e);
-        Vec3f.sub(eNorm, C);
-        Vec3f.normalize(eNorm);
-        sw = Math.acos(Vec3f.dot(eNorm, u));
-
-        return sw;
+            float v[] = Vec3f.getVec3f();
+            float res[] = Vec3f.getVec3f();
+            Vec3f.cross(v, u, n);
+            
+            Vec3f.decompose(res, eNorm, u, v, n);
+            //return Math.acos(Vec3f.dot(eNorm, u));
+            return Math.atan2(res[1],res[0]);
+        }
+        else
+        {
+            throw new RuntimeException("Can't calculate swivel from elbow and wrist if the arm is fully stretched");
+        }
     }
 
     /**
@@ -336,64 +310,22 @@ public class AnalyticalIKSolver
     public boolean solveIt(float[] g)
     {
         double swiv = swivel;
-        // System.out.println("Goal "+Vec3f.toString(goal));
         Vec3f.set(goal, g);
         Vec3f.normalize(n, goal);
 
-        double rem;
+        float qmin[];
         if (limbPosition == LimbPosition.ARM)
         {
-            Vec3f.set(forward, g[0], 0, g[2]);
-            rem = g[1];
-            Vec3f.set(axis, 0, -1, 0);
-            Vec3f.set(backAxis, 0, 0, -1);
+            qmin = Quat4f.getFromVectors(new float[] { 0, 0, 1 }, n);
+            Vec3f.set(a, 0, -1, 0);
+            Quat4f.transformVec3f(qmin, a);
         }
         else
         {
-            Vec3f.set(forward, g[0], g[1], 0);
-            rem = g[2];
-            Vec3f.set(axis, 0, 0, 1);
-            Vec3f.set(backAxis, 0, 1, 0);
-        }
-
-        // if((rem*rem)<0.00001)
-        if (rem * rem < 0.0000001)
-        {
-            Vec3f.set(a, axis);
-        }
-        else if (Vec3f.length(forward) < 0.00001)
-        {
-            Vec3f.set(a, backAxis);
-            // System.out.println("a = backAxis");
-        }
-        else
-        {
-            Vec3f.cross(planeNormal, g, forward);
-            Vec3f.normalize(planeNormal);
-            double rotAngle;
-            if (limbPosition == LimbPosition.ARM)
-            {
-                if (g[1] < 0)
-                    rotAngle = -Math.PI * 0.5;
-                else
-                    rotAngle = Math.PI * 0.5;
-            }
-            else
-            {
-                if (g[2] < 0)
-                    rotAngle = Math.PI * 0.5;
-                else
-                    rotAngle = -Math.PI * 0.5;
-            }
-            Mat3f.setFromAxisAngleScale(aRot, planeNormal, (float) rotAngle, 1);
-            Vec3f.set(a, n);
-            Mat3f.transformVec3f(aRot, a);
-            // System.out.println("a = complicated formula "+
-            // Vec3f.toString(g));
-            // Vec3f.normalize(a);
-        }
-        // System.out.println("a = "+Vec3f.toString(a) +
-        // "g = "+Vec3f.toString(g));
+            qmin = Quat4f.getFromVectors(new float[] { 0, -1, 0 }, n);
+            Vec3f.set(a, 0, 0, 1);
+            Quat4f.transformVec3f(qmin, a);
+        }        
 
         float l3 = Vec3f.length(goal);
         if (project)
@@ -451,8 +383,7 @@ public class AnalyticalIKSolver
             // z=x cross y
             Vec3f.cross(z, x, y);
 
-            Mat4f.set(R1, x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2],
-                    z[2], 0, 0, 0, 0, 1);
+            Mat4f.set(R1, x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0, 0, 0, 0, 1);
             Mat4f.mul(R1, R1, sewT);
             return true;
         }
@@ -460,25 +391,22 @@ public class AnalyticalIKSolver
         // aim
         Mat4f.setIdentity(Rx);
 
-        // y = -e/||e||
+        // y = -n (=a)
         Vec3f.set(y, n);
         Vec3f.scale(-1, y);
 
-        // x=w-(w.y)y/||w-(w.y)y||
-        Vec3f.set(w, 1, 0, 0);
+        qmin = Quat4f.getFromVectors(new float[] { 0, -1, 0 }, n);
+
         Vec3f.set(x, 1, 0, 0);
-        float dot = Vec3f.dot(w, y);
-        Vec3f.set(tempv, y);
-        Vec3f.scale(dot, tempv);
-        Vec3f.sub(x, tempv);
-        Vec3f.normalize(x);
+        Quat4f.transformVec3f(qmin, x);
+        Quat4f.transformVec3f(Quat4f.getQuat4fFromAxisAngle(y[0], y[1], y[2], (float) swiv), x);
 
         // z = x cross y
         Vec3f.cross(z, x, y);
+        
+        Mat4f.set(R1, x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0, 0, 0, 0, 1);
 
-        Mat4f.set(R1, x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2],
-                z[2], 0, 0, 0, 0, 1);
-        Mat4f.mul(R1, R1, sewT);
+        // Mat4f.mul(R1, R1, sewT);
         return false;
     }
 
@@ -573,8 +501,7 @@ public class AnalyticalIKSolver
      * @param src
      *            the vector in world coordinates
      */
-    public static void translateToLocalSystem(VJoint obj1, VJoint obj2,
-            float src[], float dst[])
+    public static void translateToLocalSystem(VJoint obj1, VJoint obj2, float src[], float dst[])
     {
         float q[] = new float[4];
         obj2.getParent().getPathRotation(obj1, q);
@@ -600,11 +527,13 @@ public class AnalyticalIKSolver
     private float n[] = new float[3];
     private float e[] = new float[3];
     private float[] tempv = new float[3];
+    /*
     private float forward[] = new float[3];
     private float axis[] = new float[3];
     private float backAxis[] = new float[3];
     private float[] planeNormal = new float[3];
     private float aRot[] = new float[9];
+    */
     private float eNorm[] = new float[3];
     private float u[] = new float[3];
     private float[] v = new float[3];

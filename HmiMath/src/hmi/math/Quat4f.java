@@ -403,6 +403,10 @@ public final class Quat4f
         q[3] = an[0] * h[1] - an[1] * h[0];
     }
 
+    /**
+     * Gets the Quaternions q from Vec3f vectors a and b The quaternion is such that it rotates vectors in the a direction towards vectors in the b
+     * direction. (If a and b happen to have the same length, a would be rotated into b)
+     */
     public static float[] getFromVectors(float[] a, float[] b)
     {
         float[] q = new float[QUAT4F_SIZE];
