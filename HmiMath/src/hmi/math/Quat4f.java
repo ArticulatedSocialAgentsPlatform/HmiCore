@@ -118,6 +118,16 @@ public final class Quat4f
         setFromRollPitchYawDegrees(newQuat, roll, pitch, yaw);
         return newQuat;
     }
+    
+    /**
+     * Returns a new float[4] array with specified components No check is made that this is a unit quaternion
+     */
+    public static float[] getQuat4fFromRollPitchYaw(float roll, float pitch, float yaw)
+    {
+        float[] newQuat = new float[QUAT4F_SIZE];
+        setFromRollPitchYaw(newQuat, roll, pitch, yaw);
+        return newQuat;
+    }
 
     /**
      * Adds quaternions a to quaternion dst.
