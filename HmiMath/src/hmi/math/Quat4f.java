@@ -98,6 +98,16 @@ public final class Quat4f
         setFromAxisAngle4f(newQuat, x, y, z, angle);
         return newQuat;
     }
+    
+    /**
+     * Returns a new quaternion float[4] array, specifuing a rotation around axis (x, y, z), with angle specified in radians.
+     */
+    public static float[] getQuat4fFromAxisAngle(float axis[], float angle)
+    {
+        float[] newQuat = new float[QUAT4F_SIZE];
+        setFromAxisAngle4f(newQuat, axis[0], axis[1], axis[2], angle);
+        return newQuat;
+    }
 
     /**
      * Returns a new quaternion float[4] array, specifuing a rotation around axis (x, y, z), with angle specified in degrees.

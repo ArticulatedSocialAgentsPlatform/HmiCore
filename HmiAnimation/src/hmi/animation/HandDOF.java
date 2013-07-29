@@ -21,6 +21,7 @@ public class HandDOF
     
     public double MCPPinkyAbduction;
     public double MCPRingAbduction;
+    public double MCPMiddleAbduction;
     public double MCPIndexAbduction;
     
     public double TMCFlexion;
@@ -67,7 +68,7 @@ public class HandDOF
         case "r_ring":
         case "l_ring": return MCPRingAbduction;
         case "r_middle":
-        case "l_middle": return 0;
+        case "l_middle": return MCPMiddleAbduction;
         case "r_index":
         case "l_index": return MCPIndexAbduction;
         default: throw new IllegalArgumentException(joint + " is not a valid MCP joint");

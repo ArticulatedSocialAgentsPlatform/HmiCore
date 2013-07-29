@@ -23,7 +23,7 @@ public class HandPanel
     public enum HandSide{LEFT,RIGHT};
     
     private JSlider DIPIndexFlexionSlider, DIPMiddleFlexionSlider, DIPRingFlexionSlider, DIPPinkyFlexionSlider, IPThumbFlexionSlider,
-            MCPIndexFlexionSlider, MCPIndexAbductionSlider, MCPMiddleFlexionSlider, MCPRingFlexionSlider, MCPRingAbductionSlider,
+            MCPIndexFlexionSlider, MCPIndexAbductionSlider, MCPMiddleFlexionSlider, MCPMiddleAbductionSlider, MCPRingFlexionSlider, MCPRingAbductionSlider,
             MCPPinkyFlexionSlider, MCPPinkyAbductionSlider,MCPThumbFlexionSlider, TMCThumbAbductionSlider, TMCThumbFlexionSlider;
 
     private JSlider createSlider(String name, int min, int max, JPanel parent)
@@ -54,7 +54,7 @@ public class HandPanel
         this.handController = hc;
         this.handSide = side;
         JLabel label = new JLabel(handName);
-        panel.setLayout(new GridLayout(16, 1));
+        panel.setLayout(new GridLayout(17, 1));
 
         panel.add(label);
         DIPIndexFlexionSlider = createSlider("PIP index flexion", (int) Math.toDegrees(Hand.getMinimumFingerFlexionPIP()),
@@ -72,7 +72,9 @@ public class HandPanel
                 (int) Math.toDegrees(Hand.getMaximumFingerAbduction()), panel);
         MCPMiddleFlexionSlider = createSlider("MCP middle flexion", (int) Math.toDegrees(Hand.getMinimumFingerFlexionMCP()),
                 (int) Math.toDegrees(Hand.getMaximumFingerFlexionMCP()), panel);
-        MCPRingFlexionSlider = createSlider("MCP ring flexion", (int) Math.toDegrees(Hand.getMinimumFingerFlexionMCP()),
+        MCPMiddleAbductionSlider = createSlider("MCP middle abduction", (int) Math.toDegrees(Hand.getMinimumFingerAbduction()),
+                (int) Math.toDegrees(Hand.getMaximumFingerAbduction()), panel);
+        MCPRingFlexionSlider = createSlider("MCP ring abduction", (int) Math.toDegrees(Hand.getMinimumFingerFlexionMCP()),
                 (int) Math.toDegrees(Hand.getMaximumFingerFlexionMCP()), panel);
         MCPRingAbductionSlider = createSlider("MCP ring abduction", (int) Math.toDegrees(Hand.getMinimumFingerAbduction()),
                 (int) Math.toDegrees(Hand.getMaximumFingerAbduction()), panel);
@@ -104,6 +106,7 @@ public class HandPanel
         handDOF.MCPIndexAbduction = Math.toRadians(MCPIndexAbductionSlider.getValue());
         handDOF.MCPIndexFlexion = Math.toRadians(MCPIndexFlexionSlider.getValue());
         handDOF.MCPMiddleFlexion = Math.toRadians(MCPMiddleFlexionSlider.getValue());
+        handDOF.MCPMiddleAbduction = Math.toRadians(MCPMiddleAbductionSlider.getValue());
         handDOF.MCPRingAbduction = Math.toRadians(MCPRingAbductionSlider.getValue());
         handDOF.MCPRingFlexion = Math.toRadians(MCPRingFlexionSlider.getValue());
         handDOF.MCPPinkyAbduction = Math.toRadians(MCPPinkyAbductionSlider.getValue());

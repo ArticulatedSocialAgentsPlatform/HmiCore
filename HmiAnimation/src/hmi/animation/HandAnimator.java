@@ -1,6 +1,7 @@
 package hmi.animation;
 
 import hmi.math.Quat4f;
+import hmi.math.Vec3f;
 import hmi.neurophysics.Hand;
 
 import java.util.HashMap;
@@ -15,9 +16,17 @@ public class HandAnimator
 {
     Map<String, VJoint> leftHandJoints = new HashMap<String,VJoint>();
     Map<String, VJoint> rightHandJoints = new HashMap<String,VJoint>();
+    private final float [] thumbFlexionAxisLeft;
+    private final float [] thumbFlexionAxisRight;
     
-    public HandAnimator(VJoint human)
+    /**
+     * Armandia flexion axis left :(1, -1, -1), right:(1, 1, 1)
+     *  
+     */
+    public HandAnimator(VJoint human, float [] thumbFlexionAxisLeft, float [] thumbFlexionAxisRight)
     {
+        this.thumbFlexionAxisLeft = Vec3f.getVec3f(thumbFlexionAxisLeft);
+        this.thumbFlexionAxisRight = Vec3f.getVec3f(thumbFlexionAxisRight);
         for(String joint:Hanim.LEFTHAND_JOINTS)
         {
             leftHandJoints.put(joint,human.getPartBySid(joint));
@@ -125,8 +134,8 @@ public class HandAnimator
             rightHandJoints.get(joint+2).setRotation(Quat4f.getQuat4fFromAxisAngle(0, 0, 1, (float)handDoF.getPIPFlexion(joint)));
             rightHandJoints.get(joint+3).setRotation(Quat4f.getQuat4fFromAxisAngle(0, 0, 1, (float)Hand.getDIPRotation(handDoF.getPIPFlexion(joint))));
         }
-        rightHandJoints.get(Hanim.r_thumb3).setRotation(Quat4f.getQuat4fFromAxisAngle(1, 1, 1, (float)handDoF.IPThumbFlexion));
-        rightHandJoints.get(Hanim.r_thumb2).setRotation(Quat4f.getQuat4fFromAxisAngle(1, 1, 1, (float)handDoF.MCPThumbFlexion));
+        rightHandJoints.get(Hanim.r_thumb3).setRotation(Quat4f.getQuat4fFromAxisAngle(thumbFlexionAxisRight, (float)handDoF.IPThumbFlexion));
+        rightHandJoints.get(Hanim.r_thumb2).setRotation(Quat4f.getQuat4fFromAxisAngle(thumbFlexionAxisRight, (float)handDoF.MCPThumbFlexion));
         
         float qAbduction[]=Quat4f.getQuat4fFromAxisAngle(1, 0, 0, (float)handDoF.TMCAbduction);
         float qFlexion[]=Quat4f.getQuat4fFromAxisAngle(0, 1, 0, (float)handDoF.TMCFlexion);
@@ -147,8 +156,8 @@ public class HandAnimator
             leftHandJoints.get(joint+2).setRotation(Quat4f.getQuat4fFromAxisAngle(0, 0, -1, (float)handDoF.getPIPFlexion(joint)));
             leftHandJoints.get(joint+3).setRotation(Quat4f.getQuat4fFromAxisAngle(0, 0, -1, (float)Hand.getDIPRotation(handDoF.getPIPFlexion(joint))));
         }
-        leftHandJoints.get(Hanim.l_thumb3).setRotation(Quat4f.getQuat4fFromAxisAngle(1, -1, -1, (float)handDoF.IPThumbFlexion));
-        leftHandJoints.get(Hanim.l_thumb2).setRotation(Quat4f.getQuat4fFromAxisAngle(1, -1, -1, (float)handDoF.MCPThumbFlexion));
+        leftHandJoints.get(Hanim.l_thumb3).setRotation(Quat4f.getQuat4fFromAxisAngle(thumbFlexionAxisLeft, (float)handDoF.IPThumbFlexion));
+        leftHandJoints.get(Hanim.l_thumb2).setRotation(Quat4f.getQuat4fFromAxisAngle(thumbFlexionAxisLeft, (float)handDoF.MCPThumbFlexion));
         
         float qAbduction[]=Quat4f.getQuat4fFromAxisAngle(1, 0, 0, (float)handDoF.TMCAbduction);
         float qFlexion[]=Quat4f.getQuat4fFromAxisAngle(0, -1, 0, (float)handDoF.TMCFlexion);
