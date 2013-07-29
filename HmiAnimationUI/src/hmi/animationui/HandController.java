@@ -4,6 +4,10 @@ import hmi.animation.HandAnimator;
 import hmi.animation.HandDOF;
 import hmi.animationui.HandPanel.HandSide;
 
+/**
+ * The controller handles hand input from the viewer and updates the hand
+ * @author hvanwelbergen
+ */
 public class HandController
 {
     private HandAnimator model;
