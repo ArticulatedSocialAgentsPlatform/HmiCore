@@ -76,9 +76,9 @@ public class HandPanel
                 (int) Math.toDegrees(Hand.getMaximumFingerFlexionMCP()), panel);
         MCPRingAbductionSlider = createSlider("MCP ring abduction", (int) Math.toDegrees(Hand.getMinimumFingerAbduction()),
                 (int) Math.toDegrees(Hand.getMaximumFingerAbduction()), panel);
-        MCPPinkyFlexionSlider = createSlider("MCP ring flexion", (int) Math.toDegrees(Hand.getMinimumFingerFlexionMCP()),
+        MCPPinkyFlexionSlider = createSlider("MCP pinky flexion", (int) Math.toDegrees(Hand.getMinimumFingerFlexionMCP()),
                 (int) Math.toDegrees(Hand.getMaximumFingerFlexionMCP()), panel);
-        MCPPinkyAbductionSlider = createSlider("MCP ring abduction", (int) Math.toDegrees(Hand.getMinimumFingerAbduction()),
+        MCPPinkyAbductionSlider = createSlider("MCP pinky abduction", (int) Math.toDegrees(Hand.getMinimumFingerAbduction()),
                 (int) Math.toDegrees(Hand.getMaximumFingerAbduction()), panel);
         
 

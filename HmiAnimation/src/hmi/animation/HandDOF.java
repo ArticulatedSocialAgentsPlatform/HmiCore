@@ -30,8 +30,8 @@ public class HandDOF
     {
         switch (joint)
         {
-        case "r_pinky": return PIPPinkyFlexion;
-        case "l_pinky": 
+        case "r_pinky": 
+        case "l_pinky": return PIPPinkyFlexion;
         case "r_ring":
         case "l_ring": return PIPRingFlexion;
         case "r_middle":
@@ -46,8 +46,8 @@ public class HandDOF
     {
         switch (joint)
         {
-        case "r_pinky": return MCPPinkyFlexion;
-        case "l_pinky": 
+        case "r_pinky": 
+        case "l_pinky": return MCPPinkyFlexion;
         case "r_ring":
         case "l_ring": return MCPRingFlexion;
         case "r_middle":
@@ -62,8 +62,8 @@ public class HandDOF
     {
         switch (joint)
         {
-        case "r_pinky": return MCPPinkyAbduction;
-        case "l_pinky": 
+        case "r_pinky": 
+        case "l_pinky": return MCPPinkyAbduction;
         case "r_ring":
         case "l_ring": return MCPRingAbduction;
         case "r_middle":
