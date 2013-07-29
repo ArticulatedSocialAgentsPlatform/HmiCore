@@ -245,7 +245,14 @@ public final class VJointUtils
         }
         else
         {
-            log.warn("No " + parentSid + " or " + childSid + " for skeleton " + skeletonRoot.getName());
+            if(child == null)
+            {
+                log.warn("No " + childSid + " for skeleton " + skeletonRoot.getName());
+            }
+            if(parent == null)
+            {
+                log.warn("No " + parentSid + " for skeleton " + skeletonRoot.getName());
+            }
         }
     }
     
