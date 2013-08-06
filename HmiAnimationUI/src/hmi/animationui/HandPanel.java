@@ -13,6 +13,11 @@ import javax.swing.event.ChangeListener;
 
 import lombok.Getter;
 
+/**
+ * UI Element for setting hand poses.
+ * @author hvanwelbergen
+ *
+ */
 public class HandPanel
 {
     @Getter
@@ -74,7 +79,7 @@ public class HandPanel
                 (int) Math.toDegrees(Hand.getMaximumFingerFlexionMCP()), panel);
         MCPMiddleAbductionSlider = createSlider("MCP middle abduction", (int) Math.toDegrees(Hand.getMinimumFingerAbduction()),
                 (int) Math.toDegrees(Hand.getMaximumFingerAbduction()), panel);
-        MCPRingFlexionSlider = createSlider("MCP ring abduction", (int) Math.toDegrees(Hand.getMinimumFingerFlexionMCP()),
+        MCPRingFlexionSlider = createSlider("MCP ring flexion", (int) Math.toDegrees(Hand.getMinimumFingerFlexionMCP()),
                 (int) Math.toDegrees(Hand.getMaximumFingerFlexionMCP()), panel);
         MCPRingAbductionSlider = createSlider("MCP ring abduction", (int) Math.toDegrees(Hand.getMinimumFingerAbduction()),
                 (int) Math.toDegrees(Hand.getMaximumFingerAbduction()), panel);
