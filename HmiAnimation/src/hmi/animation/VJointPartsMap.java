@@ -13,7 +13,7 @@ public class VJointPartsMap
 {
     private Map<String,VJoint> jointMap;
     
-    public void VJointsPartsMap(VJoint vjRoot)
+    public VJointPartsMap(VJoint vjRoot)
     {
         Map<String,VJoint> m = new HashMap<String,VJoint>();
         m.put(vjRoot.getSid(),vjRoot);
