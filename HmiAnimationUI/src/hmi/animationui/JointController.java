@@ -4,6 +4,7 @@ import hmi.animation.VJoint;
 import hmi.animation.VJointUtils;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * The controller handles input from the viewer and updates the vjoint structure
@@ -31,10 +32,8 @@ public class JointController implements RotationsController {
 	 */
 	public void setJointRotations(
 			Collection<JointRotationConfiguration> rotations) {
-		System.out.println("setJointRotations");
 
 		for (JointRotationConfiguration rotConf : rotations) {
-			System.out.print("Setting for " + rotConf.getJointName() + "; ");
 			model.getPart(rotConf.getJointName()).setRotation(rotConf.getQ());
 		}
 		System.out.println();
@@ -58,5 +57,16 @@ public class JointController implements RotationsController {
 
 	public Collection<JointRotationConfiguration> getSelectedJointRotations() {
 		return jv.getSelectedJointRotationConfigurations();
+	}
+
+	/**
+	 * Sets the values of all sliders for the joints in <i>joints</i> to the
+	 * value of the corresponding joint.
+	 * 
+	 * @param righthandJoints
+	 */
+	public void adjustSliderToModel(List<String> joints) {
+		jv.adjustSliderToModel(model, joints);
+
 	}
 }

@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.font.TextAttribute;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -192,6 +193,9 @@ public class JointRotationPanel {
 	}
 
 	public void setJointRotationConfiguration(JointRotationConfiguration j) {
+		// System.out.println(String.format("Setting %s: RPY = %s; Q = %s",
+		// j.getJointName(), Arrays.toString(j.getRpyDeg()),
+		// Arrays.toString(j.getQ())));
 		rollSlider.setValue((int) j.getRpyDeg()[0]);
 		pitchSlider.setValue((int) j.getRpyDeg()[1]);
 		yawSlider.setValue((int) j.getRpyDeg()[2]);

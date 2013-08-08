@@ -1,8 +1,15 @@
 package hmi.animationui;
 
+import hmi.animation.Hanim;
+import hmi.animation.VJoint;
+import hmi.animation.VJointUtils;
+import hmi.math.Quat4f;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +67,9 @@ public class JointView {
 		reset();
 		for (JointRotationConfiguration j : rotationConfigurations) {
 			JointRotationPanel rp = rotationPanels.get(j.getJointName());
-			rp.setJointRotationConfiguration(j);
+			if (rp != null) {
+				rp.setJointRotationConfiguration(j);
+			}
 		}
 	}
 
@@ -75,6 +84,34 @@ public class JointView {
 	public void reset() {
 		for (JointRotationPanel j : rotationPanels.values()) {
 			j.reset();
+		}
+	}
+
+	/**
+	 * Sets the values of all sliders for the joints in <i>joints</i> to the
+	 * value of the corresponding joint according to the current model pose.
+	 * 
+	 * @param joints
+	 */
+	public void adjustSliderToModel(VJoint model, List<String> joints) {
+		for (String j : joints) {
+			JointRotationPanel rp = rotationPanels.get(j);
+			if (rp != null) {
+				VJoint p = model.getPart(rp.getRotationConfiguration()
+						.getJointName());
+				float q[] = Quat4f.getQuat4f();
+				p.getRotation(q);
+				float rpyDeg[] = new float[3];
+				Quat4f.getRollPitchYaw(q, rpyDeg);
+				for (int i = 0; i < rpyDeg.length; i++) {
+					rpyDeg[i] = (float) Math.toDegrees(rpyDeg[i]);
+				}
+				// System.out.println(String.format("RPY: %s; Joint: %s", Arrays
+				// .toString(rpyDeg), rp.getRotationConfiguration()
+				// .getJointName()));
+				rp.setJointRotationConfiguration(new JointRotationConfiguration(
+						rp.getRotationConfiguration().getJointName(), q, rpyDeg));
+			}
 		}
 	}
 
