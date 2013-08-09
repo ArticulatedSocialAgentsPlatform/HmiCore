@@ -1,5 +1,6 @@
 package hmi.animation;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,5 +32,10 @@ public class VJointPartsMap
     public VJoint get(String sid)
     {
         return jointMap.get(sid);
+    }
+    
+    public Collection<VJoint>getJoints()
+    {
+        return jointMap.values();
     }
 }

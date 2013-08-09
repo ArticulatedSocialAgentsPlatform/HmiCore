@@ -74,6 +74,9 @@ public final class VJointUtils
         return ImmutableSet.copyOf(j);
     }
 
+    /**
+     * If id is null, set sid to id if id is not null, otherwise set sid to name.
+     */
     public static void setSidToIdOrNameIfNullSid(Collection<VJoint> joints)
     {
         for (VJoint vj : joints)
@@ -88,6 +91,20 @@ public final class VJointUtils
                 {
                     vj.setSid(vj.getName());
                 }
+            }
+        }
+    }
+    
+    /**
+     * Set sid to name if sid is null
+     */
+    public static void setSidToNameIfNullSid(Collection<VJoint> joints)
+    {
+        for (VJoint vj : joints)
+        {
+            if (vj.getSid() == null)
+            {
+                vj.setSid(vj.getName());                
             }
         }
     }
