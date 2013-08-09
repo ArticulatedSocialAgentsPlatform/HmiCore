@@ -20,11 +20,10 @@ public class VJointPartsMap
         m.put(vjRoot.getSid(),vjRoot);
         for(VJoint vj: vjRoot.getParts())
         {
-            if(vj.getSid() == null)
+            if(vj.getSid() != null)
             {
-                throw new IllegalArgumentException("Part with "+vj+" has null sid. Root joint: "+vjRoot);
-            }
-            m.put(vj.getSid(),vj);
+                m.put(vj.getSid(),vj);                
+            }            
         }
         jointMap = ImmutableMap.copyOf(m);
     }
