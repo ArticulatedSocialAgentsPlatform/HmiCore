@@ -12,26 +12,44 @@ import java.util.Arrays;
  * 
  * @author hvanwelbergen
  */
-public class HandController {
-	private HandAnimator model;
-	private JointController jc;
+public class HandController
+{
+    private HandAnimator model;
+    private JointController jc;
 
-	public HandController(HandAnimator model, JointController jc) {
-		this.model = model;
-		this.jc = jc;
-	}
+    public HandController(HandAnimator model)
+    {
+        this(model,null);
+    }
+    
+    public HandController(HandAnimator model, JointController jc)
+    {
+        this.model = model;
+        this.jc = jc;
+    }
 
-	public void setJointRotations(HandDOF handConfig, HandSide side) {
-		if (side == HandSide.RIGHT) {
-			model.setHandDOFRight(handConfig);
-			jc.adjustSliderToModel(Arrays.asList(Hanim.RIGHTHAND_JOINTS));
-		} else {
-			model.setHandDOFLeft(handConfig);
-			jc.adjustSliderToModel(Arrays.asList(Hanim.LEFTHAND_JOINTS));
-		}
-	}
+    public void setJointRotations(HandDOF handConfig, HandSide side)
+    {
+        if (side == HandSide.RIGHT)
+        {
+            model.setHandDOFRight(handConfig);
+            if(jc!=null)
+            {
+                jc.adjustSliderToModel(Arrays.asList(Hanim.RIGHTHAND_JOINTS));
+            }
+        }
+        else
+        {
+            model.setHandDOFLeft(handConfig);
+            if(jc!=null)
+            {
+                jc.adjustSliderToModel(Arrays.asList(Hanim.LEFTHAND_JOINTS));
+            }
+        }
+    }
 
-	public HandsView constructHandsView() {
-		return new HandsView(this);
-	}
+    public HandsView constructHandsView()
+    {
+        return new HandsView(this);
+    }
 }
