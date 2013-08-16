@@ -100,6 +100,12 @@ public class FaceControllerPose implements FaceController
     }
 
     @Override
+    public float getCurrentWeight(String targetName)
+    {
+        return morphs.get(targetName);
+    }
+    
+    @Override
     public void addMPEG4Configuration(MPEG4Configuration mpeg4Config)
     {
         mpeg4config.addValues(mpeg4Config);
@@ -116,4 +122,6 @@ public class FaceControllerPose implements FaceController
     {
         mpeg4config.setValues(mpeg4Config.getValues());
     }
+
+   
 }

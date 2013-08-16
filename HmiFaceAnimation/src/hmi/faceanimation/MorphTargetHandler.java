@@ -80,4 +80,13 @@ public class MorphTargetHandler
             }
         }
     }
+    
+    public synchronized float getCurrentWeight(String targetName)
+    {
+        if(desiredMorphTargets.containsKey(targetName))
+        {
+            return desiredMorphTargets.get(targetName);
+        }
+        return 0;
+    }
 }

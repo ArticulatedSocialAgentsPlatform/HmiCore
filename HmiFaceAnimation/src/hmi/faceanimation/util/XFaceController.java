@@ -107,4 +107,10 @@ public class XFaceController implements FaceController
                 
     }
 
+    @Override
+    public float getCurrentWeight(String targetName)
+    {
+        return 0;
+    }
+
 }

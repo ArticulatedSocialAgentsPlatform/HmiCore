@@ -85,7 +85,12 @@ public class StdOutFaceController implements FaceController
         {
             System.out.println(targetNames[i] + ": " + weights[i]);
         }
+    }
 
+    @Override
+    public float getCurrentWeight(String targetName)
+    {
+        return 0;
     }
 
 }

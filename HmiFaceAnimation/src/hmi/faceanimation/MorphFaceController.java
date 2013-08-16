@@ -10,6 +10,8 @@ import java.util.Collection;
 public interface MorphFaceController
 {
     void setMorphTargets(String[] targetNames, float[] weights);
+    
+    float getCurrentWeight(String targetName);
 
     void addMorphTargets(String[] targetNames, float[] weights);
 

@@ -158,5 +158,4 @@ public class HMIFaceController implements FaceController
             }
         }
     }
-
 }
