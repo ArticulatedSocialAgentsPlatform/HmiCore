@@ -103,7 +103,7 @@ public class JointView
      * 
      * @param joints
      */
-    public void adjustSliderToModel(VJoint model, List<String> joints)
+    public void adjustSliderToModel(VJoint model, Collection<String> joints)
     {
         float q[] = Quat4f.getQuat4f();        
         for (String j : joints)

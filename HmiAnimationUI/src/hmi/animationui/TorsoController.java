@@ -5,7 +5,6 @@ import hmi.animation.VJoint;
 import hmi.animation.VJointUtils;
 import hmi.neurophysics.Torso;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -22,6 +21,7 @@ public class TorsoController implements RotationsController
 {
     private final ImmutableList<VJoint> thoracicJoints;
     private final ImmutableList<VJoint> torsoJoints;
+    private final Collection<String> controlledJoints;
     private JointController jc;
 
     public TorsoController(VJoint model)
@@ -36,6 +36,7 @@ public class TorsoController implements RotationsController
         thoracicJoints = ImmutableList.copyOf(VJointUtils.gatherJoints(Hanim.THORACIC_JOINTS, model));
         joints.addAll(thoracicJoints);
         torsoJoints = ImmutableList.copyOf(joints);
+        controlledJoints = VJointUtils.transformToSidSet(torsoJoints);
     }
 
     public JointView constructTorsoView()
@@ -57,7 +58,7 @@ public class TorsoController implements RotationsController
         }
         if(jc!=null)
         {
-            jc.adjustSliderToModel(Arrays.asList(Hanim.THORACIC_JOINTS));
+            jc.adjustSliderToModel(controlledJoints);
         }
     }
 }

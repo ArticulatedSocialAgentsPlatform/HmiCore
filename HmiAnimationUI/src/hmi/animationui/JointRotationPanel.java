@@ -12,7 +12,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.font.TextAttribute;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,8 +67,8 @@ public class JointRotationPanel {
 		slider.addMouseWheelListener(mouseWheelListener);
 		slider.addChangeListener(new ChangeListener() {
 			@Override
-			public void stateChanged(ChangeEvent e) {
-				if (!slider.getValueIsAdjusting()) {
+			public void stateChanged(ChangeEvent e) {				
+			    if (!slider.getValueIsAdjusting()) {
 					panelState.previousStateOfCheckbox = useInKeyFrameCheckBox
 							.isSelected();
 					panelState.previousSliderValues.put(
@@ -84,7 +83,10 @@ public class JointRotationPanel {
 					panelState.lastUsedSlider = slider;
 					useInKeyFrameCheckBox.setSelected(true);
 				}
-				jointView.update();
+			    if(slider.hasFocus())
+				{
+			        jointView.update();
+				}
 				sliderLabel.setText("" + slider.getValue());
 			}
 		});
@@ -148,7 +150,7 @@ public class JointRotationPanel {
 		undoButton.setText("(undo)");
 		undoButton.setForeground(Color.blue);
 		Font original = undoButton.getFont();
-		Map attributes = original.getAttributes();
+		Map<TextAttribute,Object> attributes = new HashMap<TextAttribute,Object>(original.getAttributes());
 		attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 		undoButton.setFont(original.deriveFont(attributes));
 		// undoButton.setFocusPainted(false);

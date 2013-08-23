@@ -4,7 +4,6 @@ import hmi.animation.VJoint;
 import hmi.animation.VJointUtils;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * The controller handles input from the viewer and updates the vjoint structure
@@ -67,7 +66,7 @@ public class JointController implements RotationsController
      * 
      * @param righthandJoints
      */
-    public void adjustSliderToModel(List<String> joints)
+    public void adjustSliderToModel(Collection<String> joints)
     {
         jv.adjustSliderToModel(model, joints);
     }
