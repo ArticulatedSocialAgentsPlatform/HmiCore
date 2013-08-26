@@ -6,7 +6,10 @@ import hmi.math.Vec3f;
 import java.util.Arrays;
 
 /**
- * Rotates the eyelids, given left and right eye joint rotations
+ * Rotates the eyelids, given left and right eye joint rotations<br>
+ * Based on:<br>
+ * C. Evinger, K. A. Manning and P. A. Sibony, Eyelid movements. Mechanisms and normal data (1991), in: Investigative ophthalmology and visual science, 32:2(387--400):<br>
+ * Eye lid rotation angle is linearly related to the 'up/down gaze angle' (and angles seem also roughly the same).
  * @author hvanwelbergen
  */
 public class EyeLidMorpher
