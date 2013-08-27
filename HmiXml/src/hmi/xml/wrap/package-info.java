@@ -22,7 +22,7 @@
 /**
  * Some wrapper classes that turn simple Java types into XMLStructures
  */
-@hmi.xml.Info.NoEmptyClassWarning
+@hmi.util.NoEmptyClassWarning
 package hmi.xml.wrap;
 
 
