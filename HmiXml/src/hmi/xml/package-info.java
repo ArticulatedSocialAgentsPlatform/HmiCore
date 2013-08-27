@@ -21,6 +21,6 @@
 /**
  * Support for reading and writing XML. Main classes are XMLTokenizer and XMLStructureAdapter.
  */
-@Info.NoEmptyClassWarning
+@hmi.util.NoEmptyClassWarning
 package hmi.xml;
 
