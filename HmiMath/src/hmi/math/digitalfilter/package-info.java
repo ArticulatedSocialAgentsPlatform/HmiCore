@@ -21,6 +21,6 @@
 /**
  * Butterworth and Winters filters 
  */
-@hmi.math.Info.NoEmptyClassWarning
+@hmi.util.NoEmptyClassWarning
 package hmi.math.digitalfilter;
 

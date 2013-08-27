@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * Convert Action Units from Ekmans Facial ACtion Coding System to MPEG4 configurations.
  * 
@@ -24,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
  * @author reidsma
  * @author paulrc
  */
-@Slf4j
 public class FACSConverter
 {
     private static class Influence

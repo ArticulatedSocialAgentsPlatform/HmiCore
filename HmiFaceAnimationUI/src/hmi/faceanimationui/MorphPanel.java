@@ -4,13 +4,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.font.TextAttribute;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.BoxLayout;
@@ -21,8 +21,6 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import com.google.common.util.concurrent.MoreExecutors;
 
 import lombok.Getter;
 
@@ -139,9 +137,9 @@ public class MorphPanel {
 		undoButton.setText("(undo)");
 		undoButton.setForeground(Color.blue);
 		Font original = undoButton.getFont();
-		Map attributes = original.getAttributes();
-		attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-		undoButton.setFont(original.deriveFont(attributes));
+		Map<TextAttribute,Object> newAttributes = new HashMap<>(original.getAttributes());		
+		newAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+		undoButton.setFont(original.deriveFont(newAttributes));
 		// undoButton.setFocusPainted(false);
 		undoButton.setMargin(new Insets(0, 0, 0, 0));
 		undoButton.setContentAreaFilled(false);

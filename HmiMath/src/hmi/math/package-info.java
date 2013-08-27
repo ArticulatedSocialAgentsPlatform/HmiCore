@@ -21,6 +21,6 @@
 /**
  * Mathematical utility classes for dealing with vectors, quaternions, splines, matrices, filters, etcetera. 
  */
-@hmi.math.Info.NoEmptyClassWarning
+@hmi.util.NoEmptyClassWarning
 package hmi.math;
 

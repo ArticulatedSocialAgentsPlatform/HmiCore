@@ -23,7 +23,6 @@ import java.util.TreeMap;
 
 public class GLHead extends XMLStructureAdapter implements Head
 {
-    private static final long serialVersionUID = -1151644062991823029L;
     private HashMap<FeaturePoint, float[]> fpPositions;
     private ArrayList<FAP> keepSync;
     private HashMap<FAP, Deformer> deformers;

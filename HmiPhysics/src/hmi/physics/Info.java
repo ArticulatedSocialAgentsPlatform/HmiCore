@@ -21,88 +21,28 @@
 
 package hmi.physics; // change this line for other packages
 
+import hmi.util.InfoUtils;
+
 import javax.swing.JOptionPane;
 
 /**
- * The Info class is intended to be used as "Main class" when the package is jarred.
- * Running java -jar <packageJarFile> will print some package information.
- * Note that some of this information is only available from the Manifest.mf file,
- * that is included in the jar file, and not when running directly from compiled classes.
+ * The Info class is intended to be used as "Main class" when the package is
+ * jarred. Running java -jar <packageJarFile> will print some package
+ * information. Note that some of this information is only available from the
+ * Manifest.mf file, that is included in the jar file, and not when running
+ * directly from compiled classes.
  */
 public final class Info
 {
-    private Info(){}
-    private static Package pack = Info.class.getPackage();
-    public static final String packageName = pack.getName();
-
-    /**
-     * Yields a String containing manifest file info.
-     * When not running from a jar file, only the package name is included.
-     */
-    public static String manifestInfo()
+    private Info()
     {
-        StringBuffer buf = new StringBuffer();
-        buf.append("Package: ");
-        buf.append(packageName);
-        buf.append("\n");
-        if (pack.getSpecificationTitle() != null)
-        {
-            buf.append("Specification-Title: " + pack.getSpecificationTitle() + "\n");
-        }
-        if (pack.getSpecificationVersion() != null)
-        {
-            buf.append("Specification-Version: " + pack.getSpecificationVersion() + "\n");
-        }
-        if (pack.getSpecificationVendor() != null)
-        {
-            buf.append("Specification-Vendor: " + pack.getSpecificationVendor() + "\n");
-        }
-        if (pack.getImplementationTitle() != null)
-        {
-            buf.append("Implementation-Title: " + pack.getImplementationTitle() + "\n");
-        }
-        if (pack.getImplementationVersion() != null)
-        {
-            buf.append("Implementation-Version: " + pack.getImplementationVersion() + "\n");
-        }
-        if (pack.getImplementationVendor() != null)
-        {
-            buf.append("Implementation-Vendor: " + pack.getImplementationVendor() + "\n");
-        }
-        return buf.toString();
     }
 
     /**
-     * Checks whether the current specification version meets the specified required version;
-     * if not, a RuntimeException is thrown.
-     * No check is performed when manifest info is not available.
-     */
-    public static void requireVersion(String requiredVersion)
-    {
-        if (pack.getSpecificationVersion() == null) return; // no check possible, so assume ok
-        if (pack.isCompatibleWith(requiredVersion)) return;
-        String msg = "Package " + packageName + " Version " + pack.getSpecificationVersion() + " does not meet the required version "
-                + requiredVersion;
-        JOptionPane.showMessageDialog(null, msg, "Package Info", JOptionPane.PLAIN_MESSAGE);
-        throw new RuntimeException(msg);
-    }
-
-    /**
-     * Returns the specification version from the Manifest.mf file, if available,
-     * or else an empty String.
-     */
-    public static String getVersion()
-    {
-        String result = pack.getSpecificationVersion();
-        return (result == null) ? "" : result;
-    }
-
-    /*
      * Show some package information
      */
     public static void main(String[] arg)
     {
-        JOptionPane.showMessageDialog(null, Info.manifestInfo(), "Package Info", JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(null, InfoUtils.manifestInfo(Info.class.getPackage()), "Package Info", JOptionPane.PLAIN_MESSAGE);
     }
-
 }
