@@ -3,8 +3,6 @@ package hmi.faceanimation;
 import hmi.math.Quat4f;
 import hmi.math.Vec3f;
 
-import java.util.Arrays;
-
 /**
  * Rotates the eyelids, given left and right eye joint rotations<br>
  * Based on:<br>
@@ -31,7 +29,7 @@ public class EyeLidMorpher
         float values[] = new float[morphTargets.length];
         for (int i = 0; i < morphTargets.length; i++)
         {
-            float current = faceController.getCurrentWeight(morphTargets[i]);
+            float current = faceController.getCurrentWeight(morphTargets[i]);            
             if (Math.abs(current) > Math.abs(morphValue))
             {
                 values[i] = current;
@@ -41,7 +39,6 @@ public class EyeLidMorpher
                 values[i] = morphValue;
             }
         }
-        Arrays.fill(values, morphValue);
-        faceController.setMorphTargets(morphTargets, values);
+        faceController.setMorphTargets(morphTargets, values);        
     }
 }
