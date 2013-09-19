@@ -289,7 +289,7 @@ public class GLRendererV0  implements GLEventListener, ClockListener{
     */
    public void shutDown() 
    {
-      GLProfile.shutdown(GLProfile.ShutdownType.COMPLETE);
+      GLProfile.shutdown();
    } 
     
          
