@@ -132,8 +132,7 @@ public class IKPanel
         }
         catch (ParseException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         
         if(autoSwivel.isSelected())
@@ -156,8 +155,7 @@ public class IKPanel
         }
         catch (ParseException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         float x = ((Number) xField.getValue()).floatValue();
         float y = ((Number) yField.getValue()).floatValue();
