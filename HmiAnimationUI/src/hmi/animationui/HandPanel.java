@@ -100,6 +100,32 @@ public class HandPanel
     }
 
     private void update()
+    {   
+        handController.setJointRotations(getCurrentHandDOF(), handSide);
+    }
+
+    public void setHandDOF(HandDOF h)
+    {
+        DIPIndexFlexionSlider.setValue((int)Math.toDegrees(h.PIPIndexFlexion));
+        DIPMiddleFlexionSlider.setValue((int)Math.toDegrees(h.PIPMiddleFlexion));
+        DIPRingFlexionSlider.setValue((int)Math.toDegrees(h.PIPRingFlexion));
+        DIPPinkyFlexionSlider.setValue((int)Math.toDegrees(h.PIPRingFlexion));
+        MCPIndexFlexionSlider.setValue((int)Math.toDegrees(h.MCPIndexFlexion));
+        MCPIndexAbductionSlider.setValue((int)Math.toDegrees(h.MCPIndexAbduction));
+        MCPMiddleFlexionSlider.setValue((int)Math.toDegrees(h.MCPMiddleFlexion));
+        MCPMiddleAbductionSlider.setValue((int)Math.toDegrees(h.MCPMiddleAbduction));
+        MCPRingFlexionSlider.setValue((int)Math.toDegrees(h.MCPRingFlexion));
+        MCPRingAbductionSlider.setValue((int)Math.toDegrees(h.MCPRingAbduction));
+        MCPPinkyFlexionSlider.setValue((int)Math.toDegrees(h.MCPPinkyFlexion));
+        MCPPinkyAbductionSlider.setValue((int)Math.toDegrees(h.MCPPinkyAbduction));
+        IPThumbFlexionSlider.setValue((int)Math.toDegrees(h.IPThumbFlexion));
+        MCPThumbFlexionSlider.setValue((int)Math.toDegrees(h.MCPThumbFlexion));
+        TMCThumbFlexionSlider.setValue((int)Math.toDegrees(h.TMCFlexion));
+        TMCThumbAbductionSlider.setValue((int)Math.toDegrees(h.TMCAbduction));
+        update();
+    }
+    
+    public HandDOF getCurrentHandDOF()
     {
         HandDOF handDOF = new HandDOF();
         handDOF.PIPIndexFlexion = Math.toRadians(DIPIndexFlexionSlider.getValue());
@@ -121,7 +147,6 @@ public class HandPanel
         handDOF.MCPThumbFlexion = Math.toRadians(MCPThumbFlexionSlider.getValue());
         handDOF.TMCAbduction = Math.toRadians(TMCThumbAbductionSlider.getValue());
         handDOF.TMCFlexion = Math.toRadians(TMCThumbFlexionSlider.getValue());
-        handController.setJointRotations(handDOF, handSide);
+        return handDOF;
     }
-
 }
