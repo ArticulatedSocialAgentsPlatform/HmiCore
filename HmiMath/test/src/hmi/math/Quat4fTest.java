@@ -19,7 +19,8 @@
 package hmi.math;
 
 import static hmi.testutil.math.Quat4fTestUtil.assertQuat4fRotationEquivalent;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import hmi.testutil.math.Quat4fTestUtil;
 
 import org.junit.Test;
@@ -37,27 +38,27 @@ public class Quat4fTest
     @Test
     public void testSetFromMat4f()
     {
-        float qExpected[] = Quat4f.getQuat4f();        
+        float qExpected[] = Quat4f.getQuat4f();
         Quat4f.set(qExpected, 0.0f, 0.6427876f, -0.76604456f, -1.0941049E-4f);
-        //Quat4f.set(qExpected, 0, 1, 0,0);
+        // Quat4f.set(qExpected, 0, 1, 0,0);
         float m[] = Mat4f.getMat4f();
-        Mat4f.setFromTR(m,Vec3f.getZero(),qExpected);
+        Mat4f.setFromTR(m, Vec3f.getZero(), qExpected);
         float q[] = Quat4f.getQuat4f();
-        Quat4f.setFromMat4f(q,m);
-        assertQuat4fRotationEquivalent(qExpected,q,PRECISION);
+        Quat4f.setFromMat4f(q, m);
+        assertQuat4fRotationEquivalent(qExpected, q, PRECISION);
     }
-    
+
     @Test
     public void testSetFromMat3f()
     {
-        float qExpected[] = Quat4f.getQuat4f();        
+        float qExpected[] = Quat4f.getQuat4f();
         Quat4f.set(qExpected, 0.0f, 0.6427876f, -0.76604456f, -1.0941049E-4f);
-        //Quat4f.set(qExpected, 0, 1, 0,0);
+        // Quat4f.set(qExpected, 0, 1, 0,0);
         float m[] = Mat3f.getMat3f();
-        Mat3f.setFromQuatScale(m,qExpected,1);        
+        Mat3f.setFromQuatScale(m, qExpected, 1);
         float q[] = Quat4f.getQuat4f();
-        Quat4f.setFromMat3f(q,m);
-        assertQuat4fRotationEquivalent(qExpected,q,PRECISION);
+        Quat4f.setFromMat3f(q, m);
+        assertQuat4fRotationEquivalent(qExpected, q, PRECISION);
     }
 
     @Test
@@ -553,15 +554,15 @@ public class Quat4fTest
         float q1[] = Quat4f.getQuat4f();
         float q2[] = Quat4f.getQuat4f();
         float qr[] = Quat4f.getQuat4f();
-        Quat4f.setFromAxisAngle4f(q1,1,1,0,1);
-        Quat4f.setFromAxisAngle4f(q2,0,0,1,-2f);
-        
+        Quat4f.setFromAxisAngle4f(q1, 1, 1, 0, 1);
+        Quat4f.setFromAxisAngle4f(q2, 0, 0, 1, -2f);
+
         Quat4f.interpolate(qr, q1, q2, 0);
-        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr,q1,PRECISION);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr, q1, PRECISION);
         Quat4f.interpolate(qr, q1, q2, 1);
-        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr,q2,PRECISION);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr, q2, PRECISION);
     }
-    
+
     @Test
     public void testSquadEdges()
     {
@@ -570,17 +571,17 @@ public class Quat4fTest
         float a[] = Quat4f.getQuat4f();
         float b[] = Quat4f.getQuat4f();
         float qr[] = Quat4f.getQuat4f();
-        Quat4f.setFromAxisAngle4f(q1,1,1,0,1);
-        Quat4f.setFromAxisAngle4f(q2,0,0,1,-2f);
-        Quat4f.setFromAxisAngle4f(a,1,1,1,0.5f);
-        Quat4f.setFromAxisAngle4f(b,1,0,1,2f);
-        
+        Quat4f.setFromAxisAngle4f(q1, 1, 1, 0, 1);
+        Quat4f.setFromAxisAngle4f(q2, 0, 0, 1, -2f);
+        Quat4f.setFromAxisAngle4f(a, 1, 1, 1, 0.5f);
+        Quat4f.setFromAxisAngle4f(b, 1, 0, 1, 2f);
+
         Quat4f.squad(qr, q1, q2, a, b, 0);
-        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr,q1,PRECISION);
-        Quat4f.squad(qr, q1, q2,a,b, 1);
-        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr,q2,PRECISION);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr, q1, PRECISION);
+        Quat4f.squad(qr, q1, q2, a, b, 1);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr, q2, PRECISION);
     }
-    
+
     @Test
     public void testSquadEdgesIndexed()
     {
@@ -592,16 +593,16 @@ public class Quat4fTest
         int Q1_INDEX = 1;
         int Q2_INDEX = 2;
         int QR_INDEX = 3;
-        
-        Quat4f.setFromAxisAngle4f(q1,Q1_INDEX, 1,1,0,1);
-        Quat4f.setFromAxisAngle4f(q2,Q2_INDEX, 0,0,1,-2f);
-        Quat4f.setFromAxisAngle4f(a,1,1,1,0.5f);
-        Quat4f.setFromAxisAngle4f(b,1,0,1,2f);
-        
-        Quat4f.squad(qr, QR_INDEX, q1, Q1_INDEX, q2, Q2_INDEX,a, b, 0);
-        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr,QR_INDEX,q1,Q1_INDEX, PRECISION);
-        Quat4f.squad(qr, QR_INDEX, q1, Q1_INDEX, q2, Q2_INDEX,a, b, 1);
-        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr,QR_INDEX,q2,Q2_INDEX, PRECISION);
+
+        Quat4f.setFromAxisAngle4f(q1, Q1_INDEX, 1, 1, 0, 1);
+        Quat4f.setFromAxisAngle4f(q2, Q2_INDEX, 0, 0, 1, -2f);
+        Quat4f.setFromAxisAngle4f(a, 1, 1, 1, 0.5f);
+        Quat4f.setFromAxisAngle4f(b, 1, 0, 1, 2f);
+
+        Quat4f.squad(qr, QR_INDEX, q1, Q1_INDEX, q2, Q2_INDEX, a, b, 0);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr, QR_INDEX, q1, Q1_INDEX, PRECISION);
+        Quat4f.squad(qr, QR_INDEX, q1, Q1_INDEX, q2, Q2_INDEX, a, b, 1);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(qr, QR_INDEX, q2, Q2_INDEX, PRECISION);
     }
 
     /**
@@ -764,22 +765,43 @@ public class Quat4fTest
             assertTrue(Vec3f.epsilonEquals(aVelDiff, i * 3, aacc, 0, PRECISION_DIFF2));
         }
     }
-    
+
     @Test
     public void testGetTwistAroundSameAxis()
     {
-        assertEquals(3, Quat4f.getTwist(Quat4f.getQuat4fFromAxisAngle(1,0,0,3), Vec3f.getUnitX()), PRECISION);
+        assertEquals(3, Quat4f.getTwist(Quat4f.getQuat4fFromAxisAngle(1, 0, 0, 3), Vec3f.getUnitX()), PRECISION);
     }
-    
+
     @Test
     public void testGetTwistAroundOrthogonalAxis()
     {
-        assertEquals(0, Quat4f.getTwist(Quat4f.getQuat4fFromAxisAngle(1,0,0,1), Vec3f.getUnitY()), PRECISION);
+        assertEquals(0, Quat4f.getTwist(Quat4f.getQuat4fFromAxisAngle(1, 0, 0, 1), Vec3f.getUnitY()), PRECISION);
     }
-    
+
     @Test
     public void testGetTwistNoRotation()
     {
-        assertEquals(0, Quat4f.getTwist(Quat4f.getQuat4fFromAxisAngle(1,0,0,0), Vec3f.getUnitY()), PRECISION);
+        assertEquals(0, Quat4f.getTwist(Quat4f.getQuat4fFromAxisAngle(1, 0, 0, 0), Vec3f.getUnitY()), PRECISION);
+    }
+
+    @Test
+    public void testGetRollPitchYaw()
+    {
+        float qExpected[] = Quat4f.getQuat4fFromRollPitchYaw(1f, 2f, 3f);
+        float rpy[] = new float[3];
+        Quat4f.getRollPitchYaw(qExpected, rpy);
+        float q[] = Quat4f.getQuat4fFromRollPitchYaw(rpy[0], rpy[1], rpy[2]);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(qExpected, q, PRECISION);
+    }
+    
+    
+    @Test
+    public void testGetRollPitchYawDegrees()
+    {
+        float qExpected[] = Quat4f.getQuat4fFromRollPitchYawDegrees(10f, 20f, 30f);
+        float rpy[] = new float[3];
+        Quat4f.getRollPitchYawDegrees(qExpected, rpy);
+        float q[] = Quat4f.getQuat4fFromRollPitchYawDegrees(rpy[0], rpy[1], rpy[2]);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(qExpected, q, PRECISION);
     }
 }

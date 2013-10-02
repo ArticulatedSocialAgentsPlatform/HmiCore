@@ -403,6 +403,12 @@ public final class Quat4f
         result[1] = (float) Math.asin(-2 * (q[z] * q[y] - q[x] * q[s]));
         result[2] = (float) Math.atan2(2 * (q[z] * q[x] + q[y] * q[s]), sqw + sqz - sqx - sqy);
     }
+    
+    public static void getRollPitchYawDegrees(float[] q, float[] result)
+    {
+        getRollPitchYaw(q,result);
+        Vec3f.scale(1f/(float)Mat4f.DEGTORADF, result);
+    }
 
     /**
      * Sets the Quaternions q from Vec3f vectors a and b The quaternion is such that it rotates vectors in the a direction towards vectors in the b
