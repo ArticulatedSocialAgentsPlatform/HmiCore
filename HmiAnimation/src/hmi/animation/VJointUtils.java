@@ -5,6 +5,7 @@ import hmi.math.Vec3f;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -94,7 +95,7 @@ public final class VJointUtils
             }
         }
     }
-    
+
     /**
      * Set sid to name if sid is null
      */
@@ -104,7 +105,7 @@ public final class VJointUtils
         {
             if (vj.getSid() == null)
             {
-                vj.setSid(vj.getName());                
+                vj.setSid(vj.getName());
             }
         }
     }
@@ -186,12 +187,12 @@ public final class VJointUtils
         alignSegment(skeletonRoot, hmi.animation.Hanim.r_pinky1, hmi.animation.Hanim.r_pinky2, downVec);
         alignSegment(skeletonRoot, hmi.animation.Hanim.r_pinky2, hmi.animation.Hanim.r_pinky3, downVec);
         alignSegment(skeletonRoot, hmi.animation.Hanim.r_pinky3, hmi.animation.Hanim.r_pinky_distal_tip, downVec);
-        
+
         float[] thumbDir = Vec3f.getVec3f(0f, -1f, 1f);
         alignSegment(skeletonRoot, Hanim.l_thumb1, Hanim.l_thumb2, thumbDir);
         alignSegment(skeletonRoot, Hanim.l_thumb2, Hanim.l_thumb3, thumbDir);
         alignSegment(skeletonRoot, Hanim.l_thumb3, Hanim.l_thumb_distal_tip, thumbDir);
-        
+
         alignSegment(skeletonRoot, Hanim.r_thumb1, Hanim.r_thumb2, thumbDir);
         alignSegment(skeletonRoot, Hanim.r_thumb2, Hanim.r_thumb3, thumbDir);
         alignSegment(skeletonRoot, Hanim.r_thumb3, Hanim.r_thumb_distal_tip, thumbDir);
@@ -204,7 +205,7 @@ public final class VJointUtils
         alignIsolatedSegments(skeletonRoot, hmi.animation.Hanim.r_hip, hmi.animation.Hanim.r_knee, hmi.animation.Hanim.r_ankle, downVec);
     }
 
-    /** 
+    /**
      * auxiliary method for aligning some body segment inside a skeleton structure with a specified direction vector
      * The parent joint is rotated, the grandchild joint is rotated an equal amount backwards, so that just the segments,
      * starting at parent, up to but not including grandchild are rotated "in isolation"
@@ -232,13 +233,14 @@ public final class VJointUtils
         }
         else
         {
-            log.warn("No " + parentSid + " or " + childSid + " for skeleton " + skeletonRoot.getName() + "(need both for setting hanim pose)");
+            log.warn("No " + parentSid + " or " + childSid + " for skeleton " + skeletonRoot.getName()
+                    + "(need both for setting hanim pose)");
         }
     }
-    
-    /** 
-     * auxiliary method for aligning some body segment inside a skeleton structure with a specified direction vector 
-     * The parent joint is rotated 
+
+    /**
+     * auxiliary method for aligning some body segment inside a skeleton structure with a specified direction vector
+     * The parent joint is rotated
      **/
     public static void alignSegment(VJoint skeletonRoot, String parentSid, String childSid, float[] vec)
     {
@@ -262,53 +264,55 @@ public final class VJointUtils
         }
         else
         {
-            if(child == null)
+            if (child == null)
             {
                 log.warn("No " + childSid + " for skeleton " + skeletonRoot.getName());
             }
-            if(parent == null)
+            if (parent == null)
             {
                 log.warn("No " + parentSid + " for skeleton " + skeletonRoot.getName());
             }
         }
     }
-    
+
     private static VJoint createNullRotationCopyTree(VJoint root, VJoint vj, VJoint vjParent, String prefix)
     {
         VJoint v = vj.copy(prefix);
-        float tParent[] = Vec3f.getVec3f(); 
+        float tParent[] = Vec3f.getVec3f();
         float tCurrent[] = Vec3f.getVec3f();
-        vjParent.getPathTranslation(root,tParent);
-        vj.getPathTranslation(root,tCurrent);
-        Vec3f.sub(tCurrent,tParent);
-        
-        v.setRotation(Quat4f.getIdentity());        
+        vjParent.getPathTranslation(root, tParent);
+        vj.getPathTranslation(root, tCurrent);
+        Vec3f.sub(tCurrent, tParent);
+
+        v.setRotation(Quat4f.getIdentity());
         v.setTranslation(tCurrent);
-        for(VJoint vChild:vj.getChildren())
+        for (VJoint vChild : vj.getChildren())
         {
-            v.addChild(createNullRotationCopyTree(root, vChild,vj,prefix));
+            v.addChild(createNullRotationCopyTree(root, vChild, vj, prefix));
         }
         return v;
     }
-    
+
     /**
-     * Creates a new VJoint tree in which all joints are in the same position as in vj, but have 0 rotation.  
+     * Creates a new VJoint tree in which all joints are in the same position as in vj, but have 0 rotation.
      */
     public static VJoint createNullRotationCopyTree(VJoint vj, String prefix)
     {
         vj.calculateMatrices();
         VJoint v = vj.copy(prefix);
         v.setRotation(Quat4f.getIdentity());
-        
-        for(VJoint vChild:vj.getChildren())
+
+        for (VJoint vChild : vj.getChildren())
         {
-            v.addChild(createNullRotationCopyTree(vj.getParent(), vChild,vj,prefix));
+            v.addChild(createNullRotationCopyTree(vj.getParent(), vChild, vj, prefix));
         }
         v.calculateMatrices();
         return v;
     }
-    
-    
+
+    /**
+     * Get a list of all joints that have an sid that's one of sids.
+     */
     public static List<VJoint> gatherJoints(String[] sids, VJoint skeleton)
     {
         List<VJoint> joints = new ArrayList<>();
@@ -318,7 +322,24 @@ public final class VJointUtils
             {
                 joints.add(skeleton.getPart(sid));
             }
-        }        
+        }
         return joints;
+    }
+
+    /**
+     * Get a list of all sids for all joints in skeleton that have an sid that's one of sids.
+     */
+    public static ImmutableSet<String> gatherJointSids(String[] sids, VJoint skeleton)
+    {
+        Set<String> joints = new HashSet<>();
+        Set<String> availableJoints = transformToSidSet(skeleton.getParts());
+        for (String sid : sids)
+        {
+            if (availableJoints.contains(sid))
+            {
+                joints.add(sid);
+            }
+        }
+        return ImmutableSet.copyOf(joints);
     }
 }
