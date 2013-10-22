@@ -11,17 +11,28 @@ public final class HanimBody
 {
     private HanimBody(){}
     
+    public static VJoint getLOA2HanimBodyWithEyes()
+    {
+        VJoint vj = getLOA2HanimBody();
+        insertEyesAt(vj.getPart(Hanim.skullbase));
+        return vj;
+    }
+    
     public static VJoint getLOA1HanimBodyWithEyes()
     {
         VJoint vj = getLOA1HanimBody();
-        VJoint skull = vj.getPart(Hanim.skullbase);
+        insertEyesAt(vj.getPart(Hanim.skullbase));
+        return vj;        
+    }
+
+    private static void insertEyesAt(VJoint skull)
+    {
         VJoint vEyeLeft = new VJoint();
         VJoint vEyeRight = new VJoint();
         vEyeRight.setSid(Hanim.r_eyeball_joint);
         vEyeLeft.setSid(Hanim.l_eyeball_joint);
         skull.addChild(vEyeLeft);
         skull.addChild(vEyeRight);
-        return vj;        
     }
     
     public static VJoint getLOA2HanimBody()
