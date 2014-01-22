@@ -1,4 +1,3 @@
-  
 To generate a javadoc of all HMI packages:
 
 ant resolvelist
