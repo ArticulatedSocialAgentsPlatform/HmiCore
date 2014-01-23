@@ -67,8 +67,8 @@ public class JointRotationPanel {
 		slider.addMouseWheelListener(mouseWheelListener);
 		slider.addChangeListener(new ChangeListener() {
 			@Override
-			public void stateChanged(ChangeEvent e) {				
-			    if (!slider.getValueIsAdjusting()) {
+			public void stateChanged(ChangeEvent e) {
+				if (!slider.getValueIsAdjusting()) {
 					panelState.previousStateOfCheckbox = useInKeyFrameCheckBox
 							.isSelected();
 					panelState.previousSliderValues.put(
@@ -83,10 +83,10 @@ public class JointRotationPanel {
 					panelState.lastUsedSlider = slider;
 					useInKeyFrameCheckBox.setSelected(true);
 				}
-			    if(slider.hasFocus())
-				{
-			        jointView.update();
-				}
+				// if(slider.hasFocus())
+				// {
+				jointView.update(getRotationConfiguration());
+				// }
 				sliderLabel.setText("" + slider.getValue());
 			}
 		});
@@ -150,7 +150,8 @@ public class JointRotationPanel {
 		undoButton.setText("(undo)");
 		undoButton.setForeground(Color.blue);
 		Font original = undoButton.getFont();
-		Map<TextAttribute,Object> attributes = new HashMap<TextAttribute,Object>(original.getAttributes());
+		Map<TextAttribute, Object> attributes = new HashMap<TextAttribute, Object>(
+				original.getAttributes());
 		attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 		undoButton.setFont(original.deriveFont(attributes));
 		// undoButton.setFocusPainted(false);
@@ -195,12 +196,24 @@ public class JointRotationPanel {
 	}
 
 	public void setJointRotationConfiguration(JointRotationConfiguration j) {
-		// System.out.println(String.format("Setting %s: RPY = %s; Q = %s",
-		// j.getJointName(), Arrays.toString(j.getRpyDeg()),
-		// Arrays.toString(j.getQ())));
 		rollSlider.setValue((int) j.getRpyDeg()[0]);
 		pitchSlider.setValue((int) j.getRpyDeg()[1]);
 		yawSlider.setValue((int) j.getRpyDeg()[2]);
+		useInKeyFrameCheckBox.setSelected(true);
+	}
+
+	/**
+	 * In contrast to setJointRotationConfiguration, this method should just set
+	 * the slider to the specified values without triggering a model update.
+	 * 
+	 * @param j
+	 */
+	public void adjustSliderToModel(JointRotationConfiguration j) {
+
+		rollSlider.setValue((int) j.getRpyDeg()[0]);
+		pitchSlider.setValue((int) j.getRpyDeg()[1]);
+		yawSlider.setValue((int) j.getRpyDeg()[2]);
+
 		useInKeyFrameCheckBox.setSelected(true);
 	}
 
@@ -216,7 +229,7 @@ public class JointRotationPanel {
 	}
 
 	/**
-	 * Class used to implement und-functionality for these sliders (and
+	 * Class used to implement undo-functionality for these sliders (and
 	 * checkBox).
 	 * 
 	 * @author sjebbara
