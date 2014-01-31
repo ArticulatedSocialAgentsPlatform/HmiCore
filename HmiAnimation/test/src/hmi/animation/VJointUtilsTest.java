@@ -27,8 +27,8 @@ public class VJointUtilsTest
     private static final float PRECISION = 0.001f;
     private VJoint joint1, joint2, joint3, joint4;
 
-    //joint1->joint2
-    //      ->joint3->joint4
+    // joint1->joint2
+    // ->joint3->joint4
     @Before
     public void setup()
     {
@@ -89,7 +89,38 @@ public class VJointUtilsTest
     @Test
     public void testGatherJointSids()
     {
-        Set<String> gathered = VJointUtils.gatherJointSids(ImmutableSet.of("unknown1", "joint1","joint2","unknown2").toArray(new String[4]), joint1);
+        Set<String> gathered = VJointUtils.gatherJointSids(
+                ImmutableSet.of("unknown1", "joint1", "joint2", "unknown2").toArray(new String[4]), joint1);
         assertThat(gathered, IsIterableContainingInAnyOrder.containsInAnyOrder("joint1", "joint2"));
+    }
+
+    @Test
+    public void testTransformToSidSet()
+    {
+        assertThat(VJointUtils.transformToSidSet(joint1.getParts()),
+                IsIterableContainingInAnyOrder.containsInAnyOrder("joint1", "joint2", "joint3", "joint4"));
+    }
+    
+    @Test
+    public void testTransformToSidList()
+    {
+        assertThat(VJointUtils.transformToSidList(joint1.getParts()),
+                IsIterableContainingInAnyOrder.containsInAnyOrder("joint1", "joint2", "joint3", "joint4"));
+    }
+    
+    @Test
+    public void testTransformToSidSetWithNulls()
+    {
+        joint1.addChild(new VJoint("joint5"));
+        assertThat(VJointUtils.transformToSidSet(joint1.getParts()),
+                IsIterableContainingInAnyOrder.containsInAnyOrder("joint1", "joint2", "joint3", "joint4","joint5"));
+    }
+    
+    @Test
+    public void testTransformToSidListWithNulls()
+    {
+        joint1.addChild(new VJoint("joint5"));
+        assertThat(VJointUtils.transformToSidList(joint1.getParts()),
+                IsIterableContainingInAnyOrder.containsInAnyOrder("joint1", "joint2", "joint3", "joint4","joint5"));
     }
 }
