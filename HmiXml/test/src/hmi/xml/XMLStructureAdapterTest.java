@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import org.hamcrest.collection.IsIterableContainingInOrder;
 import org.junit.Test;
@@ -326,7 +327,6 @@ public class XMLStructureAdapterTest
 
         fmt.pushXMLNameSpace(new XMLNameSpace("bmlt", "http://hmi.ns1.test"));
         XMLStructureAdapter.appendNamespacedAttribute(buf, fmt, "http://hmi.ns1.test", "bmltattr", "bmltval");
-        List<XMLNameSpace> namespaceList = new ArrayList<XMLNameSpace>();
 
         String encoded = buf.toString();
         // System.out.println("encoded=" + encoded);
@@ -423,38 +423,48 @@ public class XMLStructureAdapterTest
         assertEquals("<test></test>", testA.getSection());
     }
 
-    @Test
-    public void testAppendWithNamespace()
+    class TestXMLAdapter extends XMLStructureAdapter
     {
-        class TestXMLAdapter extends XMLStructureAdapter
+        @Getter
+        private String testVal = "val";
+
+        public StringBuilder appendAttributeString(StringBuilder buf, XMLFormatting fmt)
         {
-            @Getter
-            private String testVal;
-
-            public StringBuilder appendAttributeString(StringBuilder buf, XMLFormatting fmt)
-            {
-                appendNamespacedAttribute(buf, fmt, "http://test.com", "testatr", "testval");
-                return buf;
-            }
-
-            public void decodeAttributes(HashMap<String, String> attrMap, XMLTokenizer tokenizer)
-            {
-                testVal = getRequiredAttribute("http://test.com:testatr", attrMap, tokenizer);
-            }
-
-            @Override
-            public String getXMLTag()
-            {
-                return "Test";
-            }
+            appendNamespacedAttribute(buf, fmt, "http://test.com", "testatr", "testval");
+            return buf;
         }
-        ;
+
+        public void decodeAttributes(HashMap<String, String> attrMap, XMLTokenizer tokenizer)
+        {
+            testVal = getRequiredAttribute("http://test.com:testatr", attrMap, tokenizer);
+        }
+
+        @Override
+        public String getXMLTag()
+        {
+            return "Test";
+        }
+    }
+
+    @Test
+    public void testAppendWithAutomaticNamespace()
+    {
         StringBuilder buf = new StringBuilder();
         TestXMLAdapter sIn = new TestXMLAdapter();
-        sIn.appendXML(buf);        
-        
+        sIn.appendXML(buf);
+
         TestXMLAdapter sOut = new TestXMLAdapter();
         sOut.readXML(buf.toString());
-        assertEquals("testval",sOut.getTestVal());
+        assertEquals("testval", sOut.getTestVal());
+    }
+
+    @Test(expected = Exception.class)
+    public void testAppend()
+    {
+        TestXMLAdapter adapter = new TestXMLAdapter();
+        XMLFormatting fmt = new XMLFormatting();
+        StringBuilder buf = new StringBuilder();
+        adapter.appendXML(buf, fmt);
+        fmt.popXMLNameSpace();// namespacestack should be empty
     }
 }

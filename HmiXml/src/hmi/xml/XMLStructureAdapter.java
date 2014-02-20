@@ -845,6 +845,7 @@ public class XMLStructureAdapter implements XMLStructure
      */
     public StringBuilder appendXML(StringBuilder buf, XMLFormatting fmt, List<XMLNameSpace> xmlNamespaceList)
     {
+        fmt.pushMark();
         if (xmlNamespaceList != null)
         {
             for (XMLNameSpace ns : xmlNamespaceList)
@@ -920,14 +921,8 @@ public class XMLStructureAdapter implements XMLStructure
         else
         {
             buf.append("/>");
-        }
-        if (xmlNamespaceList != null)
-        {
-            for (XMLNameSpace ns : xmlNamespaceList)
-            {
-                fmt.popXMLNameSpace();
-            }
-        }
+        }        
+        fmt.popMark();
         return buf;
     }
 

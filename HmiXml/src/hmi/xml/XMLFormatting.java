@@ -140,6 +140,21 @@ public class XMLFormatting  {
    private int tabIncrement = TAB;
    private static Logger logger = LoggerFactory.getLogger("hmi.xml.XMLStructure");  
    
-
+   /**
+    * Pushes a &quot;mark&quot; on the stack, informally denoting the position where a new STag element has started.
+    * This is used later on to pop a number of pushes together
+    */
+   public void pushMark()
+   {
+       namespaceStack.pushMark();
+   }
+   
+   /**
+    * Pops elements from the stack up to and including the last mark.
+    */
+   public void popMark()
+   {
+       namespaceStack.popMark();
+   }
   
 }
