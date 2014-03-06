@@ -342,7 +342,7 @@ public final class VJointUtils
     /**
      * Return vj's sid, name - if sid null, or id if both sid, name == null.
      */
-    public String getSidNameId(VJoint vj)
+    public static String getSidNameId(VJoint vj)
     {
         if(vj.getSid()!=null)
         {
