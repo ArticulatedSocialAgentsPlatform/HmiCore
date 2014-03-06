@@ -338,4 +338,24 @@ public final class VJointUtils
         }
         return ImmutableSet.copyOf(joints);
     }
+    
+    /**
+     * Return vj's sid, name - if sid null, or id if both sid, name == null.
+     */
+    public String getSidNameId(VJoint vj)
+    {
+        if(vj.getSid()!=null)
+        {
+            return vj.getSid();
+        }
+        if(vj.getName()!=null)
+        {
+            return vj.getName();
+        }
+        if(vj.getId()!=null)
+        {
+            return vj.getId();
+        }
+        return null;
+    }
 }
