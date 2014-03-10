@@ -274,6 +274,17 @@ public class Quat4fTest
         Vec3fTestUtil.assertVec3fEquals(b, a, PRECISION);
     }
 
+    @Test
+    public void setFromParallelVectors()
+    {
+        float[] a = Vec3f.getVec3f(0f, 1f, 0f);
+        float[] b = Vec3f.getVec3f(0f, 1f, 0f);
+        float[] q = Quat4f.getQuat4f();
+        Quat4f.setFromVectors(q, a, b);
+        Quat4f.transformVec3f(q, a);
+        Vec3fTestUtil.assertVec3fEquals(b, a, PRECISION);
+    }
+    
     /**
      * Test of the setFromVectors method
      */
