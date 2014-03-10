@@ -22,6 +22,7 @@ import static hmi.testutil.math.Quat4fTestUtil.assertQuat4fRotationEquivalent;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import hmi.testutil.math.Quat4fTestUtil;
+import hmi.testutil.math.Vec3fTestUtil;
 
 import org.junit.Test;
 
@@ -251,6 +252,28 @@ public class Quat4fTest
         testFromMat4fIndexed(0.5f, 0.3f, 0.4f, (float) Math.PI);
     }
 
+    @Test
+    public void setFromOppositeVectors()
+    {
+        float[] a = Vec3f.getVec3f(1f, 0f, 0f);
+        float[] b = Vec3f.getVec3f(-1f, 0f, 0f);
+        float[] q = Quat4f.getQuat4f();
+        Quat4f.setFromVectors(q, a, b);
+        Quat4f.transformVec3f(q, a);
+        Vec3fTestUtil.assertVec3fEquals(b, a, PRECISION);
+    }
+    
+    @Test
+    public void setFromOppositeVectors2()
+    {
+        float[] a = Vec3f.getVec3f(0f, 1f, 0f);
+        float[] b = Vec3f.getVec3f(0f, -1f, 0f);
+        float[] q = Quat4f.getQuat4f();
+        Quat4f.setFromVectors(q, a, b);
+        Quat4f.transformVec3f(q, a);
+        Vec3fTestUtil.assertVec3fEquals(b, a, PRECISION);
+    }
+
     /**
      * Test of the setFromVectors method
      */
@@ -263,14 +286,14 @@ public class Quat4fTest
         Quat4f.setFromVectors(q, a, b);
 
         Quat4f.transformVec3f(q, a);
-        assertTrue(Vec3f.epsilonEquals(a, b, PRECISION));
+        Vec3fTestUtil.assertVec3fEquals(b, a, PRECISION);
 
         Vec3f.set(a, 0f, 1f, 0f);
         Vec3f.set(b, 0f, 0f, 1f);
         Quat4f.setFromVectors(q, a, b);
 
         Quat4f.transformVec3f(q, a);
-        assertTrue(Vec3f.epsilonEquals(a, b, PRECISION));
+        Vec3fTestUtil.assertVec3fEquals(b, a, PRECISION);
 
         Vec3f.set(a, 0f, 0f, 1f);
         Vec3f.set(b, 1f, 0f, 0f);
@@ -524,7 +547,6 @@ public class Quat4fTest
         // q0 q0^t = 1
         Quat4f.setFromAxisAngle4f(q0, 0.8f, 0.21f, 0.3f, 1f);
         Quat4f.mulConjugateRight(q0, q0);
-        System.out.println(Quat4f.toString(q0));
         Quat4f.setIdentity(q1);
         assertTrue(Quat4f.epsilonEquals(q0, q1, PRECISION));
     }
@@ -793,8 +815,7 @@ public class Quat4fTest
         float q[] = Quat4f.getQuat4fFromRollPitchYaw(rpy[0], rpy[1], rpy[2]);
         Quat4fTestUtil.assertQuat4fRotationEquivalent(qExpected, q, PRECISION);
     }
-    
-    
+
     @Test
     public void testGetRollPitchYawDegrees()
     {

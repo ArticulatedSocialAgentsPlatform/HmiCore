@@ -28,14 +28,15 @@ package hmi.math;
 public final class Quat4f
 {
 
-    /* Prevent creation of Quat4f Objects.*/
-    private Quat4f() { }
+    /* Prevent creation of Quat4f Objects. */
+    private Quat4f()
+    {
+    }
 
     /**
      * Length of Quat4f arrays is 4
      */
     public static final int QUAT4F_SIZE = 4;
-
 
     /**
      * Offset values for quaternion s, x, y, and z components q = (s, (x,y,z)), where s is the scalar part, x, y, z are the imaginary parts.
@@ -63,7 +64,6 @@ public final class Quat4f
     {
         return new float[QUAT4F_SIZE];
     }
-    
 
     /**
      * Returns a new float[4] array with specified components No check is made that this is a unit quaternion
@@ -98,7 +98,7 @@ public final class Quat4f
         setFromAxisAngle4f(newQuat, x, y, z, angle);
         return newQuat;
     }
-    
+
     /**
      * Returns a new quaternion float[4] array, specifuing a rotation around axis (x, y, z), with angle specified in radians.
      */
@@ -128,7 +128,7 @@ public final class Quat4f
         setFromRollPitchYawDegrees(newQuat, roll, pitch, yaw);
         return newQuat;
     }
-    
+
     /**
      * Returns a new float[4] array with specified components No check is made that this is a unit quaternion
      */
@@ -201,8 +201,7 @@ public final class Quat4f
      */
     public static boolean epsilonRotationEquivalent(float[] a, float[] b, float epsilon)
     {
-        if (Vec4f.epsilonEquals(a, b, epsilon))
-            return true;
+        if (Vec4f.epsilonEquals(a, b, epsilon)) return true;
         return Vec4f.epsilonEquals(a, -b[0], -b[1], -b[2], -b[3], epsilon);
     }
 
@@ -212,8 +211,7 @@ public final class Quat4f
      */
     public static boolean epsilonRotationEquivalent(float[] a, float bs, float bx, float by, float bz, float epsilon)
     {
-        if (Vec4f.epsilonEquals(a, bs, bx, by, bz, epsilon))
-            return true;
+        if (Vec4f.epsilonEquals(a, bs, bx, by, bz, epsilon)) return true;
         return Vec4f.epsilonEquals(a, -bs, -bx, -by, -bz, epsilon);
     }
 
@@ -223,8 +221,7 @@ public final class Quat4f
      */
     public static boolean epsilonRotationEquivalent(float[] a, int aIndex, float[] b, int bIndex, float epsilon)
     {
-        if (Vec4f.epsilonEquals(a, aIndex, b, bIndex, epsilon))
-            return true;
+        if (Vec4f.epsilonEquals(a, aIndex, b, bIndex, epsilon)) return true;
         float a0 = a[aIndex];
         float a1 = a[aIndex + 1];
         float a2 = a[aIndex + 2];
@@ -254,38 +251,37 @@ public final class Quat4f
     // q[z] = (float)(cx * cy * sz - sx * sy * cz);
     // }
 
-
     /**
      * Sets the quaternion for a rotation around the x-axis.
      */
     public static void setXRot(float[] q, float angle)
     {
-        q[S] = (float) Math.cos(angle/2.0);
-        q[X] = (float) Math.sin(angle/2.0);
+        q[S] = (float) Math.cos(angle / 2.0);
+        q[X] = (float) Math.sin(angle / 2.0);
         q[Y] = 0.0f;
         q[Z] = 0.0f;
     }
-    
+
     /**
      * Sets the quaternion for a rotation around the y-axis.
      */
     public static void setYRot(float[] q, float angle)
     {
-        q[S] = (float) Math.cos(angle/2.0);
+        q[S] = (float) Math.cos(angle / 2.0);
         q[X] = 0.0f;
-        q[Y] = (float) Math.sin(angle/2.0);      
+        q[Y] = (float) Math.sin(angle / 2.0);
         q[Z] = 0.0f;
     }
-    
+
     /**
      * Sets the quaternion for a rotation around the z-axis.
      */
     public static void setZRot(float[] q, float angle)
     {
-        q[S] = (float) Math.cos(angle/2.0);        
+        q[S] = (float) Math.cos(angle / 2.0);
         q[Y] = 0.0f;
         q[X] = 0.0f;
-        q[Z] = (float) Math.sin(angle/2.0);
+        q[Z] = (float) Math.sin(angle / 2.0);
     }
 
     /**
@@ -295,7 +291,7 @@ public final class Quat4f
     {
         setXRot(q, (float) Math.toRadians(degrees));
     }
-    
+
     /**
      * Sets the quaternion for a rotation around the y-axis, with the angle specified in degrees.
      */
@@ -303,8 +299,8 @@ public final class Quat4f
     {
         setYRot(q, (float) Math.toRadians(degrees));
     }
-    
-     /**
+
+    /**
      * Sets the quaternion for a rotation around the z-axis, with the angle specified in degrees.
      */
     public static void setZRotDegrees(float[] q, float degrees)
@@ -340,7 +336,7 @@ public final class Quat4f
     {
         setFromRollPitchYaw(q, Mat4f.DEGTORADF * roll, Mat4f.DEGTORADF * pitch, Mat4f.DEGTORADF * yaw);
     }
-    
+
     /**
      * Like setFromRollPitchYaw, but with angles specified in degrees, rather than in radians.
      */
@@ -368,7 +364,7 @@ public final class Quat4f
         q[y] = (float) (cx * sy * cz - sx * cy * sz);
         q[z] = (float) (cx * cy * sz - sx * sy * cz);
     }
-    
+
     /**
      * calculates a quaternion representation from "roll-pitch-yaw" angles specifies in radians. This is a rotation of the form Ry(yaw) o Rx(pitch) o
      * Rz(roll). So, the roll is around the Z axis, pitch around the X axis, and yaw around the Y axis. Informally, roll is in the objects own
@@ -383,10 +379,10 @@ public final class Quat4f
         double sx = Math.sin(pitch / 2.0);
         double sy = Math.sin(yaw / 2.0);
         double sz = Math.sin(roll / 2.0);
-        q[s+index] = (float) (cx * cy * cz + sx * sy * sz);
-        q[x+index] = (float) (cx * sy * sz + sx * cy * cz);
-        q[y+index] = (float) (cx * sy * cz - sx * cy * sz);
-        q[z+index] = (float) (cx * cy * sz - sx * sy * cz);
+        q[s + index] = (float) (cx * cy * cz + sx * sy * sz);
+        q[x + index] = (float) (cx * sy * sz + sx * cy * cz);
+        q[y + index] = (float) (cx * sy * cz - sx * cy * sz);
+        q[z + index] = (float) (cx * cy * sz - sx * sy * cz);
     }
 
     /**
@@ -403,11 +399,11 @@ public final class Quat4f
         result[1] = (float) Math.asin(-2 * (q[z] * q[y] - q[x] * q[s]));
         result[2] = (float) Math.atan2(2 * (q[z] * q[x] + q[y] * q[s]), sqw + sqz - sqx - sqy);
     }
-    
+
     public static void getRollPitchYawDegrees(float[] q, float[] result)
     {
-        getRollPitchYaw(q,result);
-        Vec3f.scale(1f/(float)Mat4f.DEGTORADF, result);
+        getRollPitchYaw(q, result);
+        Vec3f.scale(1f / (float) Mat4f.DEGTORADF, result);
     }
 
     /**
@@ -419,8 +415,16 @@ public final class Quat4f
         float[] an = Vec3f.getVec3f(a);
         Vec3f.normalize(an);
         float[] h = Vec3f.getVec3f(b);
+
         Vec3f.normalize(h);
         Vec3f.add(h, an);
+        if (Vec3f.lengthSq(h) < 0.001)
+        {
+            float ortho[] = Vec3f.getVec3f();
+            Vec3f.findOrthogonal(ortho, an);
+            Quat4f.setFromAxisAngleDegrees(q, ortho, 180);
+            return;
+        }
         Vec3f.normalize(h);
 
         q[0] = Vec3f.dot(an, h);
@@ -516,7 +520,7 @@ public final class Quat4f
 
     /**
      * Convert from XYZW format (with the real component at the end) to (our) WXYZ format, with the real component as first component.
-     * Input: qXYZW   Output: qWXYZ. The two float arrays can be aliased.
+     * Input: qXYZW Output: qWXYZ. The two float arrays can be aliased.
      */
     public static void setFromXYZW(float[] qWXYZ, float[] qXYZW)
     {
@@ -524,22 +528,21 @@ public final class Quat4f
         qWXYZ[3] = qXYZW[2];
         qWXYZ[2] = qXYZW[1];
         qWXYZ[1] = qXYZW[0];
-        qWXYZ[0] = w;       
+        qWXYZ[0] = w;
     }
-    
+
     /**
      * Convert from XYZW format (with the real component at the end) to (our) WXYZ format, with the real component as first component.
-     * Input: qXYZW starting at [xyzwIndex]  Output: qWXYZ starting at [wxyzIndex]. The two float arrays can be aliased.
+     * Input: qXYZW starting at [xyzwIndex] Output: qWXYZ starting at [wxyzIndex]. The two float arrays can be aliased.
      */
     public static void setFromXYZW(float[] qWXYZ, int wxyzIndex, float[] qXYZW, int xyzwIndex)
     {
-        float w = qXYZW[xyzwIndex+3];
-        qWXYZ[wxyzIndex+3] = qXYZW[xyzwIndex+2];
-        qWXYZ[wxyzIndex+2] = qXYZW[xyzwIndex+1];
-        qWXYZ[wxyzIndex+1] = qXYZW[xyzwIndex];
-        qWXYZ[wxyzIndex]   = w;       
+        float w = qXYZW[xyzwIndex + 3];
+        qWXYZ[wxyzIndex + 3] = qXYZW[xyzwIndex + 2];
+        qWXYZ[wxyzIndex + 2] = qXYZW[xyzwIndex + 1];
+        qWXYZ[wxyzIndex + 1] = qXYZW[xyzwIndex];
+        qWXYZ[wxyzIndex] = w;
     }
-
 
     /**
      * Convert Euler angles to quaternion coefficients.
@@ -689,21 +692,21 @@ public final class Quat4f
     }
 
     /**
-     * Get the angle part of the quaternion (in radians)     
+     * Get the angle part of the quaternion (in radians)
      */
     public static float getAngle(float q[])
     {
         return (float) (2.0 * Math.acos(q[s]));
     }
-    
+
     /**
-     * Get the angle part of the quaternion (in radians)     
+     * Get the angle part of the quaternion (in radians)
      */
-    public static float getAngle(float q[],int index)
+    public static float getAngle(float q[], int index)
     {
-        return (float) (2.0 * Math.acos(q[s+index]));
+        return (float) (2.0 * Math.acos(q[s + index]));
     }
-    
+
     /**
      * Encodes a Quat4f value into AxisAngle4f format and returns the latter in a new float[4] array
      */
@@ -725,13 +728,12 @@ public final class Quat4f
         {
             float mRot[] = Mat3f.getMat3f();
             float mScale[] = Mat3f.getMat3f();
-            Mat3f.polarDecompose(m,mRot,mScale);
+            Mat3f.polarDecompose(m, mRot, mScale);
             setFromMat3f(q, mRot);
-            //throw new IllegalArgumentException("Quat4f.setFromMat3f: non-rotation matrix m"+Mat3f.toString(m)+", ww= " + ww);
+            // throw new IllegalArgumentException("Quat4f.setFromMat3f: non-rotation matrix m"+Mat3f.toString(m)+", ww= " + ww);
         }
-        
-        if (ww < 0)
-            ww = 0;
+
+        if (ww < 0) ww = 0;
         if (ww >= EPS2)
         {
             q[s] = (float) Math.sqrt(ww);
@@ -744,8 +746,7 @@ public final class Quat4f
         {
             q[s] = 0.0f;
             ww = -0.5 * (m[Mat3f.M11] + m[Mat3f.M22]);
-            if (ww < 0)
-                ww = 0;
+            if (ww < 0) ww = 0;
             if (ww >= EPS2)
             {
                 q[x] = (float) Math.sqrt(ww);
@@ -757,8 +758,7 @@ public final class Quat4f
             {
                 q[x] = 0.0f;
                 ww = 0.5 * (1.0 - m[Mat3f.M22]);
-                if (ww < 0)
-                    ww = 0;
+                if (ww < 0) ww = 0;
                 if (ww >= EPS2)
                 {
                     q[y] = (float) (Math.sqrt(ww));
@@ -783,17 +783,16 @@ public final class Quat4f
         double ww;
         ww = 0.25 * (1.0 + m[Mat4f.M00] + m[Mat4f.M11] + m[Mat4f.M22]);
         if (ww < -EPS2)
-        {    
+        {
             float mRot[] = Mat3f.getMat3f();
             float mScale[] = Mat3f.getMat3f();
             float m3[] = Mat3f.from4x4(m);
-            Mat3f.polarDecompose(m3,mRot,mScale);
-            setFromMat3f(q, mRot);            
-            //throw new IllegalArgumentException("Quat4f.setFromMat4f: non-rotation matrix "+Mat4f.toString(m));        
+            Mat3f.polarDecompose(m3, mRot, mScale);
+            setFromMat3f(q, mRot);
+            // throw new IllegalArgumentException("Quat4f.setFromMat4f: non-rotation matrix "+Mat4f.toString(m));
         }
-        
-        if (ww < 0)
-            ww = 0;
+
+        if (ww < 0) ww = 0;
         if (ww >= EPS2)
         {
             q[s] = (float) Math.sqrt(ww);
@@ -806,8 +805,7 @@ public final class Quat4f
         {
             q[s] = 0.0f;
             ww = -0.5 * (m[Mat4f.M11] + m[Mat4f.M22]);
-            if (ww < 0)
-                ww = 0;
+            if (ww < 0) ww = 0;
             if (ww >= EPS2)
             {
                 q[x] = (float) Math.sqrt(ww);
@@ -819,8 +817,7 @@ public final class Quat4f
             {
                 q[x] = 0.0f;
                 ww = 0.5 * (1.0 - m[Mat4f.M22]);
-                if (ww < 0)
-                    ww = 0;
+                if (ww < 0) ww = 0;
                 if (ww >= EPS2)
                 {
                     q[y] = (float) (Math.sqrt(ww));
@@ -836,61 +833,56 @@ public final class Quat4f
         Quat4f.normalize(q);
     }
 
-    
     /**
      * Calculates the quaternion q elements from a 4X4 or 4X3 matrix m, assuming that the latter does not include scaling and/or skewing. For a 4X4
      * matrix, we assume that the m33 elements equals 1.0
      */
-    public static void setFromMat4f(float[] q,int qi, float[] m, int mi)
+    public static void setFromMat4f(float[] q, int qi, float[] m, int mi)
     {
         double ww;
-        ww = 0.25 * (1.0 + m[Mat4f.M00+mi] + m[Mat4f.M11+mi] + m[Mat4f.M22+mi]);
-        if (ww < -EPS2)
-            throw new IllegalArgumentException("Quat4f.setFromMat3f: non-rotation matrix ");
-        if (ww < 0)
-            ww = 0;
+        ww = 0.25 * (1.0 + m[Mat4f.M00 + mi] + m[Mat4f.M11 + mi] + m[Mat4f.M22 + mi]);
+        if (ww < -EPS2) throw new IllegalArgumentException("Quat4f.setFromMat3f: non-rotation matrix ");
+        if (ww < 0) ww = 0;
         if (ww >= EPS2)
         {
-            q[s+qi] = (float) Math.sqrt(ww);
-            ww = 0.25 / q[s+qi];
-            q[x+qi] = (float) ((m[Mat4f.M21+mi] - m[Mat4f.M12+mi]) * ww);
-            q[y+qi] = (float) ((m[Mat4f.M02+mi] - m[Mat4f.M20+mi]) * ww);
-            q[z+qi] = (float) ((m[Mat4f.M10+mi] - m[Mat4f.M01+mi]) * ww);
+            q[s + qi] = (float) Math.sqrt(ww);
+            ww = 0.25 / q[s + qi];
+            q[x + qi] = (float) ((m[Mat4f.M21 + mi] - m[Mat4f.M12 + mi]) * ww);
+            q[y + qi] = (float) ((m[Mat4f.M02 + mi] - m[Mat4f.M20 + mi]) * ww);
+            q[z + qi] = (float) ((m[Mat4f.M10 + mi] - m[Mat4f.M01 + mi]) * ww);
         }
         else
         {
-            q[s+qi] = 0.0f;
-            ww = -0.5 * (m[Mat4f.M11+mi] + m[Mat4f.M22+mi]);
-            if (ww < 0)
-                ww = 0;
+            q[s + qi] = 0.0f;
+            ww = -0.5 * (m[Mat4f.M11 + mi] + m[Mat4f.M22 + mi]);
+            if (ww < 0) ww = 0;
             if (ww >= EPS2)
             {
-                q[x+qi] = (float) Math.sqrt(ww);
-                ww = 0.5 / q[x+qi];
-                q[y+qi] = (float) (m[Mat4f.M10+mi] * ww);
-                q[z+qi] = (float) (m[Mat4f.M20+mi] * ww);
+                q[x + qi] = (float) Math.sqrt(ww);
+                ww = 0.5 / q[x + qi];
+                q[y + qi] = (float) (m[Mat4f.M10 + mi] * ww);
+                q[z + qi] = (float) (m[Mat4f.M20 + mi] * ww);
             }
             else
             {
-                q[x+qi] = 0.0f;
-                ww = 0.5 * (1.0 - m[Mat4f.M22+mi]);
-                if (ww < 0)
-                    ww = 0;
+                q[x + qi] = 0.0f;
+                ww = 0.5 * (1.0 - m[Mat4f.M22 + mi]);
+                if (ww < 0) ww = 0;
                 if (ww >= EPS2)
                 {
-                    q[y+qi] = (float) (Math.sqrt(ww));
-                    q[z+qi] = (float) (m[Mat4f.M21+mi] / (2.0 * q[y+qi]));
+                    q[y + qi] = (float) (Math.sqrt(ww));
+                    q[z + qi] = (float) (m[Mat4f.M21 + mi] / (2.0 * q[y + qi]));
                 }
                 else
                 {
-                    q[y+qi] = 0.0f;
-                    q[z+qi] = 1.0f;
+                    q[y + qi] = 0.0f;
+                    q[z + qi] = 1.0f;
                 }
             }
         }
-        Quat4f.normalize(q,qi);
+        Quat4f.normalize(q, qi);
     }
-    
+
     /**
      * Multiplies two quaternions, and puts the result in c: c = a * b
      */
@@ -1077,7 +1069,8 @@ public final class Quat4f
      */
     public static void normalize(float[] a, int aIndex)
     {
-        float norm = a[aIndex + s] * a[aIndex + s] + a[aIndex + x] * a[aIndex + x] + a[aIndex + y] * a[aIndex + y] + a[aIndex + z] * a[aIndex + z];
+        float norm = a[aIndex + s] * a[aIndex + s] + a[aIndex + x] * a[aIndex + x] + a[aIndex + y] * a[aIndex + y] + a[aIndex + z]
+                * a[aIndex + z];
         if (norm > 0.0f)
         {
             norm = 1.0f / (float) Math.sqrt(norm);
@@ -1130,31 +1123,30 @@ public final class Quat4f
 
     /**
      * Performs a spherical cubic interpolation between q1 and q2, with a and b as the de Casteljau control points.<br>
-     * squad(qr, q1, q2, a, b, alpha)=slerp(slerp(p,q,alpha), slerp(a,b,alpha), 2t(1-t))  
+     * squad(qr, q1, q2, a, b, alpha)=slerp(slerp(p,q,alpha), slerp(a,b,alpha), 2t(1-t))
      */
     public static void squad(float[] qr, int qrIndex, float q1[], int q1Index, float q2[], int q2Index, float[] a, float[] b, float alpha)
     {
         float qTemp1[] = Quat4f.getQuat4f();
-        interpolate(qTemp1,0,q1,q1Index, q2, q2Index, alpha);
+        interpolate(qTemp1, 0, q1, q1Index, q2, q2Index, alpha);
         float qTemp2[] = Quat4f.getQuat4f();
-        interpolate(qTemp2,a,b,alpha);
-        interpolate(qr, qrIndex, qTemp1, 0, qTemp2, 0, 2*alpha*(1-alpha));
+        interpolate(qTemp2, a, b, alpha);
+        interpolate(qr, qrIndex, qTemp1, 0, qTemp2, 0, 2 * alpha * (1 - alpha));
     }
-    
-    
+
     /**
      * Performs a spherical cubic interpolation between q1 and q2, with a and b as the de Casteljau control points.<br>
-     * squad(qr, q1, q2, a, b, alpha)=slerp(slerp(p,q,alpha), slerp(a,b,alpha), 2t(1-t))  
+     * squad(qr, q1, q2, a, b, alpha)=slerp(slerp(p,q,alpha), slerp(a,b,alpha), 2t(1-t))
      */
     public static void squad(float[] qr, float q1[], float q2[], float[] a, float[] b, float alpha)
     {
         float qTemp1[] = Quat4f.getQuat4f();
-        interpolate(qTemp1,q1,q2,alpha);
+        interpolate(qTemp1, q1, q2, alpha);
         float qTemp2[] = Quat4f.getQuat4f();
-        interpolate(qTemp2,a,b,alpha);
-        interpolate(qr, qTemp1, qTemp2, 2*alpha*(1-alpha));
+        interpolate(qTemp2, a, b, alpha);
+        interpolate(qr, qTemp1, qTemp2, 2 * alpha * (1 - alpha));
     }
-    
+
     /**
      * Performs a great circle interpolation (slerp) between two quaternions q1 and q2, and places the result in quaternion qr.
      */
@@ -1235,7 +1227,7 @@ public final class Quat4f
         float s1, s2;
         if (1 - cosOmega < SLERPEPSILON)
         { // go for linear interpolation, rather than slerp interpolation
-            // System.out.println(" 1-cosOmega = " + (1-cosOmega) + " linear");
+          // System.out.println(" 1-cosOmega = " + (1-cosOmega) + " linear");
             s1 = 1.0f - alpha;
             s2 = alpha;
         }
@@ -1275,19 +1267,19 @@ public final class Quat4f
      */
     public static float getTwist(float q[], float axis[])
     {
-        float ortho[]=Vec3f.getVec3f();
-        Vec3f.findOrthogonal(ortho,axis);
+        float ortho[] = Vec3f.getVec3f();
+        Vec3f.findOrthogonal(ortho, axis);
         float transformed[] = Vec3f.getVec3f(ortho);
         Quat4f.transformVec3f(q, transformed);
-        
-        float flattened[]=Vec3f.getVec3f();
-        Vec3f.scale(Vec3f.dot(transformed,axis), flattened, axis);
+
+        float flattened[] = Vec3f.getVec3f();
+        Vec3f.scale(Vec3f.dot(transformed, axis), flattened, axis);
         Vec3f.sub(flattened, transformed, flattened);
         Vec3f.normalize(flattened);
-        
-        return (float)Math.acos(Vec3f.dot(ortho,flattened));
+
+        return (float) Math.acos(Vec3f.dot(ortho, flattened));
     }
-    
+
     /**
      * Rotates a vector with a quaternion, assumes the quaternion is length 1 transforms v, and also returns it.
      * Efficieny note: for large numbers of vertices, it is more efficient to turn the quaternion into a
@@ -1387,10 +1379,10 @@ public final class Quat4f
 
     private static final float PI_DEGREES = 180.0f;
 
-   /**
-    * Produces a string which explains the quat rotation in terms of rotations axis and rotation angle,
-    * withc specified fieldwidth and precision.
-    */
+    /**
+     * Produces a string which explains the quat rotation in terms of rotations axis and rotation angle,
+     * withc specified fieldwidth and precision.
+     */
     public static String explainQuat4f(float[] q, int fieldwidth, int precision)
     {
         float[] aa = getAxisAngle4fFromQuat4f(q);
@@ -1412,7 +1404,6 @@ public final class Quat4f
     {
         return explainQuat4f(q, 6, 3);
     }
-
 
     /**
      * q = e^v
@@ -1461,7 +1452,6 @@ public final class Quat4f
         }
         Vec3f.set(v, (float) (a * q[Quat4f.x]), (float) (a * q[Quat4f.y]), (float) (a * q[Quat4f.z]));
     }
-
 
     /**
      * Calculates qout=qin^p = exp(log(q)p)
@@ -1520,12 +1510,12 @@ public final class Quat4f
      */
     public static void setAngularVelocityFromQuat4f(float[] avel, int aVelIndex, float[] q, int qIndex, float[] qrate, int qRateIndex)
     {
-        avel[aVelIndex] = -qrate[qRateIndex + s] * q[qIndex + x] + q[qIndex + s] * qrate[qRateIndex + x] - qrate[qRateIndex + y] * q[qIndex + z]
-                + qrate[qRateIndex + z] * q[qIndex + y];
-        avel[aVelIndex + 1] = -qrate[qRateIndex + s] * q[qIndex + y] + q[qIndex + s] * qrate[qRateIndex + y] - qrate[qRateIndex + z] * q[qIndex + x]
-                + qrate[qRateIndex + x] * q[qIndex + z];
-        avel[aVelIndex + 2] = -qrate[qRateIndex + s] * q[qIndex + z] + q[qIndex + s] * qrate[qRateIndex + z] - qrate[qRateIndex + x] * q[qIndex + y]
-                + qrate[qRateIndex + y] * q[qIndex + x];
+        avel[aVelIndex] = -qrate[qRateIndex + s] * q[qIndex + x] + q[qIndex + s] * qrate[qRateIndex + x] - qrate[qRateIndex + y]
+                * q[qIndex + z] + qrate[qRateIndex + z] * q[qIndex + y];
+        avel[aVelIndex + 1] = -qrate[qRateIndex + s] * q[qIndex + y] + q[qIndex + s] * qrate[qRateIndex + y] - qrate[qRateIndex + z]
+                * q[qIndex + x] + qrate[qRateIndex + x] * q[qIndex + z];
+        avel[aVelIndex + 2] = -qrate[qRateIndex + s] * q[qIndex + z] + q[qIndex + s] * qrate[qRateIndex + z] - qrate[qRateIndex + x]
+                * q[qIndex + y] + qrate[qRateIndex + y] * q[qIndex + x];
         Vec3f.scale(2, avel, aVelIndex);
     }
 
@@ -1545,7 +1535,8 @@ public final class Quat4f
     /**
      * Calculates the instantatious angular acceleration from the quaternion, quaternion rate and quaternion rate diff a = w' = 2*qrate'*(q^-1)
      */
-    public static void setAngularAccelerationFromQuat4f(float[] aacc, int aaccIndex, float[] q, int qIndex, float[] qratediff, int qRateDiffIndex)
+    public static void setAngularAccelerationFromQuat4f(float[] aacc, int aaccIndex, float[] q, int qIndex, float[] qratediff,
+            int qRateDiffIndex)
     {
         // qrate' * q^-1
         aacc[aaccIndex] = -qratediff[qRateDiffIndex + s] * q[qIndex + x] + q[qIndex + s] * qratediff[qRateDiffIndex + x]
@@ -1579,6 +1570,5 @@ public final class Quat4f
             q[3] = 0.0f;
         }
     }
-    
-}
 
+}

@@ -112,6 +112,7 @@ public class VJoint implements VObject
     public VJoint(String id, String sid, int capacity)
     {
         children = new ArrayList<>(capacity);
+        setRotation(Quat4f.getIdentity());
         setSid(sid);
         setId(id);
     }
