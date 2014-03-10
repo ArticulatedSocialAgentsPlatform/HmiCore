@@ -1176,6 +1176,12 @@ public class VJoint implements VObject
         decomposeLocalMatrix();
     }
 
+    public void setLocalTransform(float[] matrix, int i)
+    {
+        Mat4f.set(localMatrix, 0, matrix, i);
+        decomposeLocalMatrix();
+    }
+    
     /*
      * decomposes the localMatrix into quaternion, scaling, translation
      */
