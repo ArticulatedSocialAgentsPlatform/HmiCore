@@ -60,7 +60,7 @@ public final class VJointUtils
     }
 
     /**
-     * Create a set of sid strings from a collection of VJoints. 
+     * Create a set of sid strings from a collection of VJoints.
      * If the sid of a joint in joints is null, its id or name are used respectively.
      */
     public static Set<String> transformToSidSet(Collection<VJoint> joints)
@@ -123,7 +123,7 @@ public final class VJointUtils
             }
         }
     }
-    
+
     /**
      * Create a set of sid strings from a collection of VJoints. If the sid of a joint in joints is null, its id or name are used respectively.
      */
@@ -131,6 +131,15 @@ public final class VJointUtils
     {
         List<String> j = Lists.transform(joints, new ApplySidFuntion());
         return ImmutableList.copyOf(j);
+    }
+
+    public static void alignSegmentIfExists(VJoint skeletonRoot, String joint1, String joint2, float[] vec)
+    {
+        Set<String> availableJoints = VJointUtils.transformToSidSet(skeletonRoot.getParts());
+        if (availableJoints.contains(joint1) && availableJoints.contains(joint2))
+        {
+            alignSegment(skeletonRoot, joint1, joint2, vec);
+        }
     }
 
     /**
@@ -148,50 +157,50 @@ public final class VJointUtils
         alignSegment(skeletonRoot, hmi.animation.Hanim.l_shoulder, hmi.animation.Hanim.l_elbow, downVec);
         alignSegment(skeletonRoot, hmi.animation.Hanim.l_elbow, hmi.animation.Hanim.l_wrist, downVec);
 
-        alignSegment(skeletonRoot, hmi.animation.Hanim.l_index1, hmi.animation.Hanim.l_index2, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.l_index2, hmi.animation.Hanim.l_index3, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.l_index3, hmi.animation.Hanim.l_index_distal_tip, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.l_index1, hmi.animation.Hanim.l_index2, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.l_index2, hmi.animation.Hanim.l_index3, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.l_index3, hmi.animation.Hanim.l_index_distal_tip, downVec);
 
-        alignSegment(skeletonRoot, hmi.animation.Hanim.l_middle1, hmi.animation.Hanim.l_middle2, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.l_middle2, hmi.animation.Hanim.l_middle3, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.l_middle3, hmi.animation.Hanim.l_middle_distal_tip, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.l_middle1, hmi.animation.Hanim.l_middle2, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.l_middle2, hmi.animation.Hanim.l_middle3, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.l_middle3, hmi.animation.Hanim.l_middle_distal_tip, downVec);
 
-        alignSegment(skeletonRoot, hmi.animation.Hanim.l_ring1, hmi.animation.Hanim.l_ring2, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.l_ring2, hmi.animation.Hanim.l_ring3, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.l_ring3, hmi.animation.Hanim.l_ring_distal_tip, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.l_ring1, hmi.animation.Hanim.l_ring2, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.l_ring2, hmi.animation.Hanim.l_ring3, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.l_ring3, hmi.animation.Hanim.l_ring_distal_tip, downVec);
 
-        alignSegment(skeletonRoot, hmi.animation.Hanim.l_pinky1, hmi.animation.Hanim.l_pinky2, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.l_pinky2, hmi.animation.Hanim.l_pinky3, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.l_pinky3, hmi.animation.Hanim.l_pinky_distal_tip, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.l_pinky1, hmi.animation.Hanim.l_pinky2, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.l_pinky2, hmi.animation.Hanim.l_pinky3, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.l_pinky3, hmi.animation.Hanim.l_pinky_distal_tip, downVec);
 
         // right arms/hand/fingers:
         alignSegment(skeletonRoot, hmi.animation.Hanim.r_shoulder, hmi.animation.Hanim.r_elbow, downVec);
         alignSegment(skeletonRoot, hmi.animation.Hanim.r_elbow, hmi.animation.Hanim.r_wrist, downVec);
 
-        alignSegment(skeletonRoot, hmi.animation.Hanim.r_index1, hmi.animation.Hanim.r_index2, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.r_index2, hmi.animation.Hanim.r_index3, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.r_index3, hmi.animation.Hanim.r_index_distal_tip, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.r_index1, hmi.animation.Hanim.r_index2, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.r_index2, hmi.animation.Hanim.r_index3, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.r_index3, hmi.animation.Hanim.r_index_distal_tip, downVec);
 
-        alignSegment(skeletonRoot, hmi.animation.Hanim.r_middle1, hmi.animation.Hanim.r_middle2, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.r_middle2, hmi.animation.Hanim.r_middle3, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.r_middle3, hmi.animation.Hanim.r_middle_distal_tip, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.r_middle1, hmi.animation.Hanim.r_middle2, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.r_middle2, hmi.animation.Hanim.r_middle3, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.r_middle3, hmi.animation.Hanim.r_middle_distal_tip, downVec);
 
-        alignSegment(skeletonRoot, hmi.animation.Hanim.r_ring1, hmi.animation.Hanim.r_ring2, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.r_ring2, hmi.animation.Hanim.r_ring3, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.r_ring3, hmi.animation.Hanim.r_ring_distal_tip, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.r_ring1, hmi.animation.Hanim.r_ring2, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.r_ring2, hmi.animation.Hanim.r_ring3, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.r_ring3, hmi.animation.Hanim.r_ring_distal_tip, downVec);
 
-        alignSegment(skeletonRoot, hmi.animation.Hanim.r_pinky1, hmi.animation.Hanim.r_pinky2, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.r_pinky2, hmi.animation.Hanim.r_pinky3, downVec);
-        alignSegment(skeletonRoot, hmi.animation.Hanim.r_pinky3, hmi.animation.Hanim.r_pinky_distal_tip, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.r_pinky1, hmi.animation.Hanim.r_pinky2, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.r_pinky2, hmi.animation.Hanim.r_pinky3, downVec);
+        alignSegmentIfExists(skeletonRoot, hmi.animation.Hanim.r_pinky3, hmi.animation.Hanim.r_pinky_distal_tip, downVec);
 
         float[] thumbDir = Vec3f.getVec3f(0f, -1f, 1f);
-        alignSegment(skeletonRoot, Hanim.l_thumb1, Hanim.l_thumb2, thumbDir);
-        alignSegment(skeletonRoot, Hanim.l_thumb2, Hanim.l_thumb3, thumbDir);
-        alignSegment(skeletonRoot, Hanim.l_thumb3, Hanim.l_thumb_distal_tip, thumbDir);
+        alignSegmentIfExists(skeletonRoot, Hanim.l_thumb1, Hanim.l_thumb2, thumbDir);
+        alignSegmentIfExists(skeletonRoot, Hanim.l_thumb2, Hanim.l_thumb3, thumbDir);
+        alignSegmentIfExists(skeletonRoot, Hanim.l_thumb3, Hanim.l_thumb_distal_tip, thumbDir);
 
-        alignSegment(skeletonRoot, Hanim.r_thumb1, Hanim.r_thumb2, thumbDir);
-        alignSegment(skeletonRoot, Hanim.r_thumb2, Hanim.r_thumb3, thumbDir);
-        alignSegment(skeletonRoot, Hanim.r_thumb3, Hanim.r_thumb_distal_tip, thumbDir);
+        alignSegmentIfExists(skeletonRoot, Hanim.r_thumb1, Hanim.r_thumb2, thumbDir);
+        alignSegmentIfExists(skeletonRoot, Hanim.r_thumb2, Hanim.r_thumb3, thumbDir);
+        alignSegmentIfExists(skeletonRoot, Hanim.r_thumb3, Hanim.r_thumb_distal_tip, thumbDir);
 
         // legs/feet:
         // align hip-knee with downvec, but correct "backwards" at the ankle joints (so we use alignIsolatedSegments rather than alignSegment)
@@ -338,21 +347,21 @@ public final class VJointUtils
         }
         return ImmutableSet.copyOf(joints);
     }
-    
+
     /**
      * Return vj's sid, name - if sid null, or id if both sid, name == null.
      */
     public static String getSidNameId(VJoint vj)
     {
-        if(vj.getSid()!=null)
+        if (vj.getSid() != null)
         {
             return vj.getSid();
         }
-        if(vj.getName()!=null)
+        if (vj.getName() != null)
         {
             return vj.getName();
         }
-        if(vj.getId()!=null)
+        if (vj.getId() != null)
         {
             return vj.getId();
         }
