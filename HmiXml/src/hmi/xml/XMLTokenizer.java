@@ -39,6 +39,8 @@ import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * A scanner of XML input streams.
  * <p>
@@ -1240,7 +1242,7 @@ public class XMLTokenizer
      */
     private void attributePrefixFixup(String nsPrefix, String ns)
     {
-        Set<String> attributeNames = attributes.keySet();
+        Set<String> attributeNames = ImmutableSet.copyOf(attributes.keySet());
         for (String attrName : attributeNames)
         {
             int colPos = attrName.indexOf(':');

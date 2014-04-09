@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import org.hamcrest.collection.IsIterableContainingInOrder;
 import org.junit.Test;
@@ -85,6 +84,37 @@ public class XMLStructureAdapterTest
         assertThat(Ints.asList(ints), IsIterableContainingInOrder.contains(1, 2, 3));
     }
 
+    @Test
+    public void testReadNameSpacedAttribute()
+    {
+        
+        class TestXML extends XMLStructureAdapter
+        {
+            @Getter
+            String id;
+            
+            @Getter
+            String test;
+            
+            public String getXMLTag()
+            {
+                return "test";
+            }
+            
+            @Override
+            public void decodeAttributes(HashMap<String, String> attrMap, XMLTokenizer tokenizer)
+            {
+                id = getRequiredAttribute("id", attrMap, tokenizer);
+                test = getRequiredAttribute("externalns:testname", attrMap, tokenizer);
+            }
+        };
+        TestXML xa = new TestXML();
+        String xmlString = "<test test:testname=\"testval\" id=\"idx\" xmlns:test=\"externalns\"/>";
+        xa.readXML(xmlString);
+        assertEquals("idx", xa.getId());
+        assertEquals("testval", xa.getTest());
+    }
+    
     @Test
     public void writeNamespaceTag()
     {
