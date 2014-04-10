@@ -256,4 +256,8 @@ public class JointRotationPanel {
 		}
 	}
 
+	public void deselect() {
+		useInKeyFrameCheckBox.setSelected(false);
+	}
+
 }

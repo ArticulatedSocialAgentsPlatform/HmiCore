@@ -117,4 +117,10 @@ public class JointView {
 		}
 	}
 
+	public void deselectAll() {
+		for (JointRotationPanel p : rotationPanels.values()) {
+			p.deselect();
+		}
+	}
+
 }

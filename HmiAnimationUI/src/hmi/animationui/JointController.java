@@ -4,6 +4,7 @@ import hmi.animation.VJoint;
 import hmi.animation.VJointUtils;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * The controller handles input from the viewer and updates the vjoint structure
@@ -69,5 +70,12 @@ public class JointController implements RotationsController
     public void adjustSliderToModel(Collection<String> joints)
     {
         jv.adjustSliderToModel(model, joints);
+    }
+    
+    /**
+     * Excludes every joint from the animation.
+     */
+    public void deselectAll(){
+    	jv.deselectAll();
     }
 }
