@@ -63,6 +63,19 @@ public class XMLStructureAdapterTest
 
     }
 
+    @Test(expected=XMLScanException.class)
+    public void testQuoteInTag()
+    {
+        XMLStructureAdapter xa = new XMLStructureAdapter()
+        {
+            public String getXMLTag()
+            {
+                return "gaze";
+            }
+        };
+        xa.readXML("<gaze id=\"gaze1\" start=\"0\" ready=\"1\" target=\"redbox\" \"influence=\"HEAD\" />");
+    }
+    
     @Test
     public void decodeIntArray1()
     {
