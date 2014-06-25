@@ -128,24 +128,20 @@ public class MorphPanel {
 		labelPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		labelPanel.add(label);
 		labelPanel.add(undoButton);
-		// panel.setLayout(new GridLayout());
 		panel.add(labelPanel);
 	}
 
 	private void setupUndoButton() {
-		// undoButton.setIcon(new ImageIcon(UNDO_ICON_FILENAME));
 		undoButton.setText("(undo)");
 		undoButton.setForeground(Color.blue);
 		Font original = undoButton.getFont();
 		Map<TextAttribute,Object> newAttributes = new HashMap<>(original.getAttributes());		
 		newAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 		undoButton.setFont(original.deriveFont(newAttributes));
-		// undoButton.setFocusPainted(false);
 		undoButton.setMargin(new Insets(0, 0, 0, 0));
 		undoButton.setContentAreaFilled(false);
 		undoButton.setBorderPainted(false);
 		undoButton.setOpaque(false);
-		// undoButton.setPreferredSize(new Dimension(50, 50));
 		undoButton.setToolTipText(UNDO_BUTTON_TOOL_TIP);
 		undoButton.addActionListener(new ActionListener() {
 
@@ -173,16 +169,13 @@ public class MorphPanel {
 	private void setupCheckbox(final JCheckBox c) {
 		JPanel checkboxPanel = new JPanel();
 		c.setToolTipText(CHECKBOX_TOOL_TIP);
-		// final JLabel checkboxLabel = new JLabel("use:");
-		// checkboxLabel.setPreferredSize(new Dimension(40, 20));
 		c.setPreferredSize(new Dimension(CHECKBOX_WIDTH, DEFAULT_HEIGHT));
-		// checkboxPanel.add(checkboxLabel);
 		checkboxPanel.add(c);
 		panel.add(checkboxPanel);
 	}
 
 	public MorphConfiguration getMorphConfiguration() {
-		return new MorphConfiguration(morphName, Math.max(0,
+		return new MorphConfiguration(morphName, Math.max(-100,
 				Math.min((float) morphSlider.getValue() / 100.0f, 1)));
 	}
 
