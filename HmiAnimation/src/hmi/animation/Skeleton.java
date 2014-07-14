@@ -49,8 +49,6 @@ public class Skeleton// implements ExchangeBuffer
    private float[][] transformMatrices;
    private boolean invalidMatrices = true; // signals "invalid" matrix arrays, due to modifications for roots and/or jointSids
    
-   private static Logger logger = LoggerFactory.getLogger("hmi.animation.Skeleton");
-
    /* prevent Skeletons without id */
    private Skeleton() {}
    
@@ -244,31 +242,6 @@ public class Skeleton// implements ExchangeBuffer
        } 
    }
    
-   
-   
-   
-   
-//   /** 
-//    * Create a new VJoint that is added as root node
-//    * The VJoint sid is specified, its id is set to
-//    * the Skeleton id + "-" + sid.
-//    */
-//   public void createRoot(String sid) {
-//       addRoot(new VJoint(makeId(sid), sid));       
-//   }
-//   
-//   /**
-//    * Creates a new VJoint with specified child sid, added as a child node
-//    * to a parent node with specified parent sid.
-//    * * If no such parent node is present, no new child node will
-//    * be created.
-//    */
-//   public void addChildNode(String parentSid, String childSid) {
-//       VJoint parent = getVJoint(parentSid);
-//       if (parent != null) {
-//           parent.addChild(new VJoint(makeId(childSid), childSid));
-//       }
-//   }
    
       /* Method for creating a VJoint id from a specified sid */
    public String makeId(String sid) {

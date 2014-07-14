@@ -1146,7 +1146,7 @@ public class VJoint implements VObject
     {
         if (!validLocalMatrix || hasSharedBuffers)
         {
-
+            Quat4f.normalize(rotation);
             switch (scalingType)
             {
             case IDENTITY:
