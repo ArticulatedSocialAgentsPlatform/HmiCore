@@ -454,6 +454,27 @@ public class XMLStructureAdapterTest
         assertEquals("<test/>", testA.getSection());
     }
 
+    @Test(expected = XMLScanException.class)
+    public void testMissingPrefix()
+    {
+        final class TestB extends XMLStructureAdapter
+        {
+            @Override
+            public String getXMLTag()
+            {
+                return "TestB";
+            }
+            
+            @Override
+            public boolean decodeAttribute(String attrName, String attrValue, XMLTokenizer tokenizer)
+            {
+                throw new XMLScanException("Attribute "+attrName+" not supported.");
+            }
+        }
+        TestB testB = new TestB();
+        testB.readXML("<TestB bmla:appendAfter=\"bml1\"/>");        
+    }
+    
     @Test
     public void testGetEmptyXMLSectionWithClosingTag()
     {
@@ -527,4 +548,6 @@ public class XMLStructureAdapterTest
         adapter.appendXML(buf, fmt);
         fmt.popXMLNameSpace();// namespacestack should be empty
     }
+    
+    
 }
