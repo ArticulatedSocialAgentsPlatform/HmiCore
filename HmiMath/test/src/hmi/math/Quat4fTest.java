@@ -36,32 +36,9 @@ public class Quat4fTest
     private static final float PRECISION_DIFF = 0.0001f;
     private static final float PRECISION_DIFF2 = 0.02f;
 
-    @Test
-    public void testSetFromMat4f()
-    {
-        float qExpected[] = Quat4f.getQuat4f();
-        Quat4f.set(qExpected, 0.0f, 0.6427876f, -0.76604456f, -1.0941049E-4f);
-        // Quat4f.set(qExpected, 0, 1, 0,0);
-        float m[] = Mat4f.getMat4f();
-        Mat4f.setFromTR(m, Vec3f.getZero(), qExpected);
-        float q[] = Quat4f.getQuat4f();
-        Quat4f.setFromMat4f(q, m);
-        assertQuat4fRotationEquivalent(qExpected, q, PRECISION);
-    }
+    
 
-    @Test
-    public void testSetFromMat3f()
-    {
-        float qExpected[] = Quat4f.getQuat4f();
-        Quat4f.set(qExpected, 0.0f, 0.6427876f, -0.76604456f, -1.0941049E-4f);
-        // Quat4f.set(qExpected, 0, 1, 0,0);
-        float m[] = Mat3f.getMat3f();
-        Mat3f.setFromQuatScale(m, qExpected, 1);
-        float q[] = Quat4f.getQuat4f();
-        Quat4f.setFromMat3f(q, m);
-        assertQuat4fRotationEquivalent(qExpected, q, PRECISION);
-    }
-
+    
     @Test
     public void testEpsilonEquivalent()
     {
@@ -112,6 +89,36 @@ public class Quat4fTest
         assertEquals(Quat4f.length(q), 1, PRECISION);
     }
 
+    @Test
+    public void testEpsilonRotationEquivalentInverse()
+    {
+        float qExpected [] = Quat4f.getQuat4f();        
+        Quat4f.setFromAxisAngle4f(qExpected,1f,0,0,2);
+        float q[] = Quat4f.getQuat4f(qExpected);
+        Vec4f.scale(-1,q);
+        assertTrue(Quat4f.epsilonRotationEquivalent(qExpected,q,PRECISION));
+    }
+    
+    @Test
+    public void testEpsilonRotationEquivalentAlmostInverse()
+    {
+        float qExpected [] = Quat4f.getQuat4f();        
+        Quat4f.setFromAxisAngle4f(qExpected,1f,0,0,2);
+        float q[] = Quat4f.getQuat4f(qExpected);
+        Vec4f.scale(-1+PRECISION*0.1f,q);
+        assertTrue(Quat4f.epsilonRotationEquivalent(qExpected,q,PRECISION));
+    }
+    
+    @Test
+    public void testEpsilonRotationEquivalentAlmostInverseIndexed()
+    {
+        float qExpected [] = new float[5];  
+        Quat4f.setFromAxisAngle4f(qExpected,1, 1f,0,0,2);
+        float q[] = new float[5];  
+        Quat4f.set(q,1,qExpected,1);
+        Vec4f.scale(-1+PRECISION*0.1f,q,1);
+        assertTrue(Quat4f.epsilonRotationEquivalent(qExpected,1,q,1,PRECISION));
+    }
     /**
      * Test of setFromEulerAngles method, of class Quat4f.
      */
@@ -152,6 +159,18 @@ public class Quat4fTest
         assertTrue(Quat4f.epsilonEquals(q, q2, PRECISION));
     }
 
+    @Test
+    public void testSetFromMat3f()
+    {
+        float qExpected[] = Quat4f.getQuat4f();
+        Quat4f.set(qExpected, 0.0f, 0.6427876f, -0.76604456f, -1.0941049E-4f);
+        float m[] = Mat3f.getMat3f();
+        Mat3f.setFromQuatScale(m, qExpected, 1);
+        float q[] = Quat4f.getQuat4f();
+        Quat4f.setFromMat3f(q, m);
+        assertQuat4fRotationEquivalent(qExpected, q, PRECISION);
+    }
+
     /**
      * Test of setFromMat3f method, of class Quat4f.
      */
@@ -189,6 +208,75 @@ public class Quat4fTest
         assertTrue(Quat4f.epsilonEquals(q1, q2, PRECISION));
     }
 
+    @Test
+    public void testSetFromMat3fSmallPositiveW()
+    {
+        float q[] = Quat4f.getQuat4f();
+        float m[]= new float[]{-0.999999f,0,0,
+                                        0,1,0,
+                                        0,0,-1,
+                                        0,0,0};
+        Quat4f.setFromMat3f(q,m);
+        float mExpected[]= new float[]{-1f,0,0,
+                0,1,0,
+                0,0,-1,
+                0,0,0};
+        float qExpected[] = Quat4f.getQuat4f();
+        Quat4f.setFromMat3f(qExpected,mExpected);
+        assertQuat4fRotationEquivalent(qExpected, q, PRECISION);
+    }
+    
+    @Test
+    public void testSetFromMat4f()
+    {
+        float qExpected[] = Quat4f.getQuat4f();
+        Quat4f.set(qExpected, 0.0f, 0.6427876f, -0.76604456f, -1.0941049E-4f);
+        float m[] = Mat4f.getMat4f();
+        Mat4f.setFromTR(m, Vec3f.getZero(), qExpected);
+        float q[] = Quat4f.getQuat4f();
+        Quat4f.setFromMat4f(q, m);
+        assertQuat4fRotationEquivalent(qExpected, q, PRECISION);
+    }
+    
+    @Test
+    public void testSetFromMat4fIdentity()
+    {
+        float q[] = Quat4f.getQuat4f();
+        Quat4f.setFromMat4f(q, Mat4f.getIdentity());
+        assertQuat4fRotationEquivalent(Quat4f.getIdentity(), q, PRECISION);
+    }
+    
+    @Test
+    public void testSetFromMat4fZeroDiagonal()
+    {
+        float q[] = Quat4f.getQuat4f();
+        float mExpected[]= new float[]{0,1,0,0,
+                               0,0,1,0,
+                               1,0,0,0,
+                               0,0,0,1};
+        Quat4f.setFromMat4f(q,mExpected);
+        float m[]=Mat4f.getMat4f();
+        Mat4f.setFromTR(m,Vec3f.getVec3f(),q);
+        assertTrue(Mat4f.epsilonEquals(m,mExpected, PRECISION));
+    }
+    
+    @Test
+    public void testSetFromMat4fSmallPositiveW()
+    {
+        float q[] = Quat4f.getQuat4f();
+        float m[]= new float[]{-0.999999f,0,0,0,
+                                        0,1,0,0,
+                                        0,0,-1,0,
+                                        0,0,0,1};
+        Quat4f.setFromMat4f(q,m);
+        float mExpected[]= new float[]{-1f,0,0,0,
+                0,1,0,0,
+                0,0,-1,0,
+                0,0,0,1};
+        float qExpected[] = Quat4f.getQuat4f();
+        Quat4f.setFromMat4f(qExpected,mExpected);
+        assertQuat4fRotationEquivalent(qExpected, q, PRECISION);
+    }
     /**
      * Test of setFromMat3f method, of class Quat4f.
      */
@@ -240,6 +328,24 @@ public class Quat4fTest
         Quat4fTestUtil.assertQuat4fRotationEquivalent(q1, 2, q2, 2, PRECISION);
     }
 
+    @Test
+    public void testSetFromMat4fSmallPositiveWIndexed()
+    {
+        float q[] = new float[5];
+        float m[]= new float[]{0,0, -0.999999f,0,0,0,
+                                        0,1,0,0,
+                                        0,0,-1,0,
+                                        0,0,0,1};
+        Quat4f.setFromMat4f(q,1,m,2);
+        float mExpected[]= new float[]{1, 1, -1f,0,0,0,
+                0,1,0,0,
+                0,0,-1,0,
+                0,0,0,1};
+        float qExpected[] = new float[5];
+        Quat4f.setFromMat4f(qExpected,1, mExpected,2);
+        assertQuat4fRotationEquivalent(qExpected,1, q,1, PRECISION);
+    }
+    
     /**
      * Test of setFromMat3f method, of class Quat4f.
      */

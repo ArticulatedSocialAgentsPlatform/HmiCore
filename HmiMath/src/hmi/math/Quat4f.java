@@ -222,34 +222,8 @@ public final class Quat4f
     public static boolean epsilonRotationEquivalent(float[] a, int aIndex, float[] b, int bIndex, float epsilon)
     {
         if (Vec4f.epsilonEquals(a, aIndex, b, bIndex, epsilon)) return true;
-        float a0 = a[aIndex];
-        float a1 = a[aIndex + 1];
-        float a2 = a[aIndex + 2];
-        float a3 = a[aIndex + 3];
-        float b0 = -b[bIndex];
-        float b1 = -b[bIndex + 1];
-        float b2 = -b[bIndex + 2];
-        float b3 = -b[bIndex + 3];
-        return a0 == b0 && a1 == b1 && a2 == b2 && a3 == b3;
+        return (Vec4f.epsilonEquals(a, aIndex, new float[] { -b[bIndex], -b[bIndex + 1], -b[bIndex + 2], -b[bIndex + 3] }, 0, epsilon));
     }
-
-    // /**
-    // * calculates a quaternion representation from
-    // * "roll-pitch-yaw" angles
-    // */
-    // public static void setFromRollPitchYaw(float[] q, float roll, float pitch, float yaw)
-    // {
-    // double cx = Math.cos(pitch/2.0);
-    // double cy = Math.cos(yaw/2.0);
-    // double cz = Math.cos(roll/2.0);
-    // double sx = Math.sin(pitch/2.0);
-    // double sy = Math.sin(yaw/2.0);
-    // double sz = Math.sin(roll/2.0);
-    // q[s] = (float)(cx * cy * cz + sx * sy * sz);
-    // q[x] = (float)(cx * sy * sz + sx * cy * cz);
-    // q[y] = (float)(cx * sy * cz - sx * cy * sz);
-    // q[z] = (float)(cx * cy * sz - sx * sy * cz);
-    // }
 
     /**
      * Sets the quaternion for a rotation around the x-axis.
@@ -722,113 +696,83 @@ public final class Quat4f
      */
     public static void setFromMat3f(float[] q, float[] m)
     {
-        double ww;
-        ww = 0.25 * (1.0 + m[Mat3f.M00] + m[Mat3f.M11] + m[Mat3f.M22]);
-        if (ww < -EPS2)
-        {
-            float mRot[] = Mat3f.getMat3f();
-            float mScale[] = Mat3f.getMat3f();
-            Mat3f.polarDecompose(m, mRot, mScale);
-            setFromMat3f(q, mRot);
-            // throw new IllegalArgumentException("Quat4f.setFromMat3f: non-rotation matrix m"+Mat3f.toString(m)+", ww= " + ww);
-        }
+        float tr = m[Mat3f.M00] + m[Mat3f.M11] + m[Mat3f.M22];
 
-        if (ww < 0) ww = 0;
-        if (ww >= EPS2)
+        if (tr > 0)
         {
-            q[s] = (float) Math.sqrt(ww);
-            ww = 0.25 / q[s];
-            q[x] = (float) ((m[Mat3f.M21] - m[Mat3f.M12]) * ww);
-            q[y] = (float) ((m[Mat3f.M02] - m[Mat3f.M20]) * ww);
-            q[z] = (float) ((m[Mat3f.M10] - m[Mat3f.M01]) * ww);
+            double S = Math.sqrt(tr + 1.0) * 2; // S=4*qw
+            q[Quat4f.S] = (float) (0.25 * S);
+            q[Quat4f.X] = (float) ((m[Mat3f.M21] - m[Mat3f.M12]) / S);
+            q[Quat4f.Y] = (float) ((m[Mat3f.M02] - m[Mat3f.M20]) / S);
+            q[Quat4f.Z] = (float) ((m[Mat3f.M10] - m[Mat3f.M01]) / S);
+        }
+        else if ((m[Mat3f.M00] > m[Mat3f.M11]) && (m[Mat3f.M00] > m[Mat3f.M22]))
+        {
+            double S = Math.sqrt(1.0 + m[Mat3f.M00] - m[Mat3f.M11] - m[Mat3f.M22]) * 2; // S=4*qx
+            q[Quat4f.S] = (float) ((m[Mat3f.M21] - m[Mat3f.M12]) / S);
+            q[Quat4f.X] = (float) (0.25 * S);
+            q[Quat4f.Y] = (float) ((m[Mat3f.M01] + m[Mat3f.M10]) / S);
+            q[Quat4f.Z] = (float) ((m[Mat3f.M02] + m[Mat3f.M20]) / S);
+        }
+        else if (m[Mat3f.M11] > m[Mat3f.M22])
+        {
+            double S = Math.sqrt(1.0 + m[Mat3f.M11] - m[Mat3f.M00] - m[Mat3f.M22]) * 2; // S=4*qy
+            q[Quat4f.S] = (float) ((m[Mat3f.M02] - m[Mat3f.M20]) / S);
+            q[Quat4f.X] = (float) ((m[Mat3f.M01] + m[Mat3f.M10]) / S);
+            q[Quat4f.Y] = (float) (0.25 * S);
+            q[Quat4f.Z] = (float) ((m[Mat3f.M12] + m[Mat3f.M21]) / S);
         }
         else
         {
-            q[s] = 0.0f;
-            ww = -0.5 * (m[Mat3f.M11] + m[Mat3f.M22]);
-            if (ww < 0) ww = 0;
-            if (ww >= EPS2)
-            {
-                q[x] = (float) Math.sqrt(ww);
-                ww = 0.5 / q[x];
-                q[y] = (float) (m[Mat3f.M10] * ww);
-                q[z] = (float) (m[Mat3f.M20] * ww);
-            }
-            else
-            {
-                q[x] = 0.0f;
-                ww = 0.5 * (1.0 - m[Mat3f.M22]);
-                if (ww < 0) ww = 0;
-                if (ww >= EPS2)
-                {
-                    q[y] = (float) (Math.sqrt(ww));
-                    q[z] = (float) (m[Mat3f.M21] / (2.0 * q[y]));
-                }
-                else
-                {
-                    q[y] = 0.0f;
-                    q[z] = 1.0f;
-                }
-            }
+            double S = Math.sqrt(1.0 + m[Mat3f.M22] - m[Mat3f.M00] - m[Mat3f.M11]) * 2; // S=4*qz
+            q[Quat4f.S] = (float) ((m[Mat3f.M10] - m[Mat3f.M01]) / S);
+            q[Quat4f.X] = (float) ((m[Mat3f.M02] + m[Mat3f.M20]) / S);
+            q[Quat4f.Y] = (float) ((m[Mat3f.M12] + m[Mat3f.M21]) / S);
+            q[Quat4f.Z] = (float) (0.25 * S);
         }
         Quat4f.normalize(q);
     }
 
     /**
      * Calculates the quaternion q elements from a 4X4 or 4X3 matrix m, assuming that the latter does not include scaling and/or skewing. For a 4X4
-     * matrix, we assume that the m33 elements equals 1.0
+     * matrix, we assume that the m33 elements equals 1.0<br>
+     * Code from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
      */
     public static void setFromMat4f(float[] q, float[] m)
     {
-        double ww;
-        ww = 0.25 * (1.0 + m[Mat4f.M00] + m[Mat4f.M11] + m[Mat4f.M22]);
-        if (ww < -EPS2)
-        {
-            float mRot[] = Mat3f.getMat3f();
-            float mScale[] = Mat3f.getMat3f();
-            float m3[] = Mat3f.from4x4(m);
-            Mat3f.polarDecompose(m3, mRot, mScale);
-            setFromMat3f(q, mRot);
-            // throw new IllegalArgumentException("Quat4f.setFromMat4f: non-rotation matrix "+Mat4f.toString(m));
-        }
+        float tr = m[Mat4f.M00] + m[Mat4f.M11] + m[Mat4f.M22];
 
-        if (ww < 0) ww = 0;
-        if (ww >= EPS2)
+        if (tr > 0)
         {
-            q[s] = (float) Math.sqrt(ww);
-            ww = 0.25 / q[s];
-            q[x] = (float) ((m[Mat4f.M21] - m[Mat4f.M12]) * ww);
-            q[y] = (float) ((m[Mat4f.M02] - m[Mat4f.M20]) * ww);
-            q[z] = (float) ((m[Mat4f.M10] - m[Mat4f.M01]) * ww);
+            double S = Math.sqrt(tr + 1.0) * 2; // S=4*qw
+            q[Quat4f.S] = (float) (0.25 * S);
+            q[Quat4f.X] = (float) ((m[Mat4f.M21] - m[Mat4f.M12]) / S);
+            q[Quat4f.Y] = (float) ((m[Mat4f.M02] - m[Mat4f.M20]) / S);
+            q[Quat4f.Z] = (float) ((m[Mat4f.M10] - m[Mat4f.M01]) / S);
+        }
+        else if ((m[Mat4f.M00] > m[Mat4f.M11]) && (m[Mat4f.M00] > m[Mat4f.M22]))
+        {
+            double S = Math.sqrt(1.0 + m[Mat4f.M00] - m[Mat4f.M11] - m[Mat4f.M22]) * 2; // S=4*qx
+            q[Quat4f.S] = (float) ((m[Mat4f.M21] - m[Mat4f.M12]) / S);
+            q[Quat4f.X] = (float) (0.25 * S);
+            q[Quat4f.Y] = (float) ((m[Mat4f.M01] + m[Mat4f.M10]) / S);
+            q[Quat4f.Z] = (float) ((m[Mat4f.M02] + m[Mat4f.M20]) / S);
+        }
+        else if (m[Mat4f.M11] > m[Mat4f.M22])
+        {
+            double S = Math.sqrt(1.0 + m[Mat4f.M11] - m[Mat4f.M00] - m[Mat4f.M22]) * 2; // S=4*qy
+            q[Quat4f.S] = (float) ((m[Mat4f.M02] - m[Mat4f.M20]) / S);
+            q[Quat4f.X] = (float) ((m[Mat4f.M01] + m[Mat4f.M10]) / S);
+            q[Quat4f.Y] = (float) (0.25 * S);
+            q[Quat4f.Z] = (float) ((m[Mat4f.M12] + m[Mat4f.M21]) / S);
         }
         else
         {
-            q[s] = 0.0f;
-            ww = -0.5 * (m[Mat4f.M11] + m[Mat4f.M22]);
-            if (ww < 0) ww = 0;
-            if (ww >= EPS2)
-            {
-                q[x] = (float) Math.sqrt(ww);
-                ww = 0.5 / q[x];
-                q[y] = (float) (m[Mat4f.M10] * ww);
-                q[z] = (float) (m[Mat4f.M20] * ww);
-            }
-            else
-            {
-                q[x] = 0.0f;
-                ww = 0.5 * (1.0 - m[Mat4f.M22]);
-                if (ww < 0) ww = 0;
-                if (ww >= EPS2)
-                {
-                    q[y] = (float) (Math.sqrt(ww));
-                    q[z] = (float) (m[Mat4f.M21] / (2.0 * q[y]));
-                }
-                else
-                {
-                    q[y] = 0.0f;
-                    q[z] = 1.0f;
-                }
-            }
+            double S = Math.sqrt(1.0 + m[Mat4f.M22] - m[Mat4f.M00] - m[Mat4f.M11]) * 2; // S=4*qz
+            q[Quat4f.S] = (float) ((m[Mat4f.M10] - m[Mat4f.M01]) / S);
+            q[Quat4f.X] = (float) ((m[Mat4f.M02] + m[Mat4f.M20]) / S);
+            q[Quat4f.Y] = (float) ((m[Mat4f.M12] + m[Mat4f.M21]) / S);
+            q[Quat4f.Z] = (float) (0.25 * S);
         }
         Quat4f.normalize(q);
     }
@@ -839,46 +783,39 @@ public final class Quat4f
      */
     public static void setFromMat4f(float[] q, int qi, float[] m, int mi)
     {
-        double ww;
-        ww = 0.25 * (1.0 + m[Mat4f.M00 + mi] + m[Mat4f.M11 + mi] + m[Mat4f.M22 + mi]);
-        if (ww < -EPS2) throw new IllegalArgumentException("Quat4f.setFromMat3f: non-rotation matrix ");
-        if (ww < 0) ww = 0;
-        if (ww >= EPS2)
+        float tr = m[Mat4f.M00 + mi] + m[Mat4f.M11 + mi] + m[Mat4f.M22 + mi];
+
+        if (tr > 0)
         {
-            q[s + qi] = (float) Math.sqrt(ww);
-            ww = 0.25 / q[s + qi];
-            q[x + qi] = (float) ((m[Mat4f.M21 + mi] - m[Mat4f.M12 + mi]) * ww);
-            q[y + qi] = (float) ((m[Mat4f.M02 + mi] - m[Mat4f.M20 + mi]) * ww);
-            q[z + qi] = (float) ((m[Mat4f.M10 + mi] - m[Mat4f.M01 + mi]) * ww);
+            double S = Math.sqrt(tr + 1.0) * 2; // S=4*qw
+            q[Quat4f.S + qi] = (float) (0.25 * S);
+            q[Quat4f.X + qi] = (float) ((m[Mat4f.M21 + mi] - m[Mat4f.M12 + mi]) / S);
+            q[Quat4f.Y + qi] = (float) ((m[Mat4f.M02 + mi] - m[Mat4f.M20 + mi]) / S);
+            q[Quat4f.Z + qi] = (float) ((m[Mat4f.M10 + mi] - m[Mat4f.M01 + mi]) / S);
+        }
+        else if ((m[Mat4f.M00 + mi] > m[Mat4f.M11 + mi]) && (m[Mat4f.M00 + mi] > m[Mat4f.M22 + mi]))
+        {
+            double S = Math.sqrt(1.0 + m[Mat4f.M00 + mi] - m[Mat4f.M11 + mi] - m[Mat4f.M22 + mi]) * 2; // S=4*qx
+            q[Quat4f.S + qi] = (float) ((m[Mat4f.M21 + mi] - m[Mat4f.M12 + mi]) / S);
+            q[Quat4f.X + qi] = (float) (0.25 * S);
+            q[Quat4f.Y + qi] = (float) ((m[Mat4f.M01 + mi] + m[Mat4f.M10 + mi]) / S);
+            q[Quat4f.Z + qi] = (float) ((m[Mat4f.M02 + mi] + m[Mat4f.M20 + mi]) / S);
+        }
+        else if (m[Mat4f.M11 + mi] > m[Mat4f.M22 + mi])
+        {
+            double S = Math.sqrt(1.0 + m[Mat4f.M11 + mi] - m[Mat4f.M00 + mi] - m[Mat4f.M22 + mi]) * 2; // S=4*qy
+            q[Quat4f.S + qi] = (float) ((m[Mat4f.M02 + mi] - m[Mat4f.M20 + mi]) / S);
+            q[Quat4f.X + qi] = (float) ((m[Mat4f.M01 + mi] + m[Mat4f.M10 + mi]) / S);
+            q[Quat4f.Y + qi] = (float) (0.25 * S);
+            q[Quat4f.Z + qi] = (float) ((m[Mat4f.M12 + mi] + m[Mat4f.M21 + mi]) / S);
         }
         else
         {
-            q[s + qi] = 0.0f;
-            ww = -0.5 * (m[Mat4f.M11 + mi] + m[Mat4f.M22 + mi]);
-            if (ww < 0) ww = 0;
-            if (ww >= EPS2)
-            {
-                q[x + qi] = (float) Math.sqrt(ww);
-                ww = 0.5 / q[x + qi];
-                q[y + qi] = (float) (m[Mat4f.M10 + mi] * ww);
-                q[z + qi] = (float) (m[Mat4f.M20 + mi] * ww);
-            }
-            else
-            {
-                q[x + qi] = 0.0f;
-                ww = 0.5 * (1.0 - m[Mat4f.M22 + mi]);
-                if (ww < 0) ww = 0;
-                if (ww >= EPS2)
-                {
-                    q[y + qi] = (float) (Math.sqrt(ww));
-                    q[z + qi] = (float) (m[Mat4f.M21 + mi] / (2.0 * q[y + qi]));
-                }
-                else
-                {
-                    q[y + qi] = 0.0f;
-                    q[z + qi] = 1.0f;
-                }
-            }
+            double S = Math.sqrt(1.0 + m[Mat4f.M22 + mi] - m[Mat4f.M00 + mi] - m[Mat4f.M11 + mi]) * 2; // S=4*qz
+            q[Quat4f.S + qi] = (float) ((m[Mat4f.M10 + mi] - m[Mat4f.M01 + mi]) / S);
+            q[Quat4f.X + qi] = (float) ((m[Mat4f.M02 + mi] + m[Mat4f.M20 + mi]) / S);
+            q[Quat4f.Y + qi] = (float) ((m[Mat4f.M12 + mi] + m[Mat4f.M21 + mi]) / S);
+            q[Quat4f.Z + qi] = (float) (0.25 * S);
         }
         Quat4f.normalize(q, qi);
     }
