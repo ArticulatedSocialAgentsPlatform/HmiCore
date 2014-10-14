@@ -21,3 +21,4 @@ nbproject
 nbbuild.xml
 /myDocs/
 findbugs.xml
+*/log/*

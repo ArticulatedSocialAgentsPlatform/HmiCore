@@ -8,5 +8,18 @@
       <dependency org="HMI"       name="HmiUtil"                 rev="latest.${resolve.status}"  />
       <dependency org="HMI"       name="HmiTTS"                  rev="latest.${resolve.status}"  />
       <dependency org="HMI"       name="HmiXml"                  rev="latest.${resolve.status}"  />
+      <dependency org="apache"    name="commons-lang" rev="latest.release"  /> 
+      <dependency org="apache"    name="commons-collections" rev="latest.release"  /> 
+      <dependency org="freetts"    name="freetts" rev="latest.release"  /> 
+      <dependency org="Jama"    name="Jama" rev="latest.release"  /> 
+      <dependency org="twmacinta"    name="fast-md5" rev="latest.release"  /> 
+      <dependency org="opennlp"    name="opennlp-tools" rev="latest.release"  />
+      <dependency org="opennlp"    name="opennlp-maxent" rev="latest.release"  />
+      <dependency org="gnu"    name="trove" rev="latest.release"  />
+      <dependency org="marytts"    name="marytts-common" rev="latest.release"  />
+      <dependency org="marytts"    name="marytts-lang-de" rev="latest.release"  />
+      <dependency org="marytts"    name="marytts-lang-en" rev="latest.release"  />
+      <dependency org="marytts"    name="marytts-runtime" rev="latest.release"  />
+      <dependency org="marytts"    name="marytts-signalproc" rev="latest.release"  />
    </dependencies>
 </ivy-module>

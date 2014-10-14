@@ -4,5 +4,6 @@
       <dependency org="junit"    name="junit-dep"         rev="latest.release" />
       <dependency org="HMI"      name="HmiTestUtil"   transitive="false" rev="latest.release"/>
       <dependency org="hamcrest" name="hamcrest-all"       rev="latest.release"  />                       
+      <dependency org="marytts" name="voice-dfki-pavoque-neutral-hsmm"       rev="latest.release"  />                       
    </dependencies>
 </ivy-module>
