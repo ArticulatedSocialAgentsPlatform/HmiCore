@@ -6,8 +6,9 @@
       <dependency org="slf4j"     name="slf4j-api"               rev="latest.release"  />   
       <dependency org="dfki"      name="mary-common"             rev="latest.release"  />   
       <dependency org="apache"    name="commons-collections"     rev="latest.release"  />   
-      <dependency org="opennlp"   name="opennlp-tools"           rev="latest.release"  />   
+      <dependency org="opennlp"   name="opennlp-tools"           rev="1.4.3"  />   
       <dependency org="opennlp"   name="maxent"                  rev="latest.release"  />   
+	<dependency org="opennlp"   name="jwnl"                  rev="latest.release"  />
       <dependency org="freetts"   name="freetts"                 rev="latest.release"  />   
       <dependency org="gnu"       name="trove"                   rev="latest.release"  />   
       <dependency org="hsqldb"    name="hsqldb"                  rev="latest.release"  />   
