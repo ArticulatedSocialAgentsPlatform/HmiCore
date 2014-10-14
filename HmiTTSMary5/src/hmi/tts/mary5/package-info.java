@@ -21,5 +21,5 @@
 /**
  * Implementation of TTSGenerator specifically for MARYTTS.
  */
-package hmi.tts.mary;
+package hmi.tts.mary5;
 

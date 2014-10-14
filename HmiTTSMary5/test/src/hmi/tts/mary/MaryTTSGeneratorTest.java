@@ -19,6 +19,7 @@
 package hmi.tts.mary;
 
 import hmi.testutil.tts.AbstractTTSGeneratorTest;
+import hmi.tts.mary5.MaryTTSGenerator;
 
 import org.junit.BeforeClass;
 

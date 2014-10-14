@@ -1,4 +1,4 @@
-package hmi.tts.mary;
+package hmi.tts.mary5;
 
 import marytts.datatypes.MaryDataType;
 
