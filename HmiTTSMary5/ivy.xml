@@ -10,7 +10,8 @@
       <dependency org="HMI"       name="HmiXml"                  rev="latest.${resolve.status}"  />
       <dependency org="apache"    name="commons-lang" rev="latest.release"  /> 
       <dependency org="apache"    name="commons-collections" rev="latest.release"  /> 
-      <dependency org="freetts"    name="freetts" rev="latest.release"  /> 
+	  <dependency org="apache"    name="commons-io" rev="latest.release"  /> 
+	  <dependency org="freetts"    name="freetts" rev="latest.release"  /> 
       <dependency org="Jama"    name="Jama" rev="latest.release"  /> 
       <dependency org="twmacinta"    name="fast-md5" rev="latest.release"  /> 
       <dependency org="opennlp"    name="opennlp-tools" rev="latest.release"  />
