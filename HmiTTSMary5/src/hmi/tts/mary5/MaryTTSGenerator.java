@@ -6,6 +6,7 @@ import hmi.tts.Phoneme;
 import hmi.tts.TimingInfo;
 import hmi.tts.Visime;
 import hmi.tts.WordDescription;
+import hmi.tts.mary5.prosody.MaryProsodyInfo;
 import hmi.tts.util.BMLTextUtil;
 import hmi.tts.util.NullPhonemeToVisemeMapping;
 import hmi.tts.util.PhonemeToVisemeMapping;
@@ -138,6 +139,15 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
         return ti;
     }
 
+    public synchronized MaryProsodyInfo getProsodyInfo(String text) throws SynthesisException
+    {
+        MaryProsodyInfo p = new MaryProsodyInfo();
+        marytts.setInputType(MaryDataType.TEXT.toString());
+        marytts.setOutputType(MaryDataType.ACOUSTPARAMS.toString());
+        p.parse(marytts.generateXML(text));        
+        return p;
+    }
+    
     @Override
     public synchronized TimingInfo speakBML(String text)
     {
