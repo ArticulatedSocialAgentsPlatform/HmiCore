@@ -22,6 +22,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import marytts.LocalMaryInterface;
 import marytts.MaryInterface;
 import marytts.datatypes.MaryDataType;
+import marytts.exceptions.MaryConfigurationException;
 import marytts.exceptions.SynthesisException;
 import marytts.util.MaryUtils;
 import marytts.util.data.audio.AudioPlayer;
@@ -52,9 +53,8 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
 
     /**
      * Constructor, sets up and starts the Mary TTS generator without a viseme mapping
-     * @throws Exception
      */
-    public MaryTTSGenerator() throws Exception
+    public MaryTTSGenerator() throws MaryConfigurationException
     {
         this(new NullPhonemeToVisemeMapping());
     }
@@ -66,9 +66,9 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
      *            the directory where Mary is installed and its voices can be found
      * @param visemeMappingFile
      *            the location of the phoneme to viseme mapping (e.g., "phoneme2viseme/boss2ikp.xml")
-     * @throws Exception
+     * @throws MaryConfigurationException 
      */
-    public MaryTTSGenerator(PhonemeToVisemeMapping vm) throws Exception
+    public MaryTTSGenerator(PhonemeToVisemeMapping vm) throws MaryConfigurationException
     {
         marytts = new LocalMaryInterface();        
         marytts.setVoice(marytts.getAvailableVoices().iterator().next());
