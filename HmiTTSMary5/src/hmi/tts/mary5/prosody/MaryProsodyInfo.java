@@ -47,6 +47,7 @@ public class MaryProsodyInfo
         final String phoneme;
         final int startTime;
         final int endTime;
+        final int duration;
         final List<F0Frame> f0Frames;
     }
 
@@ -150,7 +151,7 @@ public class MaryProsodyInfo
         int duration = Integer.parseInt(getAttribute(n, "d", "0"));
         String phoneme = getAttribute(n, "p", "");
         String f0 = getAttribute(n, "f0", "");
-        return new Phoneme(phoneme, startTime, startTime + duration, getF0Frames(f0));
+        return new Phoneme(phoneme, startTime, startTime + duration, duration, getF0Frames(f0));
     }
 
     private Word parseWord(Node n, int startTime)
@@ -192,6 +193,11 @@ public class MaryProsodyInfo
                 phraseElements.add(pb);
                 startTime = pb.getEndTime();
             }
+            else
+            {
+                //check one or more levels deeper
+                startTime = parsePhrase(child, startTime);
+            }
             child = child.getNextSibling();
         }
         return startTime;
@@ -214,15 +220,13 @@ public class MaryProsodyInfo
             startTime = parseChunk(sibling, startTime);
         }
         return startTime;
-    }
-
+    }    
+    
     public void parse(Document doc)
     {
         if (doc.hasChildNodes())
         {
-            duration = parseChunk(doc.getFirstChild(), 0);
-            // Set prosody with:
-            // MathUtils.interpolateNonZeroValues
+            duration = parseChunk(doc.getFirstChild(), 0);            
         }
     }
 

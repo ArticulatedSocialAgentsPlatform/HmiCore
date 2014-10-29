@@ -86,7 +86,33 @@ public class MaryProsodyInfoTest
     }
     
     @Test
-    public void getPhonemes() throws Exception
+    public void testParseWithMTU() throws Exception
+    {
+        MaryProsodyInfo info = new MaryProsodyInfo();
+        String xml="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" + 
+                "<maryxml xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"0.5\" xml:lang=\"en-GB\" xmlns=\"http://mary.dfki.de/2002/MaryXML\">\r\n" + 
+                "<p>\r\n" + 
+                "<voice name=\"dfki-prudence\">\r\n" + 
+                "<s>\r\n" + 
+                "<phrase>\r\n" + 
+                "<mtu orig=\"\">"+
+                "<t accent=\"L+H*\" g2p_method=\"lexicon\" ph=\"h @ - ' l @U\" pos=\"UH\">Hello<syllable ph=\"h @\">\r\n" + 
+                "<ph d=\"100\" end=\"0.1\" f0=\"(0,100) (50,200) (100,50)\" p=\"@\" units=\"@_L pru034 2599 0.0339375; @_R pru034 2600 0.0338125\"/>\r\n" + 
+                "</syllable>\r\n" + 
+                "</t>\r\n" + 
+                "</mtu>"+
+                "</phrase>\r\n" + 
+                "</s>\r\n" + 
+                "</voice>\r\n" + 
+                "</p>\r\n" + 
+                "</maryxml>";
+        info.parse(loadXMLFromString(xml));
+        assertEquals(1,info.getPhonemes().size());
+        assertEquals(100,info.getDuration());
+    }
+    
+    @Test
+    public void testGetPhonemes() throws Exception
     {
         MaryProsodyInfo info = new MaryProsodyInfo();
         info.parse(loadXMLFromString(TESTXML));

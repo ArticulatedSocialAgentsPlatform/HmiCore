@@ -143,7 +143,7 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
     {
         MaryProsodyInfo p = new MaryProsodyInfo();
         marytts.setInputType(MaryDataType.TEXT.toString());
-        marytts.setOutputType(MaryDataType.ACOUSTPARAMS.toString());
+        marytts.setOutputType(MaryDataType.REALISED_ACOUSTPARAMS.toString());
         p.parse(marytts.generateXML(text));        
         return p;
     }
@@ -280,8 +280,6 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
         ArrayList<Visime> vList = new ArrayList<Visime>();
         vList.add(dummyVis);
         addWordDescription(new WordDescription("", phList, vList));
-        // System.out.println("Boundary duration: " + duration);
-
     }
 
     private void parseWordDescriptionsAndBookmarks(Node node)
