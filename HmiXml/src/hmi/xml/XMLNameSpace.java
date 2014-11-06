@@ -23,50 +23,67 @@ package hmi.xml;
  * XMLNameSpace defines an XML name space, together with a short abbreviating label.
  * @author Job Zwiers
  */
-public final class XMLNameSpace  {
-  
-  /*
-   * default constructor 
-   */
-   @SuppressWarnings("unused")
-   private  XMLNameSpace() {}
+public final class XMLNameSpace
+{
 
-   /**
-    * XMLnamespace with (only) the full namespace String defined
-    */  
-   public XMLNameSpace(String namespace) {
-      this.namespace = namespace.intern();
-   }
-   
-   /**
-    * XMLnamespace with a namespace label as well as the full namespace String
-    */  
-   public XMLNameSpace(String prefix, String namespace) {
-      this.namespace = namespace.intern();
-      this.prefix = prefix.intern();
-   }
-  
-   /**
-    * Set the abbreviating label for this namespace
-    */
-   public void setPrefix(String prefix) {
-      this.prefix = prefix.intern();
-   }
-   
-   /**
-    * return the full namespace String
-    */
-   public String getNamespace() { return namespace; }
-   
-   /**
-    * Return the abbreviating label for this namespace, which could be null
-    */
-   public String getPrefix() { return prefix; }
-   
-   
-   
-  
-   private String namespace;
-   private String prefix;
-  
+    /*
+     * default constructor
+     */
+    @SuppressWarnings("unused")
+    private XMLNameSpace()
+    {
+    }
+
+    /**
+     * XMLnamespace with (only) the full namespace String defined
+     */
+    public XMLNameSpace(String namespace)
+    {
+        this.namespace = namespace.intern();
+    }
+
+    /**
+     * XMLnamespace with a namespace label as well as the full namespace String
+     */
+    public XMLNameSpace(String prefix, String namespace)
+    {
+        this.namespace = null;
+        this.prefix = null;
+        if (namespace != null)
+        {
+            this.namespace = namespace.intern();
+        }
+        if (prefix != null)
+        {
+            this.prefix = prefix.intern();
+        }
+    }
+
+    /**
+     * Set the abbreviating label for this namespace
+     */
+    public void setPrefix(String prefix)
+    {
+        this.prefix = prefix.intern();
+    }
+
+    /**
+     * return the full namespace String
+     */
+    public String getNamespace()
+    {
+        return namespace;
+    }
+
+    /**
+     * Return the abbreviating label for this namespace, which could be null
+     */
+    public String getPrefix()
+    {
+        return prefix;
+    }
+
+    private String namespace;
+    private String prefix;
+
 }
