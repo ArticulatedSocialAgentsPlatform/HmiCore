@@ -14,13 +14,12 @@ public final class Framer
     public final static double[][] frame(double input[], int frameSize, int frameStep)
     {
         int l = input.length / frameStep;
-        if( (l-1)*frameStep+frameSize>input.length)
-        {
-            l--;
-        }
+        int oversize = ((l - 1) * frameStep + frameSize)-input.length;
+        l -= Math.ceil( (double)oversize / (double)frameStep);
+
         double[][] output = new double[l][];
-        int k =0;
-        for (int i = 0; i < l*frameStep; i += frameStep)
+        int k = 0;
+        for (int i = 0; i < l * frameStep; i += frameStep)
         {
             output[k] = new double[frameSize];
             for (int j = 0; j < frameSize; j++)

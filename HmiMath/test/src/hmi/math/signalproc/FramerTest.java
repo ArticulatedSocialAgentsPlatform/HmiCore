@@ -45,7 +45,7 @@ public class FramerTest
         assertArrayEquals(new double[] { 3, 4 }, frames[1], PRECISION);
         assertArrayEquals(new double[] { 5, 6 }, frames[2], PRECISION);
     }
-    
+
     @Test
     public void testStepTwoFrameThree()
     {
@@ -55,13 +55,30 @@ public class FramerTest
         assertArrayEquals(new double[] { 3, 4, 5 }, frames[1], PRECISION);
         assertArrayEquals(new double[] { 5, 6, 7 }, frames[2], PRECISION);
     }
-    
+
     @Test
     public void testStepTwoFrameThreeIncompleteFrame()
     {
         double frames[][] = Framer.frame(new double[] { 1, 2, 3, 4, 5, 6 }, 3, 2);
         assertEquals(2, frames.length);
         assertArrayEquals(new double[] { 1, 2, 3 }, frames[0], PRECISION);
-        assertArrayEquals(new double[] { 3, 4, 5 }, frames[1], PRECISION);        
+        assertArrayEquals(new double[] { 3, 4, 5 }, frames[1], PRECISION);
+    }
+
+    @Test
+    public void testStepTwoFrameFiveIncompleteFrame()
+    {
+        double frames[][] = Framer.frame(new double[] { 1, 2, 3, 4, 5, 6 }, 5, 2);
+        assertEquals(1, frames.length);
+        assertArrayEquals(new double[] { 1, 2, 3, 4, 5 }, frames[0], PRECISION);
+    }
+
+    @Test
+    public void testStepFiveFrameTwoIncompleteFrame()
+    {
+        double frames[][] = Framer.frame(new double[] { 1, 2, 3, 4, 5, 6, 7, 8 }, 2, 5);
+        assertEquals(2, frames.length);
+        assertArrayEquals(new double[] { 1, 2 }, frames[0], PRECISION);
+        assertArrayEquals(new double[] { 6, 7 }, frames[1], PRECISION);
     }
 }
