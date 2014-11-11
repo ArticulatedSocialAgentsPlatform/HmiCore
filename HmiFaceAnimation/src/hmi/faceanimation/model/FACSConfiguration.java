@@ -130,17 +130,6 @@ public class FACSConfiguration extends XMLStructureAdapter implements Configurat
             HashMap<String, String> attrMap = tokenizer.getAttributes();
             int number = getRequiredIntAttribute("number", attrMap, tokenizer);
             String s = getRequiredAttribute("side", attrMap, tokenizer);
-            /*
-            Side side = Side.NONE;
-            if (s.equals("LEFT"))
-            {
-                side = Side.LEFT;
-            }
-            else if (s.equals("RIGHT"))
-            {
-                side = Side.RIGHT;
-            }
-            */
             float value = getRequiredFloatAttribute("value", attrMap, tokenizer);
             int index = FACS.getActionUnit(number).getIndex();
             if (s.equals("RIGHT"))
