@@ -10,16 +10,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import lombok.Data;
-
 import com.google.common.collect.ImmutableList;
 
 /**
  * A MorphInterpolator is an interpolator for simultaneous animation of several selected Morph targets of
  * a face. Interpolation is linear.
  */
-public class MorphInterpolator extends XMLStructureAdapter
+public class FaceInterpolator extends XMLStructureAdapter
 {
+    public enum Type
+    {
+        MORPH, FACS, FAPS;
+    }
+    
     private List<String> parts;
     private ConfigList configs = new ConfigList(0);
     private float[] lowerConfig, upperConfig;
@@ -29,13 +32,6 @@ public class MorphInterpolator extends XMLStructureAdapter
 
     private double lowerTime, upperTime, interval;
     
-    @Data
-    public class MorphFrame
-    {
-        final String[] morphTargets;
-        final float[] weights;
-    }
-
     public List<String> getParts()
     {
         return ImmutableList.copyOf(parts);
@@ -142,12 +138,12 @@ public class MorphInterpolator extends XMLStructureAdapter
         return alpha;
     }
     
-    public MorphFrame interpolate(double time)
+    public float[] interpolate(double time)
     {
         float alpha = getInterpolationConfigs(time);
         float []current = new float[lowerConfig.length];
         Vecf.interpolate(current, lowerConfig, upperConfig, alpha);
-        return new MorphFrame(parts.toArray(new String[parts.size()]), current);
+        return current;
     }
     /**
      * decodes the XML attributes
@@ -166,7 +162,7 @@ public class MorphInterpolator extends XMLStructureAdapter
         configs.decodeContent(xmlTokenizer);
     }
 
-    private static final String XMLTAG = "MorphInterpolator";
+    private static final String XMLTAG = "FaceInterpolator";
 
     public static String xmlTag()
     {
