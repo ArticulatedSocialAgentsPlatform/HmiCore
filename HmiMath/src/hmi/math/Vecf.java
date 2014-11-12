@@ -19,6 +19,8 @@
 
 package hmi.math;
 
+import com.google.common.primitives.Floats;
+
 /**
  * A collection of methods for vectors of arbitrary length
  * represented by float arrays.
@@ -256,9 +258,49 @@ public final class Vecf
 
     public static void setZero(float[] dst)
     {
-        for(int i=0;i<dst.length;i++)
+        for (int i = 0; i < dst.length; i++)
         {
             dst[i] = 0;
         }
+    }
+
+    public static double sum(float[] a)
+    {
+        double sum = 0;
+        for (float f : a)
+        {
+            sum += f;
+        }
+        return sum;
+    }
+
+    public static double average(float[] a)
+    {
+        return sum(a) / a.length;
+    }
+
+    public static double max(float a[])
+    {
+        return Floats.max(a);
+    }
+
+    public static double min(float a[])
+    {
+        return Floats.min(a);
+    }
+
+    /**
+     * Normalize the elements of a so that they are all between -1 and 1 and the biggest 'peak' is either -1 or 1<br>
+     * a = a.-avg(a)
+     * a./= max(abs(max(a)), abs(min(a)))
+     */
+    public static void normalizeElements(float a[])
+    {
+        double avg = average(a);
+        for (int i = 0; i < a.length; i++)
+        {
+            a[i] -= avg;
+        }
+        Vecf.scale(1f/(float)Math.max(Math.abs(max(a)), Math.abs(min(a))), a);
     }
 }
