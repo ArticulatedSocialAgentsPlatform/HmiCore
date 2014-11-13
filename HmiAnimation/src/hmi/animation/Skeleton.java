@@ -4,12 +4,11 @@ import hmi.math.Mat4f;
 import hmi.math.Vec3f;
 //import hmi.util.ExchangeBuffer;
 import hmi.xml.XMLTokenizer;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *

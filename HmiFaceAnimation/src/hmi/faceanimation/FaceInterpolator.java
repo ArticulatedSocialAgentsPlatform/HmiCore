@@ -32,6 +32,17 @@ public class FaceInterpolator extends XMLStructureAdapter
 
     private double lowerTime, upperTime, interval;
     
+    public FaceInterpolator()
+    {
+        
+    }
+    
+    public FaceInterpolator(List<String>partIds, ConfigList configs)
+    {
+        this.configs = configs;
+        this.parts = ImmutableList.copyOf(partIds);
+    }
+    
     public List<String> getParts()
     {
         return ImmutableList.copyOf(parts);
