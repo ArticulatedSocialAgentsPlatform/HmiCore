@@ -45,4 +45,21 @@ public class FaceInterpolatorTest
         float current[] = ip.interpolate(0.5);
         assertArrayEquals(current, new float[] { 0.6f, 0.5f, 0.3f }, (float) PRECISION);
     }
+    
+    @Test
+    public void testWrite()
+    {
+        String xml = "<FaceInterpolator parts=\"morph1 morph2 morph3\">" + "0.1 0.5 0.4 0.4\n" + "0.9 0.7 0.6 0.2" + "</FaceInterpolator>";
+        FaceInterpolator ipIn = new FaceInterpolator();
+        ipIn.readXML(xml);
+
+        StringBuilder buf = new StringBuilder();
+        ipIn.appendXML(buf);
+        FaceInterpolator ipOut = new FaceInterpolator();
+        ipOut.readXML(buf.toString());
+        
+        assertThat(ipOut.getParts(), IsIterableContainingInOrder.contains("morph1", "morph2", "morph3"));
+        assertEquals(0.1, ipOut.getStartTime(), PRECISION);
+        assertEquals(0.9, ipOut.getEndTime(), PRECISION);
+    }
 }

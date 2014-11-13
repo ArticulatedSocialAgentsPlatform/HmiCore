@@ -739,20 +739,13 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
      * Appends a String of signature attributes to buf
      */
     @Override
-    public StringBuilder appendAttributeString(StringBuilder buf)
+    public StringBuilder appendAttributeString(StringBuilder buf, XMLFormatting fmt)
     {
         appendAttribute(buf, "encoding", configType);
         if (rotationEncoding != null) appendAttribute(buf, "rotationEncoding", rotationEncoding);
         if (partIds != null && partIds.length > 0)
         {
-            buf.append(" parts=\"");
-            buf.append(partIds[0]);
-            for (int i = 1; i < partIds.length; i++)
-            {
-                buf.append(' ');
-                buf.append(partIds[i]);
-            }
-            buf.append("\"");
+            appendAttribute(buf, "parts", partIds,  ' ', fmt, 10);
         }
         return buf;
     }

@@ -2,6 +2,7 @@ package hmi.faceanimation;
 
 import hmi.animation.ConfigList;
 import hmi.math.Vecf;
+import hmi.xml.XMLFormatting;
 import hmi.xml.XMLStructureAdapter;
 import hmi.xml.XMLTokenizer;
 
@@ -173,6 +174,26 @@ public class FaceInterpolator extends XMLStructureAdapter
         configs.decodeContent(xmlTokenizer);
     }
 
+    @Override
+    public StringBuilder appendAttributeString(StringBuilder buf, XMLFormatting fmt)
+    {
+        appendAttribute(buf, "parts", parts.toArray(new String[parts.size()]),  ' ', fmt, 10);
+        return buf;
+    }
+    
+    @Override
+    public StringBuilder appendContent(StringBuilder buf, XMLFormatting fmt)
+    {
+        configs.appendContent(buf, fmt);
+        return buf;
+    }
+    
+    @Override
+    public boolean hasContent()
+    {
+        return true;
+    }
+    
     private static final String XMLTAG = "FaceInterpolator";
 
     public static String xmlTag()
