@@ -127,6 +127,18 @@ public final class Vecf
     }
 
     /**
+     * First scales vector a, then and a to dst
+     * dst = dst + s*a
+     */
+    public static void scaleAdd(float[] dst, float scale, float[] a)
+    {
+        for (int i = 0; i < dst.length; i++)
+        {
+            dst[i] += a[i] * scale;
+        }
+    }
+
+    /**
      * Adds vector b to vector a.
      */
     public static void add(float[] dst, float[] a)
@@ -301,6 +313,6 @@ public final class Vecf
         {
             a[i] -= avg;
         }
-        Vecf.scale(1f/(float)Math.max(Math.abs(max(a)), Math.abs(min(a))), a);
+        Vecf.scale(1f / (float) Math.max(Math.abs(max(a)), Math.abs(min(a))), a);
     }
 }

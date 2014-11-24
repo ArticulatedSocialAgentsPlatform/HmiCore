@@ -20,6 +20,7 @@ package hmi.math;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import hmi.testutil.math.Vec3fTestUtil;
 
 import org.junit.Test;
 
@@ -47,9 +48,18 @@ public class VecfTest
         float[] a2 = new float[] { 3.003f, 4.004f, 5.00f };
         float[] expect = new float[] { 9.009f, 12.012f, 15.00f };
         Vecf.scale(3.0f, a1, a2);
-        assertTrue(Vec3f.epsilonEquals(a1, expect, PRECISION));
+        Vec3fTestUtil.assertVec3fEquals(a1, expect, PRECISION);
     }
 
+    @Test
+    public void scaleAdd()
+    {
+        float[] dst = new float[]{1,2,3};
+        float[] src = new float[]{4,6,8};
+        Vecf.scaleAdd(dst, 0.5f, src);
+        Vec3fTestUtil.assertVec3fEquals(Vec3f.getVec3f(3,5,7), dst, PRECISION);
+    }
+    
     @Test
     public void normalizeElements()
     {
