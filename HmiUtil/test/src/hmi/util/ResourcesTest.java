@@ -59,23 +59,17 @@ public class ResourcesTest
         assertEquals(line2, "line2");
     }
 
-    @Ignore
+    
     @Test
     public void testDirResources() throws IOException
     {
-
-        // String udir = System.getProperty("user.dir");
         String sharedprojectdir = System.getProperty("shared.project.root");
-
-        // System.out.println("sharedprojectdir = " +sharedprojectdir );
-
-        File resDir = new File(sharedprojectdir + "/Hmi/HmiUtil/test/resource/ResourcesTests");
+        File resDir = new File(sharedprojectdir + "/HmiCore/HmiUtil/test/resource/ResourcesTests");
         Resources testRes = new Resources(resDir);
         BufferedReader restest1 = testRes.getReader("res1.txt");
         String line1 = restest1.readLine();
         assertEquals(line1, "res1 content");
         String line2 = restest1.readLine();
         assertEquals(line2, "line2");
-    }
-
+    }    
 }
