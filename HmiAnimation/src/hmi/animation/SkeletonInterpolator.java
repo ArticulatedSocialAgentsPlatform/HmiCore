@@ -842,6 +842,24 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
         }
     }
 
+    public SkeletonInterpolator subSkeletonInterpolator(int start, int end)
+    {
+        SkeletonInterpolator subSki = new SkeletonInterpolator();
+        subSki.setPartIds(partIds.clone());
+        subSki.setConfigType(configType);
+        subSki.stride = stride;
+        subSki.hasRootTranslation = hasRootTranslation;
+        subSki.hasTranslation = hasTranslation;
+        subSki.hasRotation = hasRotation;
+        subSki.hasScale = hasScale;
+        subSki.hasVelocity = hasVelocity;
+        subSki.hasAngularVelocity = hasAngularVelocity;
+        subSki.rotationEncoding = rotationEncoding;
+        subSki.targetParts = targetParts;
+        subSki.target = target;
+        subSki.configs = configs.subConfigList(start, end);
+        return subSki;
+    }
 
     /**
      * Creates a new SkeletonInterpolator from an XML encoded file. The first argument must be a

@@ -85,25 +85,25 @@ public class ConfigListTest
         clist.addConfig(5.5, c2);
         clist.addConfig(8.8, c3);
         assertEquals(4, clist.size());
-        assertEquals(3.3, clist.getStartTime(),CONFIG_PRECISION);
+        assertEquals(3.3, clist.getStartTime(), CONFIG_PRECISION);
         assertEquals(8.8, clist.getEndTime(), CONFIG_PRECISION);
 
-        assertEquals(3.3,clist.getTime(0), CONFIG_PRECISION);
-        assertEquals(5.5,clist.getTime(1), CONFIG_PRECISION);
+        assertEquals(3.3, clist.getTime(0), CONFIG_PRECISION);
+        assertEquals(5.5, clist.getTime(1), CONFIG_PRECISION);
         assertEquals(7.7, clist.getTime(2), CONFIG_PRECISION);
         assertEquals(8.8, clist.getTime(3), CONFIG_PRECISION);
-        assertTrue(c1== clist.getConfig(0));
-        assertTrue(c2== clist.getConfig(1));
-        assertTrue(c0==clist.getConfig(2));
-        assertTrue(c3== clist.getConfig(3));
+        assertTrue(c1 == clist.getConfig(0));
+        assertTrue(c2 == clist.getConfig(1));
+        assertTrue(c0 == clist.getConfig(2));
+        assertTrue(c3 == clist.getConfig(3));
 
         clist.addConfig(2.2, c4);
         assertEquals(5, clist.size(), CONFIG_PRECISION);
         assertEquals(2.2, clist.getStartTime(), CONFIG_PRECISION);
         assertEquals(2.2, clist.getTime(0), CONFIG_PRECISION);
         assertEquals(3.3, clist.getTime(1), CONFIG_PRECISION);
-        assertTrue(c4== clist.getConfig(0));
-        assertTrue(c1== clist.getConfig(1));
+        assertTrue(c4 == clist.getConfig(0));
+        assertTrue(c1 == clist.getConfig(1));
 
         clist.addConfig(5.5, c5);
         assertEquals(6, clist.size());
@@ -115,12 +115,27 @@ public class ConfigListTest
         assertEquals(7.7, clist.getTime(4), CONFIG_PRECISION);
         assertEquals(8.8, clist.getTime(5), CONFIG_PRECISION);
 
-        assertTrue(c4==clist.getConfig(0));
-        assertTrue(c1== clist.getConfig(1));
-        assertTrue(c2== clist.getConfig(2));
-        assertTrue(c5== clist.getConfig(3));
-        assertTrue(c0== clist.getConfig(4));
-        assertTrue(c3== clist.getConfig(5));
+        assertTrue(c4 == clist.getConfig(0));
+        assertTrue(c1 == clist.getConfig(1));
+        assertTrue(c2 == clist.getConfig(2));
+        assertTrue(c5 == clist.getConfig(3));
+        assertTrue(c0 == clist.getConfig(4));
+        assertTrue(c3 == clist.getConfig(5));
+    }
+
+    @Test
+    public void testSubConfig()
+    {
+        clist.addConfig(0.0, c0);
+        clist.addConfig(1.1, c1);
+        clist.addConfig(2.2, c2);
+        clist.addConfig(3.3, c3);
+        clist.addConfig(4.4, c4);
+        clist.addConfig(5.4, c5);
+        ConfigList cl = clist.subConfigList(2, 5);
+        assertEquals(8, cl.getConfigSize());
+        assertEquals(3, cl.size());
+        assertArrayEquals(c2, cl.getConfig(0), CONFIG_PRECISION);
     }
 
     @Test

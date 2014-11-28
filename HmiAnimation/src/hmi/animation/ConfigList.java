@@ -119,6 +119,16 @@ public class ConfigList extends XMLStructureAdapter implements Cloneable
         }
     }
 
+    public ConfigList subConfigList(int start, int end)
+    {
+        ConfigList cl = new ConfigList(configSize);
+        for(int i=start;i<end;i++)
+        {
+            cl.addConfig(getTime(i), getConfig(i));
+        }
+        return cl;
+    }
+    
     /**
      * Returns the Config at index i
      */

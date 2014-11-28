@@ -124,8 +124,7 @@ public class SkeletonInterpolatorTest
         String[] partIds1 = new String[] { "Root", "Joint1" };
         String type1 = "T1R";
 
-        SkeletonInterpolator ski1 = new SkeletonInterpolator(partIds1, clist1,
-                type1);
+        SkeletonInterpolator ski1 = new SkeletonInterpolator(partIds1, clist1, type1);
         assertTrue(ski1.getConfigType() == type1);
         assertTrue(ski1.getConfigList() != null);
         assertTrue(ski1.getPartIds() == partIds1);
@@ -138,49 +137,12 @@ public class SkeletonInterpolatorTest
     }
 
     @Test
-    @Ignore
-    public void testHerwin() throws IOException
-    {
-        String testFile = "wim_klapt.xml";
-        SkeletonInterpolator ski = SkeletonInterpolator.read("hmi/animation",
-                testFile);
-        int configSize = ski.getConfigSize();
-        int size = ski.size();
-        System.out.println("size and Config size for " + testFile + ": " + size
-                + " / " + configSize);
-
-        float t0 = (float) ski.getStartTime();
-        float tend = (float) ski.getEndTime();
-        // t0 = 10.0f;
-        // tend = 20.0f;
-        int nrOfSteps = 1000000;
-        float delta = (tend - t0) / nrOfSteps;
-        System.out.println("nrOfSteps: " + nrOfSteps + "  start/stop time: "
-                + t0 + " / " + tend + " delta: " + delta);
-        /*
-         * for (int cnt=0; cnt<nrOfSteps; cnt++) { //float t =t0 + cnt*delta;
-         * //System.out.println("Time = " + t); //float[] conf_t =
-         * ski.getInterpolatedConfig(t, null); }
-         */
-    }
-
-    // @Test
     public void testInterpolate()
     {
         init1(); // prepare clist1
         String[] partIds1 = new String[] { "Root", "Joint1" };
         String type1 = "T1R";
-        SkeletonInterpolator ski = new SkeletonInterpolator(partIds1, clist1,
-                type1);
-
-        for (int cnt = 0; cnt < 200; cnt++)
-        {
-            float t = cnt * 0.0003f;
-            System.out.println("Time = " + t);
-            // float[] conf_t = ski.getInterpolatedConfig(t, null);
-        }
-
-        // double tt = t1;
+        SkeletonInterpolator ski = new SkeletonInterpolator(partIds1, clist1, type1);
 
         float[] conf = ski.getInterpolatedConfig(t1, null);
 
@@ -266,8 +228,7 @@ public class SkeletonInterpolatorTest
         init1(); // prepare clist1
         String[] partIds1 = new String[] { "Root", "Joint1" };
         String type1 = "T1R";
-        SkeletonInterpolator ski = new SkeletonInterpolator(partIds1, clist1,
-                type1);
+        SkeletonInterpolator ski = new SkeletonInterpolator(partIds1, clist1, type1);
         String encoded = ski.toXMLString();
         // System.out.println("encoded: " + encoded);
 
@@ -322,24 +283,23 @@ public class SkeletonInterpolatorTest
     public void testSetTargetOnSkeletonInterpolatorContainingAnInvalidJoint()
     {
         String str = "<SkeletonInterpolator rotationEncoding=\"quaternions\" parts=\"HumanoidRoot invalid l_shoulder\" encoding=\"T1R\">"
-            + "0 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0\n"
-            + "1 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0" + "</SkeletonInterpolator>";
+                + "0 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0\n" + "1 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0" + "</SkeletonInterpolator>";
         SkeletonInterpolator ski = new SkeletonInterpolator();
         ski.readXML(str);
-        
+
         VJoint vHuman = HanimBody.getLOA1HanimBody();
         ski.setTarget(HanimBody.getLOA1HanimBody());
         ski.interpolateMillis(0);
-        float q[]=Quat4f.getQuat4f();
+        float q[] = Quat4f.getQuat4f();
         vHuman.getPart(Hanim.HumanoidRoot).getRotation(q);
         assertQuat4fRotationEquivalent(1, 0, 0, 0, q, 0.0001f);
     }
-    
+
     @Test
     public void testOne()
     {
-        String str = "<SkeletonInterpolator rotationEncoding=\"quaternions\" parts=\"HumanoidRoot\" encoding=\"R\">"
-                + "0 1 0 0 0" + "</SkeletonInterpolator>";
+        String str = "<SkeletonInterpolator rotationEncoding=\"quaternions\" parts=\"HumanoidRoot\" encoding=\"R\">" + "0 1 0 0 0"
+                + "</SkeletonInterpolator>";
         SkeletonInterpolator ski = new SkeletonInterpolator();
         ski.readXML(str);
         VJoint v = new VJoint();
@@ -357,8 +317,7 @@ public class SkeletonInterpolatorTest
     public void testFilter()
     {
         String str = "<SkeletonInterpolator rotationEncoding=\"quaternions\" parts=\"HumanoidRoot r_shoulder l_shoulder\" encoding=\"T1R\">"
-                + "0 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0\n"
-                + "1 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0" + "</SkeletonInterpolator>";
+                + "0 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0\n" + "1 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0" + "</SkeletonInterpolator>";
         SkeletonInterpolator ski = new SkeletonInterpolator();
         ski.readXML(str);
 
@@ -396,32 +355,30 @@ public class SkeletonInterpolatorTest
         rSh.getRotation(q);
         assertQuat4fRotationEquivalent(0, 0, 0, 1, q, 0.0001f);
     }
-    
+
     @Test
     public void testFilterNonExistingJoint()
     {
         String str = "<SkeletonInterpolator rotationEncoding=\"quaternions\" parts=\"HumanoidRoot invalid l_shoulder\" encoding=\"T1R\">"
-            + "0 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0\n"
-            + "1 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0" + "</SkeletonInterpolator>";
+                + "0 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0\n" + "1 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0" + "</SkeletonInterpolator>";
         SkeletonInterpolator ski = new SkeletonInterpolator();
         ski.readXML(str);
-        
+
         Set<String> filter = new HashSet<String>();
         filter.add("invalid");
         filter.add("l_shoulder");
-        
+
         ski.setTarget(HanimBody.getLOA1HanimBody());
-        ski.filterJoints(filter);  
+        ski.filterJoints(filter);
         assertEquals(2, ski.getPartIds().length);
         assertEquals(2, ski.getTargetParts().length);
     }
-    
+
     @Test
     public void testFilterRemoveRoot()
     {
         String str = "<SkeletonInterpolator rotationEncoding=\"quaternions\" parts=\"HumanoidRoot r_shoulder l_shoulder\" encoding=\"T1R\">"
-                + "0 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0\n"
-                + "1 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0" + "</SkeletonInterpolator>";
+                + "0 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0\n" + "1 0 1 0 1 0 0 0 0 1 0 0 0 0 1 0" + "</SkeletonInterpolator>";
         SkeletonInterpolator ski = new SkeletonInterpolator();
         ski.readXML(str);
 
@@ -464,8 +421,8 @@ public class SkeletonInterpolatorTest
     @Test
     public void testMirror()
     {
-        String str = "<SkeletonInterpolator rotationEncoding=\"quaternions\" parts=\"r_shoulder\" encoding=\"R\">"
-                + "0 0 0 1 0 \n" + "1 0 0 1 0 " + "</SkeletonInterpolator>";
+        String str = "<SkeletonInterpolator rotationEncoding=\"quaternions\" parts=\"r_shoulder\" encoding=\"R\">" + "0 0 0 1 0 \n"
+                + "1 0 0 1 0 " + "</SkeletonInterpolator>";
         SkeletonInterpolator ski = new SkeletonInterpolator();
         ski.readXML(str);
         VJoint vHuman = HanimBody.getLOA1HanimBody();
@@ -485,9 +442,7 @@ public class SkeletonInterpolatorTest
     public void testMirrorAfterFilter()
     {
         String str = "<SkeletonInterpolator rotationEncoding=\"quaternions\" parts=\"r_shoulder l_shoulder\" encoding=\"R\">"
-                + "0 0 0 1 0 0 0 1 0\n"
-                + "1 0 0 1 0 0 0 1 0"
-                + "</SkeletonInterpolator>";
+                + "0 0 0 1 0 0 0 1 0\n" + "1 0 0 1 0 0 0 1 0" + "</SkeletonInterpolator>";
         SkeletonInterpolator ski = new SkeletonInterpolator();
         ski.readXML(str);
         VJoint vHuman = HanimBody.getLOA1HanimBody();
@@ -513,9 +468,7 @@ public class SkeletonInterpolatorTest
     public void testMirrorAfterFilterBeforeSetTarget()
     {
         String str = "<SkeletonInterpolator rotationEncoding=\"quaternions\" parts=\"r_shoulder l_shoulder\" encoding=\"R\">"
-                + "0 0 0 1 0 0 0 1 0\n"
-                + "1 0 0 1 0 0 0 1 0"
-                + "</SkeletonInterpolator>";
+                + "0 0 0 1 0 0 0 1 0\n" + "1 0 0 1 0 0 0 1 0" + "</SkeletonInterpolator>";
         SkeletonInterpolator ski = new SkeletonInterpolator();
         ski.readXML(str);
         Set<String> joints = new HashSet<String>();
@@ -541,8 +494,8 @@ public class SkeletonInterpolatorTest
     @Test
     public void testMirrorBeforeSetTarget()
     {
-        String str = "<SkeletonInterpolator rotationEncoding=\"quaternions\" parts=\"r_shoulder\" encoding=\"R\">"
-                + "0 0 0 1 0 \n" + "1 0 0 1 0 " + "</SkeletonInterpolator>";
+        String str = "<SkeletonInterpolator rotationEncoding=\"quaternions\" parts=\"r_shoulder\" encoding=\"R\">" + "0 0 0 1 0 \n"
+                + "1 0 0 1 0 " + "</SkeletonInterpolator>";
         SkeletonInterpolator ski = new SkeletonInterpolator();
         ski.readXML(str);
         ski.mirror();
@@ -557,5 +510,18 @@ public class SkeletonInterpolatorTest
 
         vHuman.getPart(Hanim.l_shoulder).getRotation(q);
         assertQuat4fRotationEquivalent(0, 0, -1, 0, q, 0.0001f);
+    }
+
+    @Test
+    public void testSubSkeletonInterpolator()
+    {
+        init1(); // prepare clist1
+        String[] partIds1 = new String[] { "Root", "Joint1" };
+        String type1 = "T1R";
+        SkeletonInterpolator ski = new SkeletonInterpolator(partIds1, clist1, type1);
+        
+        SkeletonInterpolator subSki = ski.subSkeletonInterpolator(2,5);
+        assertArrayEquals(ski.getPartIds(), subSki.getPartIds());
+        assertEquals(3,subSki.size());
     }
 }

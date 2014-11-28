@@ -1,0 +1,39 @@
+package hmi.animation.motiongraph;
+
+import lombok.Getter;
+import hmi.animation.SkeletonInterpolator;
+import hmi.animation.VJoint;
+
+/**
+ * Motiongraph edge, containing an animation
+ * @author herwinvw
+ */
+public class MGEdge
+{
+    @Getter
+    private final SkeletonInterpolator motion;
+    
+    @Getter
+    private final MGNode outgoingNode;
+    
+    public MGEdge(SkeletonInterpolator motion, MGNode outgoingNode)
+    {
+        this.motion = motion;
+        this.outgoingNode = outgoingNode;
+    }
+    
+    public double getDuration()
+    {
+        return motion.getEndTime()-motion.getStartTime();
+    }
+    
+    public void play(double t)
+    {
+        motion.interpolateTargetParts(motion.getStartTime()+t*1000);
+    }
+    
+    public void setTarget(VJoint human)
+    {
+        motion.setTarget(human);
+    }
+}
