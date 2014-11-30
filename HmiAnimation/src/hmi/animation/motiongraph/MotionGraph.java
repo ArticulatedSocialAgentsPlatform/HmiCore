@@ -1,5 +1,6 @@
 package hmi.animation.motiongraph;
 
+import hmi.animation.ConfigList;
 import hmi.animation.SkeletonInterpolator;
 import hmi.animation.VJoint;
 
@@ -20,6 +21,7 @@ public class MotionGraph
     private MGEdge currentEdge;
     private double edgeStartTime;
     private double edgeEndTime;
+    private final TransitionChecker transitionChecker;
 
     @Data
     class Split
@@ -27,7 +29,12 @@ public class MotionGraph
         final MGEdge edge;
         final int splitPoint;
     }
-    
+
+    public MotionGraph(TransitionChecker tc)
+    {
+        transitionChecker = tc;
+    }
+
     public void addSkeletonInterpolator(SkeletonInterpolator ski)
     {
         MGNode outgoing = new MGNode();
@@ -36,42 +43,49 @@ public class MotionGraph
         edges.add(newEdge);
         nodes.add(outgoing);
         nodes.add(incoming);
-        
+
         int minFrameSize = 10;
         int iOffset = 0;
-        for (int i = 0; i < ski.size()-minFrameSize; i+=minFrameSize)
+        for (int i = 0; i < ski.size() - minFrameSize; i += minFrameSize)
         {
             List<Split> splitsTo = new ArrayList<Split>();
             List<Split> splitsFrom = new ArrayList<Split>();
-            for(MGEdge edge:edges)
+            for (MGEdge edge : edges)
             {
                 SkeletonInterpolator ski2 = edge.getMotion();
-                for (int j = 0; j < ski.size()-minFrameSize; j+=minFrameSize)
+                for (int j = 0; j < ski.size() - minFrameSize; j += minFrameSize)
                 {
-                    //gather similar configs, add to splits                                     
+                    if (transitionChecker.allowTransition(newEdge.getMotion(), ski2, i - iOffset, j))
+                    {
+                        splitsTo.add(new Split(edge, j));
+                    }
+                    if (transitionChecker.allowTransition(ski2, newEdge.getMotion(), j, i - iOffset))
+                    {
+                        splitsFrom.add(new Split(edge, j));
+                    }
                 }
             }
-            
-            if(!splitsTo.isEmpty() || splitsFrom.isEmpty())
+
+            if (!splitsTo.isEmpty() || splitsFrom.isEmpty())
             {
-                MGNode node = splitEdge(newEdge, i-iOffset);
+                MGNode node = splitEdge(newEdge, i - iOffset);
                 iOffset = i;
                 newEdge = node.getOutgoingEdges().get(0);
-                for(Split split:splitsTo)
+                for (Split split : splitsTo)
                 {
                     insertTransition(node, split.getEdge(), split.getSplitPoint());
                 }
-                for(Split split:splitsTo)
+                for (Split split : splitsTo)
                 {
                     insertTransition(split.getEdge(), split.getSplitPoint(), node);
                 }
             }
-        }        
+        }
     }
 
     public MGNode splitEdge(MGEdge edge, int frame)
     {
-        SkeletonInterpolator ski1 = edge.getMotion().subSkeletonInterpolator(0, frame);
+        SkeletonInterpolator ski1 = edge.getMotion().subSkeletonInterpolator(0, frame+1);
         SkeletonInterpolator ski2 = edge.getMotion().subSkeletonInterpolator(frame);
         MGNode node = new MGNode();
         MGEdge edge1 = new MGEdge(ski1, edge.getIncomingNode(), node);
@@ -82,26 +96,42 @@ public class MotionGraph
         nodes.add(node);
         return node;
     }
-    
-    
-    ///Transition from start to edge:iOut, splits edge
+
+    private SkeletonInterpolator createTransition(float startConfig[], float endConfig[], String[] parts, String configType)
+    {
+        ConfigList configs = new ConfigList(startConfig.length);
+        configs.addConfig(0, startConfig);
+        configs.addConfig(0.1, endConfig);
+        return new SkeletonInterpolator(parts, configs, configType);
+    }
+
+    private SkeletonInterpolator createTransition(MGNode start, MGNode end)
+    {
+        float startConfig[] = start.getOutgoingEdges().get(0).getMotion().getConfig(0);
+        float endConfig[] = end.getOutgoingEdges().get(0).getMotion().getConfig(0);
+        String[] parts = start.getOutgoingEdges().get(0).getMotion().getPartIds();
+        String configType = start.getOutgoingEdges().get(0).getMotion().getConfigType();
+        return createTransition(startConfig,endConfig,parts,configType);
+    }
+
+    // /Transition from start to edge:iOut, splits edge
     public void insertTransition(MGNode start, MGEdge edge, int iOut)
     {
         MGNode end = splitEdge(edge, iOut);
-        SkeletonInterpolator skiTrans = new SkeletonInterpolator(); //TODO: fill this
+        SkeletonInterpolator skiTrans = createTransition(start, end);
         MGEdge transition = new MGEdge(skiTrans, start, end);
         edges.add(transition);
     }
-    
-    ///Transition from edge:iOut, to end, splits edge
+
+    // /Transition from edge:iOut, to end, splits edge
     public void insertTransition(MGEdge edge, int iIn, MGNode end)
     {
         MGNode start = splitEdge(edge, iIn);
-        SkeletonInterpolator skiTrans = new SkeletonInterpolator(); //TODO: fill this
+        SkeletonInterpolator skiTrans = createTransition(start, end);
         MGEdge transition = new MGEdge(skiTrans, start, end);
         edges.add(transition);
     }
-    
+
     public void randomStart(double time)
     {
         int index = (int) Math.round(Math.random() * (nodes.size() - 1));
