@@ -3,8 +3,11 @@ package hmi.animation.motiongraph;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+
 public class MGNode
 {
+    @Getter
     private List<MGEdge> outgoingEdges = new ArrayList<MGEdge>();
     
     public void addEdge(MGEdge edge)

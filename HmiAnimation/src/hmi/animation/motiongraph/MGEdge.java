@@ -16,10 +16,15 @@ public class MGEdge
     @Getter
     private final MGNode outgoingNode;
     
-    public MGEdge(SkeletonInterpolator motion, MGNode outgoingNode)
+    @Getter
+    private final MGNode incomingNode;
+    
+    public MGEdge(SkeletonInterpolator motion, MGNode incomingNode, MGNode outgoingNode)
     {
         this.motion = motion;
         this.outgoingNode = outgoingNode;
+        this.incomingNode = incomingNode;
+        incomingNode.addEdge(this);
     }
     
     public double getDuration()

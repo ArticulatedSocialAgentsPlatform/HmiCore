@@ -842,6 +842,10 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
         }
     }
 
+    public SkeletonInterpolator subSkeletonInterpolator(int start)
+    {
+        return subSkeletonInterpolator(start,size());
+    }
     public SkeletonInterpolator subSkeletonInterpolator(int start, int end)
     {
         SkeletonInterpolator subSki = new SkeletonInterpolator();

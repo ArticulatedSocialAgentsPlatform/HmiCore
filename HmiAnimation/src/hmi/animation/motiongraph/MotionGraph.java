@@ -4,9 +4,9 @@ import hmi.animation.SkeletonInterpolator;
 import hmi.animation.VJoint;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
+import lombok.Data;
 
 /**
  * Implements a motion graph
@@ -21,37 +21,85 @@ public class MotionGraph
     private double edgeStartTime;
     private double edgeEndTime;
 
+    @Data
+    class Split
+    {
+        final MGEdge edge;
+        final int splitPoint;
+    }
+    
     public void addSkeletonInterpolator(SkeletonInterpolator ski)
     {
         MGNode outgoing = new MGNode();
-        MGEdge newEdge = new MGEdge(ski, outgoing);
         MGNode incoming = new MGNode();
-        incoming.addEdge(newEdge);
+        MGEdge newEdge = new MGEdge(ski, incoming, outgoing);
+        edges.add(newEdge);
+        nodes.add(outgoing);
+        nodes.add(incoming);
         
-        List<MGEdge> removeEdges = new ArrayList<MGEdge>();
-        
-        //need something different...
-        for (int i = 0; i < ski.size(); i++)
+        int minFrameSize = 10;
+        int iOffset = 0;
+        for (int i = 0; i < ski.size()-minFrameSize; i+=minFrameSize)
         {
-            float config[] = ski.getConfig(i);
+            List<Split> splitsTo = new ArrayList<Split>();
+            List<Split> splitsFrom = new ArrayList<Split>();
             for(MGEdge edge:edges)
             {
                 SkeletonInterpolator ski2 = edge.getMotion();
-                for (int j = 0; j < ski.size(); j++)
+                for (int j = 0; j < ski.size()-minFrameSize; j+=minFrameSize)
                 {
-                    //compare configs
-                    //if similar, insert new node+edges, get rid of existing edge                 
+                    //gather similar configs, add to splits                                     
                 }
             }
-        }
-        edges.removeAll(removeEdges);
+            
+            if(!splitsTo.isEmpty() || splitsFrom.isEmpty())
+            {
+                MGNode node = splitEdge(newEdge, i-iOffset);
+                iOffset = i;
+                newEdge = node.getOutgoingEdges().get(0);
+                for(Split split:splitsTo)
+                {
+                    insertTransition(node, split.getEdge(), split.getSplitPoint());
+                }
+                for(Split split:splitsTo)
+                {
+                    insertTransition(split.getEdge(), split.getSplitPoint(), node);
+                }
+            }
+        }        
     }
 
-    public void insertTransition(MGEdge edgeIn, MGEdge edgeOut, int iIn, int iOut)
+    public MGNode splitEdge(MGEdge edge, int frame)
     {
-        MGNode n1 = new MGNode();
-        MGNode n2 = new MGNode();
-        
+        SkeletonInterpolator ski1 = edge.getMotion().subSkeletonInterpolator(0, frame);
+        SkeletonInterpolator ski2 = edge.getMotion().subSkeletonInterpolator(frame);
+        MGNode node = new MGNode();
+        MGEdge edge1 = new MGEdge(ski1, edge.getIncomingNode(), node);
+        MGEdge edge2 = new MGEdge(ski2, node, edge.getOutgoingNode());
+        edges.remove(edge);
+        edges.add(edge1);
+        edges.add(edge2);
+        nodes.add(node);
+        return node;
+    }
+    
+    
+    ///Transition from start to edge:iOut, splits edge
+    public void insertTransition(MGNode start, MGEdge edge, int iOut)
+    {
+        MGNode end = splitEdge(edge, iOut);
+        SkeletonInterpolator skiTrans = new SkeletonInterpolator(); //TODO: fill this
+        MGEdge transition = new MGEdge(skiTrans, start, end);
+        edges.add(transition);
+    }
+    
+    ///Transition from edge:iOut, to end, splits edge
+    public void insertTransition(MGEdge edge, int iIn, MGNode end)
+    {
+        MGNode start = splitEdge(edge, iIn);
+        SkeletonInterpolator skiTrans = new SkeletonInterpolator(); //TODO: fill this
+        MGEdge transition = new MGEdge(skiTrans, start, end);
+        edges.add(transition);
     }
     
     public void randomStart(double time)
