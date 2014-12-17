@@ -29,9 +29,7 @@ abstract class AbstractMaryTTSBridge implements TTSBridge
     @Override
     public TimingInfo speakToFile(String text, String filename) throws IOException
     {
-        TimingInfo ti = getTiming(text);
-        ttsGenerator.speakToFile(wrap(text),filename,inputType);
-        return ti;
+        return ttsGenerator.speakToFile(wrap(text),filename,inputType);        
     }
 
     @Override
