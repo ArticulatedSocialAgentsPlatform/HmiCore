@@ -35,7 +35,7 @@ public class MaryTTSGeneratorTest extends AbstractTTSGeneratorTest
     @BeforeClass
     public static void setup() throws Exception
     {
-        ttsG  = new MaryTTSGenerator(System.getProperty("shared.project.root")+"/HmiResource/MARYTTS/resource/MARYTTS");        
+        ttsG  = new MaryTTSGenerator("test/lib/MARYTTS");        
     }
   
 }
