@@ -277,7 +277,8 @@ public final class VJointUtils
         {
             float[] a = child.getRelativePositionFrom(parent);
             float[] q = Quat4f.getFromVectors(a, vec);
-
+            System.out.println("q in "+parentSid+" "+Quat4f.explainQuat4f(q));
+            
             float[] r = Quat4f.getQuat4f();
             parent.getPathRotation(null, r);
             float[] rinv = Quat4f.getQuat4f();
@@ -286,8 +287,8 @@ public final class VJointUtils
 
             Quat4f.mul(s, rinv, q);
             Quat4f.mul(s, r);
-            parent.insertRotation(s); // post multiplies parent rotation with s.
-
+            System.out.println("inserting rotaton in "+parentSid+" "+Quat4f.explainQuat4f(s));
+            parent.insertRotation(s); // post multiplies parent rotation with s.            
         }
         else
         {

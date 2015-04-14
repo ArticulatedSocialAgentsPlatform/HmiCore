@@ -499,6 +499,21 @@ public class Mat4fTest
     }
 
     @Test
+    public void setFromTMat3f()
+    {
+        float m1[] = Mat4f.getMat4f();
+        float m2[] = Mat4f.getMat4f();
+        float m3[] = Mat3f.getMat3f();
+        float q[] = Quat4f.getQuat4f();
+        float v[] = Vec3f.getVec3f(1, 2, 3);
+        Quat4f.setFromAxisAngle4f(q, 1, 1, -2, 1.2f);
+        Mat4f.setFromTR(m1, v, q);
+        Mat3f.setFromQuatScale(m3, q, 1);
+        Mat4f.setFromTMat3f(m2, v, m3);
+        assertTrue(Mat4f.epsilonEquals(m1, m2, 0.00001f));
+    }
+
+    @Test
     public void testAffineInverse()
     {
         float[] m = Mat4f.getMat4f();

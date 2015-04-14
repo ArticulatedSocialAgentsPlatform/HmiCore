@@ -431,6 +431,35 @@ public final class Mat4f
         m[M32] = 0.0f;
         m[M33] = 1.0f;
     }
+    
+    /**
+     * Sets all matrix component, from a translation Vec3f t and a rotation/scaling rmatrix (Mat3f);
+     */
+    public static void setFromTMat3f(float[] m, float[] t, float[] rmatrix)
+    {
+        m[M00] = rmatrix[Mat3f.M00];
+        m[M01] = rmatrix[Mat3f.M01];
+        m[M02] = rmatrix[Mat3f.M02];
+        
+        m[M10] = rmatrix[Mat3f.M10];
+        m[M11] = rmatrix[Mat3f.M11];
+        m[M12] = rmatrix[Mat3f.M12];
+        
+        m[M20] = rmatrix[Mat3f.M20];
+        m[M21] = rmatrix[Mat3f.M21];
+        m[M22] = rmatrix[Mat3f.M22];
+        
+        // set translation column
+        m[M03] = t[0];
+        m[M13] = t[1];
+        m[M23] = t[2];
+
+        // set bottom row:
+        m[M30] = 0.0f;
+        m[M31] = 0.0f;
+        m[M32] = 0.0f;
+        m[M33] = 1.0f;
+    }
 
     // /*
     // * Sets matrix m from optional quaternion q, translation t, scalevector svec or scalematrix smatrix.
