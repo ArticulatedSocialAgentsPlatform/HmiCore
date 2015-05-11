@@ -1,21 +1,25 @@
 /*******************************************************************************
- * Copyright (C) 2009 Human Media Interaction, University of Twente, the Netherlands
- * 
- * This file is part of the Elckerlyc BML realizer.
- * 
- * Elckerlyc is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * Elckerlyc is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with Elckerlyc.  If not, see http://www.gnu.org/licenses/.
- ******************************************************************************/
+ * The MIT License (MIT)
+ * Copyright (c) 2015 University of Twente
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *******************************************************************************/
 
 package hmi.math;
 
@@ -416,6 +420,35 @@ public final class Mat4f
         m[M21] = 2.0f * q[Quat4f.s] * q[Quat4f.x] + 2.0f * q[Quat4f.y] * q[Quat4f.z];
         m[M22] = 1.0f - 2.0f * q[Quat4f.x] * q[Quat4f.x] - 2.0f * q[Quat4f.y] * q[Quat4f.y];
 
+        // set translation column
+        m[M03] = t[0];
+        m[M13] = t[1];
+        m[M23] = t[2];
+
+        // set bottom row:
+        m[M30] = 0.0f;
+        m[M31] = 0.0f;
+        m[M32] = 0.0f;
+        m[M33] = 1.0f;
+    }
+    
+    /**
+     * Sets all matrix component, from a translation Vec3f t and a rotation/scaling rmatrix (Mat3f);
+     */
+    public static void setFromTMat3f(float[] m, float[] t, float[] rmatrix)
+    {
+        m[M00] = rmatrix[Mat3f.M00];
+        m[M01] = rmatrix[Mat3f.M01];
+        m[M02] = rmatrix[Mat3f.M02];
+        
+        m[M10] = rmatrix[Mat3f.M10];
+        m[M11] = rmatrix[Mat3f.M11];
+        m[M12] = rmatrix[Mat3f.M12];
+        
+        m[M20] = rmatrix[Mat3f.M20];
+        m[M21] = rmatrix[Mat3f.M21];
+        m[M22] = rmatrix[Mat3f.M22];
+        
         // set translation column
         m[M03] = t[0];
         m[M13] = t[1];
