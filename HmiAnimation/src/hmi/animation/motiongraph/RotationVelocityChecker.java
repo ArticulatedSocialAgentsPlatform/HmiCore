@@ -17,28 +17,28 @@ public class RotationVelocityChecker implements TransitionChecker
 
     private float[] getAngularVelocity(SkeletonInterpolator ski, int frame)
     {
-        float[] config,qrate;
-        float[] avel = new float[ski.getConfigSize()/4*3];
-        
-        if(frame+1<ski.size())
+        float[] config, qrate;
+        float[] avel = new float[ski.getConfigSize() / 4 * 3];
+
+        if (frame + 1 < ski.size())
         {
             config = ski.getConfig(frame);
-            qrate = ski.getConfig(frame+1);
+            qrate = ski.getConfig(frame + 1);
         }
-        else if(frame-1>=0)
+        else if (frame - 1 >= 0)
         {
-            config = ski.getConfig(frame-1);
+            config = ski.getConfig(frame - 1);
             qrate = ski.getConfig(frame);
         }
         else
         {
             return avel;
         }
-        
+
         Vec3f.sub(qrate, config);
-        for(int i=0;i<ski.getConfigSize()/4;i++)
+        for (int i = 0; i < ski.getConfigSize() / 4; i++)
         {
-            Quat4f.setAngularVelocityFromQuat4f(avel, i*3, config, i*4, qrate, i*4);            
+            Quat4f.setAngularVelocityFromQuat4f(avel, i * 3, config, i * 4, qrate, i * 4);
         }
         return avel;
     }
@@ -50,22 +50,22 @@ public class RotationVelocityChecker implements TransitionChecker
         float configOut[] = skiOut.getConfig(frameOut);
         for (int i = 0; i < skiIn.getConfigSize() / 4; i++)
         {
-            if (!Quat4f.epsilonRotationEquivalent(configIn, i*4, configOut, i*4, epsilonRotation))
+            if (!Quat4f.epsilonRotationEquivalent(configIn, i * 4, configOut, i * 4, epsilonRotation))
             {
                 return false;
             }
         }
 
-        float[]avelIn = getAngularVelocity(skiIn,frameIn);
-        float[]avelOut=getAngularVelocity(skiOut,frameOut);
+        float[] avelIn = getAngularVelocity(skiIn, frameIn);
+        float[] avelOut = getAngularVelocity(skiOut, frameOut);
         for (int i = 0; i < skiIn.getConfigSize() / 4; i++)
         {
-            if(!Vec3f.epsilonEquals(avelIn, i, avelOut, i, epsilonVelocity))
+            if (!Vec3f.epsilonEquals(avelIn, i*3, avelOut, i*3, epsilonVelocity))
             {
                 return false;
             }
         }
-        return true;        
+        return true;
     }
 
 }

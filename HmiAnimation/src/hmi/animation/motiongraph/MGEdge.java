@@ -34,7 +34,7 @@ public class MGEdge
     
     public void play(double t)
     {
-        motion.interpolateTargetParts(motion.getStartTime()+t*1000);
+        motion.time(motion.getStartTime()+t);
     }
     
     public void setTarget(VJoint human)
