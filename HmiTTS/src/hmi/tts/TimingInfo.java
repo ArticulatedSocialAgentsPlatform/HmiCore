@@ -32,7 +32,7 @@ import net.jcip.annotations.Immutable;
  * @author welberge
  */
 @Immutable
-public final class TimingInfo
+public final class TimingInfo implements TTSTiming
 {
     private final List<WordDescription> wordDescriptions;
     private final List<Bookmark> bookmarks;
