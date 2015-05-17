@@ -7,6 +7,7 @@
       <dependency org="slf4j"     name="log4j-over-slf4j"        rev="latest.release"  /> 
       <dependency org="HMI"       name="HmiUtil"                 rev="latest.${resolve.status}"  />
       <dependency org="HMI"       name="HmiTTS"                  rev="latest.${resolve.status}"  />
+	  <dependency org="HMI"       name="HmiMath"                  rev="latest.${resolve.status}"  />
       <dependency org="HMI"       name="HmiXml"                  rev="latest.${resolve.status}"  />
 	<dependency org="apache"    name="xalan" rev="latest.release"  />  
       <dependency org="apache"    name="commons-lang" rev="latest.release"  /> 

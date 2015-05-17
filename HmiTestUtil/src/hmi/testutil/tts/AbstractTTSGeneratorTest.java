@@ -22,7 +22,13 @@
  *******************************************************************************/
 package hmi.testutil.tts;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.number.OrderingComparison.greaterThan;
+import static org.junit.Assert.assertEquals;
+import hmi.tts.AbstractTTSGenerator;
+import hmi.tts.Bookmark;
+import hmi.tts.TTSTiming;
+import hmi.tts.Visime;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,13 +37,6 @@ import java.util.List;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import hmi.tts.AbstractTTSGenerator;
-import hmi.tts.Bookmark;
-import hmi.tts.TimingInfo;
-import hmi.tts.Visime;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.OrderingComparison.greaterThan;
 
 /**
  * Abstract test class for TTSGenerator tests
@@ -56,7 +55,7 @@ public abstract class AbstractTTSGeneratorTest
         for (String voice : ttsG.getVoices())
         {
             ttsG.setVoice(voice);
-            TimingInfo tInfo = ttsG
+            TTSTiming tInfo = ttsG
                     .getBMLTiming("<sync id=\"deicticheart1\"/>Welcome!<sync id=\"deicticheart2\"/> "
                             + "I am Griet, I am 16 year old and I would like to tell you something about my life. "
                             + "People know me as the girl with the pearl ear ring. My father can no longer work since he was blinded. "
@@ -78,7 +77,7 @@ public abstract class AbstractTTSGeneratorTest
         for (String voice : ttsG.getVoices())
         {
             ttsG.setVoice(voice);
-            TimingInfo tInfo = ttsG
+            TTSTiming tInfo = ttsG
                     .getBMLTiming("<sync id=\"deicticheart1\"/>Welcome!<sync id=\"deicticheart2\"/> "
                             + "I am Griet, I am 16 year old and I would like to tell you something about my life. "
                             + "People know me as the girl with the pearl ear ring. "
@@ -108,7 +107,7 @@ public abstract class AbstractTTSGeneratorTest
             ttsG.setVoice(voice);
             File f;
             f = File.createTempFile("testBookmarksWav", ".wav");
-            TimingInfo tInfo = ttsG
+            TTSTiming tInfo = ttsG
                     .speakBMLToFile(
                             "<sync id=\"deicticheart1\"/>Welcome!<sync id=\"deicticheart2\"/>"
                                     + " I am Griet, I am 16 year old and I would like to tell you something about my life."
@@ -136,7 +135,7 @@ public abstract class AbstractTTSGeneratorTest
     @Test
     public void testDuration()
     {
-        TimingInfo tInfo = ttsG.getBMLTiming("test");
+        TTSTiming tInfo = ttsG.getBMLTiming("test");
         assertEquals("test",tInfo.getWordDescriptions().get(0).getWord());
         assertThat(tInfo.getDuration(), greaterThan(0d));
     }
@@ -144,7 +143,7 @@ public abstract class AbstractTTSGeneratorTest
     @Test
     public void testSpeakDuration()
     {
-        TimingInfo tInfo = ttsG.speak("test");
+        TTSTiming tInfo = ttsG.speak("test");
         assertEquals("test",tInfo.getWordDescriptions().get(0).getWord());
         assertThat(tInfo.getDuration(), greaterThan(0d));
     }
@@ -153,7 +152,7 @@ public abstract class AbstractTTSGeneratorTest
     public void testWavDuration() throws IOException
     {
         java.io.File f = File.createTempFile("test", ".wav");
-        TimingInfo tInfo = ttsG.speakBMLToFile("test", f.getAbsolutePath());
+        TTSTiming tInfo = ttsG.speakBMLToFile("test", f.getAbsolutePath());
         if (!f.delete())
         {
             LOGGER.warn("Can't delete temp file!");

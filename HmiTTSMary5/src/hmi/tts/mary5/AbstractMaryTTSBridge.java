@@ -22,11 +22,11 @@
  *******************************************************************************/
 package hmi.tts.mary5;
 
+import hmi.tts.TTSBridge;
+
 import java.io.IOException;
 
 import marytts.datatypes.MaryDataType;
-import hmi.tts.TTSBridge;
-import hmi.tts.TimingInfo;
 
 /**
  * Shared implementation part of all MaryTTS bridges 
@@ -43,19 +43,19 @@ abstract class AbstractMaryTTSBridge implements TTSBridge
     }
     
     @Override
-    public TimingInfo speak(String text)
+    public MaryProsody speak(String text)
     {
         return ttsGenerator.speak(wrap(text),inputType);
     }
 
     @Override
-    public TimingInfo speakToFile(String text, String filename) throws IOException
+    public MaryProsody speakToFile(String text, String filename) throws IOException
     {
         return ttsGenerator.speakToFile(wrap(text),filename,inputType);        
     }
 
     @Override
-    public TimingInfo getTiming(String text)
+    public MaryProsody getTiming(String text)
     {
         return ttsGenerator.getTiming(wrap(text),inputType);        
     }

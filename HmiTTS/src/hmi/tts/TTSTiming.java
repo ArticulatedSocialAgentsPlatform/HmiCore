@@ -9,6 +9,7 @@ import java.util.List;
 public interface TTSTiming
 {
     List<WordDescription> getWordDescriptions();
+    List<Visime> getVisimes();
     List<Bookmark> getBookmarks();
     Bookmark getBookmark(String id);
     double getDuration();

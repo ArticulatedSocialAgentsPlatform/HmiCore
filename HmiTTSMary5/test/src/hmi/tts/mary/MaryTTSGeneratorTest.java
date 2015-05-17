@@ -22,21 +22,36 @@
  *******************************************************************************/
 package hmi.tts.mary;
 
+import static org.junit.Assert.assertEquals;
 import hmi.testutil.tts.AbstractTTSGeneratorTest;
+import hmi.tts.mary5.MaryProsody;
 import hmi.tts.mary5.MaryTTSGenerator;
 
+import java.util.Arrays;
+
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
- * Creates  a MaryTTSGenerator, and runs the testcases for generic TTSGenerators on it.
+ * Creates a MaryTTSGenerator, and runs the testcases for generic TTSGenerators on it.
  * @author Herwin
  */
 public class MaryTTSGeneratorTest extends AbstractTTSGeneratorTest
 {
+    private static MaryTTSGenerator mttsG;
+
     @BeforeClass
     public static void setup() throws Exception
     {
-        ttsG  = new MaryTTSGenerator();        
+        mttsG = new MaryTTSGenerator();
+        ttsG = mttsG;
     }
-  
+
+    @Test
+    public void testProsody() throws InterruptedException
+    {
+        MaryProsody pros = mttsG.speakBML("Hello world");
+        pros = mttsG.speakBML("Hello world");
+        assertEquals(pros.getF0().length,pros.getRmsEnergy().length);
+    }
 }

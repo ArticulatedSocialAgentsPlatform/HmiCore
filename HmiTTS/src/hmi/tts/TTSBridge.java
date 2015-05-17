@@ -34,7 +34,7 @@ public interface TTSBridge
      * Speaks out the sentence, does the appropriate callbacks, fills out visime,
      * @param text the text or script to speak
      */
-    TimingInfo speak(String text);
+    TTSTiming speak(String text);
     
     /**
      * Generates a file containing the spoken sentence, does the apropiate
@@ -45,7 +45,7 @@ public interface TTSBridge
      * @throws FileNotFoundException 
      * @throws IOException 
      */
-    TimingInfo speakToFile(String text, String filename) throws IOException;
+    TTSTiming speakToFile(String text, String filename) throws IOException;
     
     /**
      * Gets the timing of the text, fills out visime, phoneme,bookmark and word
@@ -54,5 +54,5 @@ public interface TTSBridge
      * @param text
      *            the text or script to get the timing of
      */
-    TimingInfo getTiming(String text);    
+    TTSTiming getTiming(String text);    
 }

@@ -36,19 +36,19 @@ public class BMLTTSBridge implements TTSBridge
     }
     
     @Override
-    public TimingInfo speak(String text)
+    public TTSTiming speak(String text)
     {
         return ttsGenerator.speakBML(text);        
     }
 
     @Override
-    public TimingInfo speakToFile(String text, String filename) throws IOException
+    public TTSTiming speakToFile(String text, String filename) throws IOException
     {
         return ttsGenerator.speakBMLToFile(text, filename);        
     }
 
     @Override
-    public TimingInfo getTiming(String text)
+    public TTSTiming getTiming(String text)
     {
         return ttsGenerator.getBMLTiming(text);        
     }    

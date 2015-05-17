@@ -22,6 +22,8 @@
  *******************************************************************************/
 package hmi.tts.mary5;
 
+import hmi.math.signalproc.Framer;
+import hmi.math.signalproc.RootMeanSquared;
 import hmi.tts.AbstractTTSGenerator;
 import hmi.tts.Bookmark;
 import hmi.tts.Phoneme;
@@ -35,6 +37,8 @@ import hmi.tts.util.PhonemeToVisemeMapping;
 import hmi.tts.util.PhonemeUtil;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +70,9 @@ import org.xml.sax.SAXException;
 @ThreadSafe
 public class MaryTTSGenerator extends AbstractTTSGenerator
 {
+    private static final int PROSODY_FRAMERATE = 120;
+    private static final double RMS_WINDOW_SIZE = 0.050;
+
     @GuardedBy("this")
     private int currentWordOffset;
 
@@ -88,11 +95,11 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
      *            the directory where Mary is installed and its voices can be found
      * @param visemeMappingFile
      *            the location of the phoneme to viseme mapping (e.g., "phoneme2viseme/boss2ikp.xml")
-     * @throws MaryConfigurationException 
+     * @throws MaryConfigurationException
      */
     public MaryTTSGenerator(PhonemeToVisemeMapping vm) throws MaryConfigurationException
     {
-        marytts = new LocalMaryInterface();        
+        marytts = new LocalMaryInterface();
         marytts.setVoice(marytts.getAvailableVoices().iterator().next());
         visemeMapping = vm;
     }
@@ -121,18 +128,55 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
             throw new RuntimeException(e);
         }
     }
-    
-    private void speakTextFromAcousticParameters(Document doc)
-    {
-        AudioPlayer ap = new AudioPlayer(speakTextToAudioInputStream(doc, MaryDataType.ACOUSTPARAMS), null);
-        ap.start();        
-    }
-    
-    private void speakToFileFromAcousticParameters(Document doc, String filename)
+
+    private void speakTextFromAcousticParameters(Document doc, MaryProsody mp)
     {
         AudioInputStream audio = speakTextToAudioInputStream(doc, MaryDataType.ACOUSTPARAMS);
         try
         {
+            mp.setRMSEnergy(getRMSEnergy(audio));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+        AudioPlayer ap = new AudioPlayer(audio, null);
+        ap.start();
+    }
+
+    private double[] getRMSEnergy(AudioInputStream audio) throws IOException
+    {
+        byte data[] = new byte[(int) (audio.getFrameLength() * audio.getFormat().getFrameSize())];
+        audio.read(data);
+        ByteBuffer bb = ByteBuffer.wrap(data);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        if (audio.getFormat().isBigEndian())
+        {
+            bb.order(ByteOrder.BIG_ENDIAN);
+        }
+        double frame[] = new double[data.length / 2];
+        for (int i = 0; i < frame.length; i++)
+        {
+            frame[i] = (double) bb.getShort() / 32767d;
+        }
+        float frameRate = audio.getFormat().getFrameRate();
+        double frameSize = 1.0 / (double) PROSODY_FRAMERATE;
+        double frames[][] = Framer.frame(frame, (int) (RMS_WINDOW_SIZE * frameRate), (int) (frameSize * frameRate));
+        double rmsEnergy[] = new double[frames.length];
+        for (int i = 0; i < frames.length; i++)
+        {
+            rmsEnergy[i] = RootMeanSquared.rootMeanSquared(frames[i]);
+        }
+        return rmsEnergy;
+    }
+
+    private void speakToFileFromAcousticParameters(Document doc, String filename, MaryProsody mp)
+    {
+        AudioInputStream audio = speakTextToAudioInputStream(doc, MaryDataType.ACOUSTPARAMS);
+        
+        try
+        {
+            mp.setRMSEnergy(getRMSEnergy(audio));
             MaryAudioUtils.writeWavFile(MaryAudioUtils.getSamplesAsDoubleArray(audio), filename, audio.getFormat());
         }
         catch (IOException e)
@@ -140,7 +184,7 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
             throw new RuntimeException(e);
         }
     }
-    
+
     private TimingInfo getAndClearTimingInfo()
     {
         List<WordDescription> des = new ArrayList<WordDescription>();
@@ -156,7 +200,7 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
     }
 
     @Override
-    public synchronized TimingInfo speak(String text)
+    public synchronized MaryProsody speak(String text)
     {
         return speak(text, MaryDataType.TEXT);
     }
@@ -166,50 +210,50 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
         MaryProsodyInfo p = new MaryProsodyInfo();
         marytts.setInputType(MaryDataType.TEXT.toString());
         marytts.setOutputType(MaryDataType.REALISED_ACOUSTPARAMS.toString());
-        p.parse(marytts.generateXML(text));        
+        p.parse(marytts.generateXML(text));
         return p;
     }
-    
-    public synchronized TimingInfo speak(String text, MaryDataType inputType)
+
+    public synchronized MaryProsody speak(String text, MaryDataType inputType)
     {
         Document doc = getAcousticRealization(text, inputType);
-        TimingInfo ti = getTimingFromAcousticRealization(doc);
-        speakTextFromAcousticParameters(doc);
+        MaryProsody ti = getProsodyFromAcousticRealization(doc);
+        speakTextFromAcousticParameters(doc, ti);
         return ti;
     }
 
     @Override
-    public synchronized TimingInfo speakBML(String text)
+    public synchronized MaryProsody speakBML(String text)
     {
         Document doc = getAcousticRealizationBML(text);
-        TimingInfo ti = getTimingFromAcousticRealization(doc);
-        speakTextFromAcousticParameters(doc);
+        MaryProsody ti = getProsodyFromAcousticRealization(doc);
+        speakTextFromAcousticParameters(doc, ti);
         return ti;
     }
 
-    public synchronized TimingInfo speakToFile(String text, String filename,MaryDataType inputType) throws IOException
+    public synchronized MaryProsody speakToFile(String text, String filename, MaryDataType inputType) throws IOException
     {
         Document doc = getAcousticRealization(text, inputType);
-        TimingInfo ti = getTimingFromAcousticRealization(doc);
-        speakToFileFromAcousticParameters(doc,filename);
+        MaryProsody ti = getProsodyFromAcousticRealization(doc);
+        speakToFileFromAcousticParameters(doc, filename, ti);
         return ti;
     }
-    
+
     @Override
-    public synchronized TimingInfo speakToFile(String text, String filename) throws IOException
+    public synchronized MaryProsody speakToFile(String text, String filename) throws IOException
     {
         Document doc = getAcousticRealization(text, MaryDataType.TEXT);
-        TimingInfo ti = getTimingFromAcousticRealization(doc);
-        speakToFileFromAcousticParameters(doc,filename);
+        MaryProsody ti = getProsodyFromAcousticRealization(doc);
+        speakToFileFromAcousticParameters(doc, filename, ti);
         return ti;
     }
 
     @Override
-    public synchronized TimingInfo speakBMLToFile(String text, String filename) throws IOException
+    public synchronized MaryProsody speakBMLToFile(String text, String filename) throws IOException
     {
         Document doc = getAcousticRealizationBML(text);
-        TimingInfo ti = getTimingFromAcousticRealization(doc);
-        speakToFileFromAcousticParameters(doc,filename);
+        MaryProsody ti = getProsodyFromAcousticRealization(doc);
+        speakToFileFromAcousticParameters(doc, filename, ti);
         return ti;
     }
 
@@ -360,7 +404,7 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
     }
 
     @Override
-    public synchronized TimingInfo getTiming(String text)
+    public synchronized MaryProsody getTiming(String text)
     {
         return getTiming(text, MaryDataType.TEXT);
     }
@@ -369,13 +413,14 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
     {
         return getAcousticRealization(getSSMLStartTag() + BMLTextUtil.BMLToSSML(text) + "</speak>", MaryDataType.SSML);
     }
+
     public synchronized Document getAcousticRealization(String text, MaryDataType inputDataType)
     {
         marytts.setInputType(inputDataType.toString());
         marytts.setOutputType(MaryDataType.REALISED_ACOUSTPARAMS.toString());
         try
         {
-            if(inputDataType.isXMLType())
+            if (inputDataType.isXMLType())
             {
                 return marytts.generateXML(DomUtils.parseDocument(text, false));
             }
@@ -399,23 +444,31 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
         catch (IOException e)
         {
             throw new RuntimeException(e);
-        }        
+        }
     }
-    
-    public synchronized TimingInfo getTiming(String text, MaryDataType inputDataType)
+
+    public synchronized MaryProsody getTiming(String text, MaryDataType inputDataType)
     {
-        parseWordDescriptionsAndBookmarks(getAcousticRealization(text,inputDataType));
-        return getAndClearTimingInfo();
+        return getProsodyFromAcousticRealization(getAcousticRealization(text, inputDataType));
     }
-    
+
     private TimingInfo getTimingFromAcousticRealization(Document doc)
     {
         parseWordDescriptionsAndBookmarks(doc);
         return getAndClearTimingInfo();
     }
 
+    private MaryProsody getProsodyFromAcousticRealization(Document doc)
+    {
+        MaryProsody mp = new MaryProsody(getTimingFromAcousticRealization(doc));
+        MaryProsodyInfo p = new MaryProsodyInfo();
+        p.parse(doc);
+        mp.setF0(p.getF0Contour(PROSODY_FRAMERATE));
+        return mp;
+    }
+
     @Override
-    public synchronized TimingInfo getBMLTiming(String text)
+    public synchronized MaryProsody getBMLTiming(String text)
     {
         return getTiming(getSSMLStartTag() + BMLTextUtil.BMLToSSML(text) + "</speak>", MaryDataType.SSML);
     }

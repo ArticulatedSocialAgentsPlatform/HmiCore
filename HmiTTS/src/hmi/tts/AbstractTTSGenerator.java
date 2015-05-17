@@ -76,7 +76,7 @@ public abstract class AbstractTTSGenerator
         permanentCallback = cb;
     }
 
-    public abstract TimingInfo speak(String text);
+    public abstract TTSTiming speak(String text);
 
     /**
      * Speaks out the BML sentence, does the apropiate callbacks, fills out
@@ -85,7 +85,7 @@ public abstract class AbstractTTSGenerator
      * @param text
      *            the text or script to speak
      */
-    public abstract TimingInfo speakBML(String text);
+    public abstract TTSTiming speakBML(String text);
 
     /**
      * Generates a file containing the spoken sentence, does the apropiate
@@ -96,7 +96,7 @@ public abstract class AbstractTTSGenerator
      * @throws FileNotFoundException 
      * @throws IOException 
      */
-    public abstract TimingInfo speakToFile(String text, String filename) throws IOException;
+    public abstract TTSTiming speakToFile(String text, String filename) throws IOException;
 
     /**
      * Generates a file containing the spoken BML sentence, does the apropiate
@@ -106,7 +106,7 @@ public abstract class AbstractTTSGenerator
      *            the text or script to speak
      * @throws IOException 
      */
-    public abstract TimingInfo speakBMLToFile(String text, String filename) throws IOException;
+    public abstract TTSTiming speakBMLToFile(String text, String filename) throws IOException;
 
     /**
      * Gets the timing of the text, fills out visime, phoneme,bookmark and word
@@ -115,7 +115,7 @@ public abstract class AbstractTTSGenerator
      * @param text
      *            the text or script to get the timing of
      */
-    public abstract TimingInfo getTiming(String text);
+    public abstract TTSTiming getTiming(String text);
 
     /**
      * Sets the speaker
@@ -137,7 +137,7 @@ public abstract class AbstractTTSGenerator
      * @param b
      *            the bml speech behavior
      */
-    public abstract TimingInfo getBMLTiming(String s);
+    public abstract TTSTiming getBMLTiming(String s);
 
     /**
      * Get the duration of the last spoken/timed text
