@@ -27,8 +27,6 @@ import hmi.testutil.tts.AbstractTTSGeneratorTest;
 import hmi.tts.mary5.MaryProsody;
 import hmi.tts.mary5.MaryTTSGenerator;
 
-import java.util.Arrays;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -51,7 +49,7 @@ public class MaryTTSGeneratorTest extends AbstractTTSGeneratorTest
     public void testProsody() throws InterruptedException
     {
         MaryProsody pros = mttsG.speakBML("Hello world");
-        pros = mttsG.speakBML("Hello world");
+        //Thread.sleep(2000);
         assertEquals(pros.getF0().length,pros.getRmsEnergy().length);
     }
 }

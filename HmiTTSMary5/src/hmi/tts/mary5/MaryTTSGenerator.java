@@ -36,9 +36,10 @@ import hmi.tts.util.NullPhonemeToVisemeMapping;
 import hmi.tts.util.PhonemeToVisemeMapping;
 import hmi.tts.util.PhonemeUtil;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +62,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
+import com.google.common.io.ByteStreams;
 
 /**
  * MaryTTS implementation of the AbstractTTSGenerator
@@ -132,36 +135,30 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
     private void speakTextFromAcousticParameters(Document doc, MaryProsody mp)
     {
         AudioInputStream audio = speakTextToAudioInputStream(doc, MaryDataType.ACOUSTPARAMS);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        InputStream is1, is2;
         try
         {
-            mp.setRMSEnergy(getRMSEnergy(audio));
+            ByteStreams.copy(audio, baos);
+            is1 = new ByteArrayInputStream(baos.toByteArray()); 
+            is2 = new ByteArrayInputStream(baos.toByteArray()); 
+            
+            double data[] = MaryAudioUtils.getSamplesAsDoubleArray(new AudioInputStream(is1,audio.getFormat(),audio.getFrameLength()));            
+            mp.setRMSEnergy(getRMSEnergy(data, audio.getFormat().getFrameRate()));
+            is1.close();
         }
         catch (IOException e)
         {
             throw new RuntimeException(e);
         }
-        AudioPlayer ap = new AudioPlayer(audio, null);
+        AudioPlayer ap = new AudioPlayer(new AudioInputStream(is2,audio.getFormat(),audio.getFrameLength()), null);
         ap.start();
     }
 
-    private double[] getRMSEnergy(AudioInputStream audio) throws IOException
+    private double[] getRMSEnergy(double data[], double frameRate) throws IOException
     {
-        byte data[] = new byte[(int) (audio.getFrameLength() * audio.getFormat().getFrameSize())];
-        audio.read(data);
-        ByteBuffer bb = ByteBuffer.wrap(data);
-        bb.order(ByteOrder.LITTLE_ENDIAN);
-        if (audio.getFormat().isBigEndian())
-        {
-            bb.order(ByteOrder.BIG_ENDIAN);
-        }
-        double frame[] = new double[data.length / 2];
-        for (int i = 0; i < frame.length; i++)
-        {
-            frame[i] = (double) bb.getShort() / 32767d;
-        }
-        float frameRate = audio.getFormat().getFrameRate();
         double frameSize = 1.0 / (double) PROSODY_FRAMERATE;
-        double frames[][] = Framer.frame(frame, (int) (RMS_WINDOW_SIZE * frameRate), (int) (frameSize * frameRate));
+        double frames[][] = Framer.frame(data, (int) (RMS_WINDOW_SIZE * frameRate), (int) (frameSize * frameRate));
         double rmsEnergy[] = new double[frames.length];
         for (int i = 0; i < frames.length; i++)
         {
@@ -173,11 +170,11 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
     private void speakToFileFromAcousticParameters(Document doc, String filename, MaryProsody mp)
     {
         AudioInputStream audio = speakTextToAudioInputStream(doc, MaryDataType.ACOUSTPARAMS);
-        
+        double data[] = MaryAudioUtils.getSamplesAsDoubleArray(audio);
         try
         {
-            mp.setRMSEnergy(getRMSEnergy(audio));
-            MaryAudioUtils.writeWavFile(MaryAudioUtils.getSamplesAsDoubleArray(audio), filename, audio.getFormat());
+            mp.setRMSEnergy(getRMSEnergy(data, audio.getFormat().getFrameRate()));
+            MaryAudioUtils.writeWavFile(data, filename, audio.getFormat());
         }
         catch (IOException e)
         {
