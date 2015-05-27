@@ -1,6 +1,7 @@
 package hmi.tts.mary5;
 
 import hmi.tts.Bookmark;
+import hmi.tts.Prosody;
 import hmi.tts.TTSTiming;
 import hmi.tts.TimingInfo;
 import hmi.tts.Visime;
@@ -79,4 +80,9 @@ public class MaryProsody implements TTSTiming
         return ti.getVisimes();
     }
 
+    @Override 
+    public Prosody getProsody()
+    {
+        return new Prosody(f0, rmsEnergy, getDuration()/getF0().length);
+    }
 }

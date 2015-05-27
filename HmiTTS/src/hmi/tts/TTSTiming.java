@@ -13,4 +13,9 @@ public interface TTSTiming
     List<Bookmark> getBookmarks();
     Bookmark getBookmark(String id);
     double getDuration();
+    
+    default Prosody getProsody()
+    {
+        return null;
+    }
 }
