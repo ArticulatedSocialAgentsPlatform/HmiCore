@@ -85,7 +85,7 @@ public class XMLStructureAdapterTest
 
     }
 
-    @Test(expected=XMLScanException.class)
+    @Test(expected = XMLScanException.class)
     public void testQuoteInTag()
     {
         XMLStructureAdapter xa = new XMLStructureAdapter()
@@ -97,7 +97,7 @@ public class XMLStructureAdapterTest
         };
         xa.readXML("<gaze id=\"gaze1\" start=\"0\" ready=\"1\" target=\"redbox\" \"influence=\"HEAD\" />");
     }
-    
+
     @Test
     public void decodeIntArray1()
     {
@@ -123,22 +123,22 @@ public class XMLStructureAdapterTest
     {
         @Getter
         String id;
-        
+
         @Getter
         String test;
-        
+
         @Override
         public String getXMLTag()
         {
             return "test";
         }
-        
+
         @Override
         public String getNamespace()
         {
             return "testxml";
         }
-        
+
         @Override
         public void decodeAttributes(HashMap<String, String> attrMap, XMLTokenizer tokenizer)
         {
@@ -146,7 +146,7 @@ public class XMLStructureAdapterTest
             test = getRequiredAttribute("externalns:testname", attrMap, tokenizer);
         }
     }
-    
+
     @Test
     public void testReadNameSpacedAttribute()
     {
@@ -154,9 +154,9 @@ public class XMLStructureAdapterTest
         String xmlString = "<test test:testname=\"testval\" id=\"idx\" xmlns=\"testxml\" xmlns:test=\"externalns\"/>";
         xa.readXML(xmlString);
         assertEquals("idx", xa.getId());
-        assertEquals("testval", xa.getTest());        
+        assertEquals("testval", xa.getTest());
     }
-    
+
     @Test
     public void testReadNameSpacedAttribute2()
     {
@@ -166,7 +166,7 @@ public class XMLStructureAdapterTest
         assertEquals("idx", xa.getId());
         assertEquals("testval", xa.getTest());
     }
-    
+
     @Test
     public void writeNamespaceTag()
     {
@@ -486,17 +486,17 @@ public class XMLStructureAdapterTest
             {
                 return "TestB";
             }
-            
+
             @Override
             public boolean decodeAttribute(String attrName, String attrValue, XMLTokenizer tokenizer)
             {
-                throw new XMLScanException("Attribute "+attrName+" not supported.");
+                throw new XMLScanException("Attribute " + attrName + " not supported.");
             }
         }
         TestB testB = new TestB();
-        testB.readXML("<TestB bmla:appendAfter=\"bml1\"/>");        
+        testB.readXML("<TestB bmla:appendAfter=\"bml1\"/>");
     }
-    
+
     @Test
     public void testGetEmptyXMLSectionWithClosingTag()
     {
@@ -570,6 +570,53 @@ public class XMLStructureAdapterTest
         adapter.appendXML(buf, fmt);
         fmt.popXMLNameSpace();// namespacestack should be empty
     }
-    
-    
+
+    @Test
+    public void testInclude()
+    {
+        final class TestB extends XMLStructureAdapter
+        {
+            @Getter
+            private String id;
+
+            @Override
+            public boolean decodeAttribute(String attrName, String attrValue, XMLTokenizer tokenizer)
+            {
+                if(attrName.equals("id"))
+                {
+                    id = attrValue;
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public String getXMLTag()
+            {
+                return "TestB";
+            }
+        }
+        final class TestInclude extends XMLStructureAdapter
+        {
+            @Getter
+            private TestB testB;
+
+            @Override
+            public String getXMLTag()
+            {
+                return "TestInclude";
+            }
+
+            @Override
+            public void decodeContent(XMLTokenizer tokenizer) throws IOException
+            {
+                testB = new TestB();
+                testB.readXML(tokenizer);
+            }
+        }
+        String str = "<TestInclude><?include resources=\"\" file=\"testb.xml\"?></TestInclude>";
+        TestInclude testI = new TestInclude();
+        testI.readXML(str);
+        assertEquals("testb",testI.getTestB().getId());
+    }
 }
