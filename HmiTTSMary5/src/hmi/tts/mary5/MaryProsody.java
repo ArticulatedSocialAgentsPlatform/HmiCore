@@ -37,7 +37,7 @@ public class MaryProsody implements TTSTiming
         {
             this.rmsEnergy = new double[f0.length];
             Arrays.fill(this.rmsEnergy, rmsEnergy[rmsEnergy.length-1]);
-            System.arraycopy(rmsEnergy, 0, this.rmsEnergy, 0, f0.length);
+            System.arraycopy(rmsEnergy, 0, this.rmsEnergy, 0, Math.min(f0.length,rmsEnergy.length));
         }
         else
         {
