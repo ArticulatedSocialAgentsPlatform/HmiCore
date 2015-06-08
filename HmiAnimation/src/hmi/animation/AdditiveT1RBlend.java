@@ -22,6 +22,11 @@
  *******************************************************************************/
 package hmi.animation;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+
 import hmi.math.Vec3f;
 
 /**
@@ -33,7 +38,7 @@ import hmi.math.Vec3f;
 public class AdditiveT1RBlend
 {
     private final AdditiveRotationBlend rotBlend;
-    private VJoint v1, v2;
+    private List<VJoint> vJoints;
     private VJoint vOut;
 
     /**
@@ -49,20 +54,32 @@ public class AdditiveT1RBlend
      */
     public AdditiveT1RBlend(final VJoint v1, final VJoint v2, VJoint vOut)
     {
-        this.v1 = v1;
-        this.v2 = v2;
+        this(ImmutableList.of(v1, v2), vOut);
+    }
+
+    public AdditiveT1RBlend(final List<VJoint> vj, VJoint vOut)
+    {
         this.vOut = vOut;
-        rotBlend = new AdditiveRotationBlend(v1, v2, vOut);
+        this.vJoints = new ArrayList<VJoint>(vj);
+        rotBlend = new AdditiveRotationBlend(vJoints, vOut);
+    }
+
+    public void addVJoint(VJoint vj)
+    {
+        vJoints.add(vj);
+        rotBlend.addVJoint(vj);
     }
 
     public void blend()
     {
-        float t1[]=Vec3f.getVec3f();
-        float t2[]=Vec3f.getVec3f();
-        v1.getTranslation(t1);
-        v2.getTranslation(t2);
-        Vec3f.add(t1,t2);
-        vOut.setTranslation(t1);
+        float t[] = Vec3f.getVec3f();
+        float vEnd[] = Vec3f.getVec3f();
+        for (VJoint vj : vJoints)
+        {
+            vj.getTranslation(t);
+            Vec3f.add(vEnd, t);
+        }
+        vOut.setTranslation(vEnd);
         rotBlend.blend();
     }
 }

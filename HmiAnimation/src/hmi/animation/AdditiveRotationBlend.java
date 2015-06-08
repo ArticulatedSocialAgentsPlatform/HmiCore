@@ -28,8 +28,10 @@ import hmi.math.Quat4f;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+
 /**
- * Does an additive blend of the rotations of two joints and all their children:<br>
+ * Does an additive blend of the rotations of two or more joints and all their children:<br>
  * qOut = q1 * q2
  * 
  * @author welberge
@@ -37,9 +39,6 @@ import java.util.List;
 public class AdditiveRotationBlend
 {
     private List<Blender> blenders = new ArrayList<Blender>();
-    private float q1[] = new float[4];
-    private float q2[] = new float[4];
-    private float qOut[] = new float[4];
 
     /**
      * Constructor Assumes that v1.getParts(), v2.getParts() and vOut.getParts()
@@ -52,15 +51,35 @@ public class AdditiveRotationBlend
      * @param vOut
      *            output joint
      */
-    public AdditiveRotationBlend(final VJoint v1,final VJoint v2, VJoint vOut)
+    public AdditiveRotationBlend(final VJoint v1, final VJoint v2, VJoint vOut)
+    {
+        this(ImmutableList.of(v1, v2), vOut);
+    }
+
+    public AdditiveRotationBlend(final List<VJoint> vj, VJoint vOut)
     {
         int i = 0;
         for (VJoint vO : vOut.getParts())
         {
-            VJoint vj1 = v1.getParts().get(i);
-            VJoint vj2 = v2.getParts().get(i);
-            Blender b = new Blender(vj1,vj2,vO);
+            List<VJoint> vjList = new ArrayList<VJoint>();
+            for (VJoint v1 : vj)
+            {
+                VJoint vj1 = v1.getParts().get(i);
+                vjList.add(vj1);
+            }
+            Blender b = new Blender(vjList, vO);
             blenders.add(b);
+            i++;
+        }
+    }
+
+    public void addVJoint(VJoint vj)
+    {
+        int i = 0;
+        for (Blender b : blenders)
+        {
+            VJoint vjPart = vj.getParts().get(i);
+            b.vjList.add(vjPart);
             i++;
         }
     }
@@ -72,24 +91,28 @@ public class AdditiveRotationBlend
      */
     public void blend()
     {
+        float qOut[] = Quat4f.getIdentity();
+        float q[] = Quat4f.getQuat4f();
         for (Blender b : blenders)
         {
-            b.v1.getRotation(q1);
-            b.v2.getRotation(q2);
-            Quat4f.mul(qOut, q1, q2);
+            Quat4f.setIdentity(qOut);
+            for (VJoint vj : b.vjList)
+            {
+                vj.getRotation(q);
+                Quat4f.mul(qOut, q);
+            }
             b.vOut.setRotation(qOut);
         }
     }
 
     private final static class Blender
     {
-        public final VJoint v1;
-        public final VJoint v2;
+        public final List<VJoint> vjList;
         public final VJoint vOut;
-        public Blender(VJoint vj1, VJoint vj2, VJoint vO)
+
+        public Blender(List<VJoint> vjList, VJoint vO)
         {
-            v1 = vj1;
-            v2 = vj2;
+            this.vjList = vjList;
             vOut = vO;
         }
     }
