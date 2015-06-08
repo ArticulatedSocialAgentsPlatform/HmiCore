@@ -85,6 +85,20 @@ public class AdditiveRotationBlend
     }
 
     /**
+     * Sets the rotation of all input joints to the identity
+     */
+    public void setIdentityRotation()
+    {
+        for (Blender b : blenders)
+        {
+            for(VJoint vj:b.vjList)
+            {
+                vj.setRotation(Quat4f.getIdentity());
+            }
+        }
+    }
+    
+    /**
      * Does an additive blend of the rotations of input joints 1 with input
      * joints 2 and stores the result to the output joints Blending is done
      * according to qOut = q1 * q2

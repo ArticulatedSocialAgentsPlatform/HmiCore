@@ -64,6 +64,11 @@ public class AdditiveT1RBlend
         rotBlend = new AdditiveRotationBlend(vJoints, vOut);
     }
 
+    public void setIdentityRotation()
+    {
+        rotBlend.setIdentityRotation();
+    }
+    
     public void addVJoint(VJoint vj)
     {
         vJoints.add(vj);
