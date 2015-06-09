@@ -79,6 +79,12 @@ public class AdditiveT1RBlend
         rotBlend.addVJoint(vj);
     }
 
+    public void clear()
+    {
+        vJoints.clear();
+        rotBlend.clear();
+    }
+    
     public void blend()
     {
         float t[] = Vec3f.getVec3f();
