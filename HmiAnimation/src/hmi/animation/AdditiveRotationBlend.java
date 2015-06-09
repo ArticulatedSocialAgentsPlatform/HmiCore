@@ -26,6 +26,7 @@ import hmi.animation.VJoint;
 import hmi.math.Quat4f;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -38,7 +39,7 @@ import com.google.common.collect.ImmutableList;
  */
 public class AdditiveRotationBlend
 {
-    private List<Blender> blenders = new ArrayList<Blender>();
+    private List<Blender> blenders = Collections.synchronizedList(new ArrayList<Blender>());
 
     /**
      * Constructor Assumes that v1.getParts(), v2.getParts() and vOut.getParts()
@@ -76,11 +77,14 @@ public class AdditiveRotationBlend
     public void addVJoint(VJoint vj)
     {
         int i = 0;
-        for (Blender b : blenders)
+        synchronized (blenders)
         {
-            VJoint vjPart = vj.getParts().get(i);
-            b.vjList.add(vjPart);
-            i++;
+            for (Blender b : blenders)
+            {
+                VJoint vjPart = vj.getParts().get(i);
+                b.vjList.add(vjPart);
+                i++;
+            }
         }
     }
 
@@ -89,15 +93,18 @@ public class AdditiveRotationBlend
      */
     public void setIdentityRotation()
     {
-        for (Blender b : blenders)
+        synchronized (blenders)
         {
-            for(VJoint vj:b.vjList)
+            for (Blender b : blenders)
             {
-                vj.setRotation(Quat4f.getIdentity());
+                for (VJoint vj : b.vjList)
+                {
+                    vj.setRotation(Quat4f.getIdentity());
+                }
             }
         }
     }
-    
+
     /**
      * Does an additive blend of the rotations of input joints 1 with input
      * joints 2 and stores the result to the output joints Blending is done
@@ -107,15 +114,18 @@ public class AdditiveRotationBlend
     {
         float qOut[] = Quat4f.getIdentity();
         float q[] = Quat4f.getQuat4f();
-        for (Blender b : blenders)
+        synchronized (blenders)
         {
-            b.vBase.getRotation(qOut);
-            for (VJoint vj : b.vjList)
+            for (Blender b : blenders)
             {
-                vj.getRotation(q);
-                Quat4f.mul(qOut, q);
+                b.vBase.getRotation(qOut);
+                for (VJoint vj : b.vjList)
+                {
+                    vj.getRotation(q);
+                    Quat4f.mul(qOut, q);
+                }
+                b.vOut.setRotation(qOut);
             }
-            b.vOut.setRotation(qOut);
         }
     }
 
@@ -124,7 +134,7 @@ public class AdditiveRotationBlend
         public final List<VJoint> vjList;
         public final VJoint vOut;
         public final VJoint vBase;
-        
+
         public Blender(VJoint vBase, List<VJoint> vjList, VJoint vO)
         {
             this.vjList = vjList;

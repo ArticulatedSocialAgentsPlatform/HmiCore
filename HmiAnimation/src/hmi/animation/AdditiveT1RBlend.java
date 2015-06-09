@@ -23,6 +23,7 @@
 package hmi.animation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -62,7 +63,7 @@ public class AdditiveT1RBlend
     public AdditiveT1RBlend(VJoint vBase, final List<VJoint> vj, VJoint vOut)
     {
         this.vOut = vOut;
-        this.vJoints = new ArrayList<VJoint>(vj);
+        this.vJoints = Collections.synchronizedList(new ArrayList<VJoint>(vj));
         this.vBase = vBase;
         rotBlend = new AdditiveRotationBlend(vBase, vJoints, vOut);
     }
@@ -71,7 +72,7 @@ public class AdditiveT1RBlend
     {
         rotBlend.setIdentityRotation();
     }
-    
+
     public void addVJoint(VJoint vj)
     {
         vJoints.add(vj);
@@ -83,10 +84,13 @@ public class AdditiveT1RBlend
         float t[] = Vec3f.getVec3f();
         float vEnd[] = Vec3f.getVec3f();
         vBase.getTranslation(vEnd);
-        for (VJoint vj : vJoints)
+        synchronized (vJoints)
         {
-            vj.getTranslation(t);
-            Vec3f.add(vEnd, t);
+            for (VJoint vj : vJoints)
+            {
+                vj.getTranslation(t);
+                Vec3f.add(vEnd, t);
+            }
         }
         vOut.setTranslation(vEnd);
         rotBlend.blend();
