@@ -92,7 +92,7 @@ public class AdditiveT1RBlendTest
     @Test
     public void testThreeRotation()
     {
-        AdditiveT1RBlend blend = new AdditiveT1RBlend(ImmutableList.of(vj1, vj2, vj3), vjOut);
+        AdditiveT1RBlend blend = new AdditiveT1RBlend(vj1, ImmutableList.of(vj2, vj3), vjOut);
         vj1.setAxisAngle(1, 0, 0, (float) Math.PI);
         vj1.getPart("v2").setAxisAngle(0, 1, 0, (float) Math.PI * 1.0f/3.0f);
         vj2.getPart("v2").setAxisAngle(0, 1, 0, (float) Math.PI * 1.0f/3.0f);

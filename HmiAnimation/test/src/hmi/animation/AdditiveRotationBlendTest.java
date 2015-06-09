@@ -57,7 +57,7 @@ public class AdditiveRotationBlendTest
     @Test
     public void testThree()
     {
-        AdditiveRotationBlend blend = new AdditiveRotationBlend(ImmutableList.of(vj1, vj2, vj3), vjOut);
+        AdditiveRotationBlend blend = new AdditiveRotationBlend(vj1, ImmutableList.of(vj2, vj3), vjOut);
         vj1.setAxisAngle(1, 0, 0, (float) Math.PI);
         vj1.getPart("v2").setAxisAngle(0, 1, 0, (float) Math.PI * 1.0f / 3.0f);
         vj2.getPart("v2").setAxisAngle(0, 1, 0, (float) Math.PI * 1.0f / 3.0f);
@@ -102,7 +102,7 @@ public class AdditiveRotationBlendTest
     @Test
     public void testSetIdentityRotation()
     {
-        AdditiveRotationBlend blend = new AdditiveRotationBlend(ImmutableList.of(vj1, vj2, vj3), vjOut);
+        AdditiveRotationBlend blend = new AdditiveRotationBlend(vj1, ImmutableList.of(vj2, vj3), vjOut);
         for (int i = 1; i < 4; i++)
         {
             vj1.getPart("v" + i).setRollPitchYawDegrees(1, 1, 1);
@@ -114,9 +114,9 @@ public class AdditiveRotationBlendTest
         vj2.getPart("v3").getRotation(q2);
         vj3.getPart("v4").getRotation(q3);
         vj1.getPart("v2").getRotation(q4);
-        Quat4fTestUtil.assertQuat4fRotationEquivalent(Quat4f.getIdentity(), q1, PRECISION);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(Quat4f.getQuat4fFromRollPitchYawDegrees(1,1,1), q1, PRECISION);
         Quat4fTestUtil.assertQuat4fRotationEquivalent(Quat4f.getIdentity(), q2, PRECISION);
         Quat4fTestUtil.assertQuat4fRotationEquivalent(Quat4f.getIdentity(), q3, PRECISION);
-        Quat4fTestUtil.assertQuat4fRotationEquivalent(Quat4f.getIdentity(), q4, PRECISION);
+        Quat4fTestUtil.assertQuat4fRotationEquivalent(Quat4f.getQuat4fFromRollPitchYawDegrees(1,1,1), q4, PRECISION);
     }
 }

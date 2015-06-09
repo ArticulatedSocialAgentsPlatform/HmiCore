@@ -32,7 +32,7 @@ import com.google.common.collect.ImmutableList;
 
 /**
  * Does an additive blend of the rotations of two or more joints and all their children:<br>
- * qOut = q1 * q2
+ * qOut = qBase * q1 * q2 * ...
  * 
  * @author welberge
  */
@@ -51,12 +51,12 @@ public class AdditiveRotationBlend
      * @param vOut
      *            output joint
      */
-    public AdditiveRotationBlend(final VJoint v1, final VJoint v2, VJoint vOut)
+    public AdditiveRotationBlend(final VJoint vBase, final VJoint vAdd, VJoint vOut)
     {
-        this(ImmutableList.of(v1, v2), vOut);
+        this(vBase, ImmutableList.of(vAdd), vOut);
     }
 
-    public AdditiveRotationBlend(final List<VJoint> vj, VJoint vOut)
+    public AdditiveRotationBlend(VJoint vBase, final List<VJoint> vj, VJoint vOut)
     {
         int i = 0;
         for (VJoint vO : vOut.getParts())
@@ -67,7 +67,7 @@ public class AdditiveRotationBlend
                 VJoint vj1 = v1.getParts().get(i);
                 vjList.add(vj1);
             }
-            Blender b = new Blender(vjList, vO);
+            Blender b = new Blender(vBase.getParts().get(i), vjList, vO);
             blenders.add(b);
             i++;
         }
@@ -109,7 +109,7 @@ public class AdditiveRotationBlend
         float q[] = Quat4f.getQuat4f();
         for (Blender b : blenders)
         {
-            Quat4f.setIdentity(qOut);
+            b.vBase.getRotation(qOut);
             for (VJoint vj : b.vjList)
             {
                 vj.getRotation(q);
@@ -123,10 +123,12 @@ public class AdditiveRotationBlend
     {
         public final List<VJoint> vjList;
         public final VJoint vOut;
-
-        public Blender(List<VJoint> vjList, VJoint vO)
+        public final VJoint vBase;
+        
+        public Blender(VJoint vBase, List<VJoint> vjList, VJoint vO)
         {
             this.vjList = vjList;
+            this.vBase = vBase;
             vOut = vO;
         }
     }

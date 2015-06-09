@@ -31,15 +31,17 @@ import hmi.math.Vec3f;
 
 /**
  * Does an additive blend of the rotations of two joints and all their children and adds up the root translations:<br>
- * qOut = q1 * q2
+ * qOut = qBase * q1 * q2 * ...
+ * vOut = vBase + v1 + v2 + ...
  * 
  * @author welberge
  */
 public class AdditiveT1RBlend
 {
     private final AdditiveRotationBlend rotBlend;
+    private final VJoint vBase;
     private List<VJoint> vJoints;
-    private VJoint vOut;
+    private final VJoint vOut;
 
     /**
      * Constructor Assumes that v1.getParts(), v2.getParts() and vOut.getParts()
@@ -52,16 +54,17 @@ public class AdditiveT1RBlend
      * @param vOut
      *            output joint
      */
-    public AdditiveT1RBlend(final VJoint v1, final VJoint v2, VJoint vOut)
+    public AdditiveT1RBlend(VJoint vBase, final VJoint vAdd, VJoint vOut)
     {
-        this(ImmutableList.of(v1, v2), vOut);
+        this(vBase, ImmutableList.of(vAdd), vOut);
     }
 
-    public AdditiveT1RBlend(final List<VJoint> vj, VJoint vOut)
+    public AdditiveT1RBlend(VJoint vBase, final List<VJoint> vj, VJoint vOut)
     {
         this.vOut = vOut;
         this.vJoints = new ArrayList<VJoint>(vj);
-        rotBlend = new AdditiveRotationBlend(vJoints, vOut);
+        this.vBase = vBase;
+        rotBlend = new AdditiveRotationBlend(vBase, vJoints, vOut);
     }
 
     public void setIdentityRotation()
@@ -79,6 +82,7 @@ public class AdditiveT1RBlend
     {
         float t[] = Vec3f.getVec3f();
         float vEnd[] = Vec3f.getVec3f();
+        vBase.getTranslation(vEnd);
         for (VJoint vj : vJoints)
         {
             vj.getTranslation(t);
