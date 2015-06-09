@@ -107,9 +107,15 @@ public class AdditiveRotationBlend
 
     public void clear()
     {
-        blenders.clear();
+        synchronized (blenders)
+        {
+            for (Blender b : blenders)
+            {
+                b.vjList.clear();
+            }
+        }
     }
-    
+
     /**
      * Does an additive blend of the rotations of input joints 1 with input
      * joints 2 and stores the result to the output joints Blending is done
