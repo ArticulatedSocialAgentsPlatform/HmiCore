@@ -28,6 +28,7 @@ import hmi.math.Quat4f;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 
@@ -74,6 +75,23 @@ public class AdditiveRotationBlend
         }
     }
 
+    public void addVJoint(VJoint vj, Set<String> sids)
+    {
+        int i = 0;
+        synchronized (blenders)
+        {
+            for (Blender b : blenders)
+            {
+                VJoint vjPart = vj.getParts().get(i);
+                if(sids.contains(vjPart.getSid()))
+                {
+                    b.vjList.add(vjPart);
+                }
+                i++;
+            }
+        }
+    }
+    
     public void addVJoint(VJoint vj)
     {
         int i = 0;
