@@ -83,7 +83,7 @@ public class AdditiveRotationBlend
             for (Blender b : blenders)
             {
                 VJoint vjPart = vj.getParts().get(i);
-                if(sids.contains(vjPart.getSid()))
+                if (sids.contains(vjPart.getSid()))
                 {
                     b.vjList.add(vjPart);
                 }
@@ -91,7 +91,7 @@ public class AdditiveRotationBlend
             }
         }
     }
-    
+
     public void addVJoint(VJoint vj)
     {
         int i = 0;
@@ -103,6 +103,29 @@ public class AdditiveRotationBlend
                 b.vjList.add(vjPart);
                 i++;
             }
+        }
+    }
+
+    public void removeVJoint(VJoint vj)
+    {
+        int i = 0;
+        synchronized (blenders)
+        {
+            for (Blender b : blenders)
+            {
+                VJoint vjPart = vj.getParts().get(i);
+                b.vjList.remove(vjPart);
+                i++;
+            }
+        }
+    }
+
+    public void filterVJoint(VJoint vj, Set<String> sids)
+    {
+        synchronized (blenders)
+        {
+            removeVJoint(vj);
+            addVJoint(vj, sids);
         }
     }
 
