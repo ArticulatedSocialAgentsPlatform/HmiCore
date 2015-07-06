@@ -65,13 +65,12 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
     private int stride; // number of floats for a single joint, except for a possible
                         // rootTranslation
 
-    private boolean hasRootTranslation, hasTranslation, hasRotation, hasScale, hasVelocity,
-            hasAngularVelocity;
+    private boolean hasRootTranslation, hasTranslation, hasRotation, hasScale, hasVelocity, hasAngularVelocity;
 
     private String rotationEncoding = "Quat"; // default is quaternions
 
     private VObject[] targetParts;
-    
+
     private VJoint target;
 
     // cached values for the interpolation process:
@@ -140,7 +139,7 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
         targetParts = p.targetParts;
         target = p.target;
     }
-    
+
     public SkeletonInterpolator()
     {
         configs = new ConfigList(0);
@@ -316,8 +315,8 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
 
     private void filterTargetParts(Set<String> joints)
     {
-        ArrayList<VObject> newParts = new ArrayList<VObject>();        
-        int i=0;
+        ArrayList<VObject> newParts = new ArrayList<VObject>();
+        int i = 0;
         for (VObject vj : targetParts)
         {
             if (joints.contains(partIds[i]))
@@ -326,7 +325,7 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
             }
             i++;
         }
-        targetParts = newParts.toArray(new VObject[0]);        
+        targetParts = newParts.toArray(new VObject[0]);
     }
 
     /**
@@ -371,11 +370,11 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
             }
             newConfig.addConfig(configs.getTime(j), dst);
         }
-        if(targetParts!=null)
+        if (targetParts != null)
         {
             filterTargetParts(joints);
         }
-        setPartIds(newPartIds.toArray(new String[0]));        
+        setPartIds(newPartIds.toArray(new String[0]));
         setConfigList(newConfig);
         if (removeRoot)
         {
@@ -511,9 +510,9 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
         }
         for (int i = 0; i < targetParts.length; i++)
         {
-            //can happen if the SkeletonInterpolator contains joints that are not in the target
-            if(targetParts[i]==null)continue; 
-            
+            // can happen if the SkeletonInterpolator contains joints that are not in the target
+            if (targetParts[i] == null) continue;
+
             if (hasTranslation)
             {
                 Vec3f.interpolate(buf, 0, lowerConfig, index, upperConfig, index, alpha);
@@ -565,8 +564,8 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
          */
         if (lowerTime <= t && t < upperTime)
         { // check for "fast path" conditions
-            // lowerTime, upperTime, lowerIndex, upperIndex, lowerConfig, upperConfig, interval
-            // unchanged.
+          // lowerTime, upperTime, lowerIndex, upperIndex, lowerConfig, upperConfig, interval
+          // unchanged.
             return (float) ((t - lowerTime) / interval);
         }
         if (t < lowerTime)
@@ -614,8 +613,7 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
                 lowerIndex = probe;
             }
         } // time[lowerIndex] <= t && t <time[upperIndex] && upperIndex = lowerIndex+1
-        if (upperIndex != lowerIndex + 1 && upperIndex != lowerIndex) logger
-                .debug("***********************************");
+        if (upperIndex != lowerIndex + 1 && upperIndex != lowerIndex) logger.debug("***********************************");
         if (upperIndex != lowerIndex + 1 && upperIndex != lowerIndex)
         {
 
@@ -674,52 +672,58 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
 
     private void mirrorParts(int i)
     {
-        if(targetParts!=null && targetParts.length>0)
+        if (targetParts != null && targetParts.length > 0)
         {
-            if(!targetParts[i].getSid().equals(partIds[i]))
+            if (!targetParts[i].getSid().equals(partIds[i]))
             {
-                for(int j=0;j<targetParts.length;j++)
+                for (int j = 0; j < targetParts.length; j++)
                 {
-                    if(targetParts[j].getSid().equals(partIds[i]))
+                    if (targetParts[j].getSid().equals(partIds[i]))
                     {
                         VObject temp = targetParts[i];
-                        targetParts[i]=targetParts[j];
-                        targetParts[j]=temp;
+                        targetParts[i] = targetParts[j];
+                        targetParts[j] = temp;
                         return;
                     }
                 }
-                targetParts[i]=target.getPart(partIds[i]);
+                targetParts[i] = target.getPart(partIds[i]);
             }
         }
     }
+
     /**
-     * Mirrors all joint rotations on the XY plane, switches left/right partIds     
+     * Mirrors all joint rotations on the XY plane, switches left/right partIds
      */
     public void mirror()
     {
         int index = 0;
-        if(hasRootTranslation)index+=3;
-        for(int i=0;i<partIds.length;i++)
+        if (hasRootTranslation)
         {
-            if(partIds[i].startsWith("l_"))
+            configs.mirrorTranslation(index);
+            index += 3;            
+        }
+        for (int i = 0; i < partIds.length; i++)
+        {
+            if (partIds[i].startsWith("l_"))
             {
                 partIds[i] = partIds[i].replace("l_", "r_");
-                mirrorParts(i);                
+                mirrorParts(i);
             }
-            else if(partIds[i].startsWith("r_"))
+            else if (partIds[i].startsWith("r_"))
             {
-                partIds[i] = partIds[i].replace("r_", "l_");     
-                mirrorParts(i); 
+                partIds[i] = partIds[i].replace("r_", "l_");
+                mirrorParts(i);
             }
-            
+
             if (hasTranslation)
             {
+                configs.mirrorTranslation(index);
                 index += 3;
             }
             if (hasRotation)
             {
-                logger.debug("mirroring {}, index {}",partIds[i],index);
-                configs.mirror(index);
+                logger.debug("mirroring {}, index {}", partIds[i], index);
+                configs.mirrorRotation(index);
                 index += 4;
             }
             if (hasScale)
@@ -735,10 +739,9 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
                 index += 3;
             }
         }
-        
-        
+
     }
-    
+
     /**
      * Appends a String of signature attributes to buf
      */
@@ -749,7 +752,7 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
         if (rotationEncoding != null) appendAttribute(buf, "rotationEncoding", rotationEncoding);
         if (partIds != null && partIds.length > 0)
         {
-            appendAttribute(buf, "parts", partIds,  ' ', fmt, 10);
+            appendAttribute(buf, "parts", partIds, ' ', fmt, 10);
         }
         return buf;
     }
@@ -793,15 +796,13 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
             {
                 convertFromAxisAngles();
             }
-            else if(rotationEncoding.equals("quat") || rotationEncoding.equals("Quat"))
+            else if (rotationEncoding.equals("quat") || rotationEncoding.equals("Quat"))
             {// do nothing
             }
-            else if(rotationEncoding.equals("xyzw") || rotationEncoding.equals("XYZW") || rotationEncoding.equals("reversedQuat"))
+            else if (rotationEncoding.equals("xyzw") || rotationEncoding.equals("XYZW") || rotationEncoding.equals("reversedQuat"))
             {
                 reverseQuats();
             }
-            
-           
 
         }
     }
@@ -832,7 +833,7 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
             }
         }
     }
-    
+
     private void reverseQuats()
     {
         for (int i = 0; i < configs.size(); i++)
@@ -848,8 +849,9 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
 
     public SkeletonInterpolator subSkeletonInterpolator(int start)
     {
-        return subSkeletonInterpolator(start,size());
+        return subSkeletonInterpolator(start, size());
     }
+
     public SkeletonInterpolator subSkeletonInterpolator(int start, int end)
     {
         SkeletonInterpolator subSki = new SkeletonInterpolator();
@@ -874,8 +876,7 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
      * Resources object that determines the resource directory, whereas the seond argument must be
      * the filename relative to the resource directory.
      */
-    public static SkeletonInterpolator read(Resources resources, String fileName)
-            throws IOException
+    public static SkeletonInterpolator read(Resources resources, String fileName) throws IOException
     {
         Reader reader = resources.getReader(fileName);
         XMLTokenizer tk = new XMLTokenizer(reader);
@@ -933,8 +934,6 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
         return XMLTAG;
     }
 
-    
-    
     /**
      * @return the targetParts
      */

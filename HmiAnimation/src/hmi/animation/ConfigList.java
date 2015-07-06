@@ -27,6 +27,7 @@
 package hmi.animation;
 
 import hmi.math.Quat4f;
+import hmi.math.Vec3f;
 import hmi.xml.XMLFormatting;
 import hmi.xml.XMLStructureAdapter;
 import hmi.xml.XMLTokenizer;
@@ -111,7 +112,7 @@ public class ConfigList extends XMLStructureAdapter implements Cloneable
         return time[i];
     }
 
-    public void mirror(int index)
+    public void mirrorRotation(int index)
     {
         for (int i = 0; i < listSize; i++)
         {
@@ -123,6 +124,17 @@ public class ConfigList extends XMLStructureAdapter implements Cloneable
         }
     }
 
+    public void mirrorTranslation(int index)
+    {
+        for (int i = 0; i < listSize; i++)
+        {
+            float[] config = configList[i];
+            float v[] = Vec3f.getVec3f();
+            Vec3f.set(v, 0, config, index);
+            Vec3f.set(config, index, -v[Vec3f.X], v[Vec3f.Y], -v[Vec3f.Z]);
+        }
+    }
+    
     public ConfigList subConfigList(int start, int end)
     {
         ConfigList cl = new ConfigList(configSize);

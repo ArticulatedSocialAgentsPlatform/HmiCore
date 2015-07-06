@@ -28,11 +28,14 @@ package hmi.animation;
 
 import static org.junit.Assert.*;
 import static hmi.testutil.math.Quat4fTestUtil.assertQuat4fRotationEquivalent;
+import static hmi.testutil.math.Vec3fTestUtil.assertVec3fEquals;
+
 import org.junit.*;
 
 import hmi.testutil.animation.HanimBody;
 import hmi.xml.*;
 import hmi.math.*;
+
 import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,7 +45,8 @@ import java.util.Set;
  */
 public class SkeletonInterpolatorTest
 {
-
+    private static final float PRECISION = 0.0001f;
+    
     public float[] c0, c1, c2, c3, c4, c5, c6, c7;
     public double t0, t1, t2, t3, t4, t5, t6, t7;
     ConfigList clist1;
@@ -296,7 +300,7 @@ public class SkeletonInterpolatorTest
         ski.interpolateMillis(0);
         float q[] = Quat4f.getQuat4f();
         vHuman.getPart(Hanim.HumanoidRoot).getRotation(q);
-        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, 0.0001f);
+        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, PRECISION);
     }
 
     @Test
@@ -314,7 +318,7 @@ public class SkeletonInterpolatorTest
         v.getRotation(qv);
         float[] qski = Quat4f.getQuat4f();
         Quat4f.set(qski, 1, 0, 0, 0);
-        assertTrue(Quat4f.epsilonEquals(qv, qski, 0.001f));
+        assertTrue(Quat4f.epsilonEquals(qv, qski, PRECISION));
     }
 
     @Test
@@ -351,13 +355,13 @@ public class SkeletonInterpolatorTest
         ski.interpolateMillis(0);
         float[] q = Quat4f.getQuat4f();
         vHuman.getRotation(q);
-        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, 0.0001f);
+        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, PRECISION);
 
         lSh.getRotation(q);
-        assertQuat4fRotationEquivalent(0, 0, 1, 0, q, 0.0001f);
+        assertQuat4fRotationEquivalent(0, 0, 1, 0, q, PRECISION);
 
         rSh.getRotation(q);
-        assertQuat4fRotationEquivalent(0, 0, 0, 1, q, 0.0001f);
+        assertQuat4fRotationEquivalent(0, 0, 0, 1, q, PRECISION);
     }
 
     @Test
@@ -413,17 +417,38 @@ public class SkeletonInterpolatorTest
         ski.interpolateMillis(0);
         float[] q = Quat4f.getQuat4f();
         vHuman.getRotation(q);
-        assertQuat4fRotationEquivalent(0, 0, 0, 1, q, 0.0001f);
+        assertQuat4fRotationEquivalent(0, 0, 0, 1, q, PRECISION);
 
         lSh.getRotation(q);
-        assertQuat4fRotationEquivalent(0, 0, 1, 0, q, 0.0001f);
+        assertQuat4fRotationEquivalent(0, 0, 1, 0, q, PRECISION);
 
         rSh.getRotation(q);
-        assertQuat4fRotationEquivalent(0, 1, 0, 0, q, 0.0001f);
+        assertQuat4fRotationEquivalent(0, 1, 0, 0, q, PRECISION);
     }
 
     @Test
-    public void testMirror()
+    public void testMirrorWithT1R()
+    {
+        String str = "<SkeletonInterpolator rotationEncoding=\"quaternions\" parts=\"HumanoidRoot\" encoding=\"T1R\">" + "0 1 2 3 0 0 1 0 \n"
+                + "1 1 2 3 0 0 1 0 " + "</SkeletonInterpolator>";
+        SkeletonInterpolator ski = new SkeletonInterpolator();
+        ski.readXML(str);
+        VJoint vHuman = HanimBody.getLOA1HanimBody();
+        ski.setTarget(vHuman);
+        ski.mirror();
+        ski.interpolateTargetParts(0);
+        
+        float q[] = Quat4f.getQuat4f();
+        vHuman.getPart(Hanim.HumanoidRoot).getRotation(q);
+        assertQuat4fRotationEquivalent(0, 0, -1, 0, q, PRECISION);
+
+        float tr[]=Vec3f.getVec3f();
+        vHuman.getPart("HumanoidRoot").getTranslation(tr);
+        assertVec3fEquals(-1,2,-3,tr, PRECISION);
+    }
+    
+    @Test
+    public void testMirrorR()
     {
         String str = "<SkeletonInterpolator rotationEncoding=\"quaternions\" parts=\"r_shoulder\" encoding=\"R\">" + "0 0 0 1 0 \n"
                 + "1 0 0 1 0 " + "</SkeletonInterpolator>";
@@ -436,10 +461,10 @@ public class SkeletonInterpolatorTest
 
         float q[] = Quat4f.getQuat4f();
         vHuman.getPart(Hanim.r_shoulder).getRotation(q);
-        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, 0.0001f);
+        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, PRECISION);
 
         vHuman.getPart(Hanim.l_shoulder).getRotation(q);
-        assertQuat4fRotationEquivalent(0, 0, -1, 0, q, 0.0001f);
+        assertQuat4fRotationEquivalent(0, 0, -1, 0, q, PRECISION);
     }
 
     @Test
@@ -462,10 +487,10 @@ public class SkeletonInterpolatorTest
 
         float q[] = Quat4f.getQuat4f();
         vHuman.getPart(Hanim.r_shoulder).getRotation(q);
-        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, 0.0001f);
+        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, PRECISION);
 
         vHuman.getPart(Hanim.l_shoulder).getRotation(q);
-        assertQuat4fRotationEquivalent(0, 0, -1, 0, q, 0.0001f);
+        assertQuat4fRotationEquivalent(0, 0, -1, 0, q, PRECISION);
     }
 
     @Test
@@ -489,10 +514,10 @@ public class SkeletonInterpolatorTest
 
         float q[] = Quat4f.getQuat4f();
         vHuman.getPart(Hanim.r_shoulder).getRotation(q);
-        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, 0.0001f);
+        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, PRECISION);
 
         vHuman.getPart(Hanim.l_shoulder).getRotation(q);
-        assertQuat4fRotationEquivalent(0, 0, -1, 0, q, 0.0001f);
+        assertQuat4fRotationEquivalent(0, 0, -1, 0, q, PRECISION);
     }
 
     @Test
@@ -510,10 +535,10 @@ public class SkeletonInterpolatorTest
 
         float q[] = Quat4f.getQuat4f();
         vHuman.getPart(Hanim.r_shoulder).getRotation(q);
-        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, 0.0001f);
+        assertQuat4fRotationEquivalent(1, 0, 0, 0, q, PRECISION);
 
         vHuman.getPart(Hanim.l_shoulder).getRotation(q);
-        assertQuat4fRotationEquivalent(0, 0, -1, 0, q, 0.0001f);
+        assertQuat4fRotationEquivalent(0, 0, -1, 0, q, PRECISION);
     }
 
     @Test
