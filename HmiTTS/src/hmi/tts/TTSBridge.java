@@ -25,7 +25,7 @@ package hmi.tts;
 import java.io.IOException;
 
 /**
- * Generic interface to a TTSGenerator 
+ * Generic interface to a TTSGenerator
  * @author welberge
  */
 public interface TTSBridge
@@ -34,19 +34,19 @@ public interface TTSBridge
      * Speaks out the sentence, does the appropriate callbacks, fills out visime,
      * @param text the text or script to speak
      */
-    TTSTiming speak(String text);
-    
+    TTSTiming speak(String text) throws TTSException;
+
     /**
      * Generates a file containing the spoken sentence, does the apropiate
      * callbacks, fills out visime, phoneme, bookmark and word lists.
      * 
      * @param text
      *            the text or script to speak
-     * @throws FileNotFoundException 
-     * @throws IOException 
+     * @throws FileNotFoundException
+     * @throws IOException
      */
-    TTSTiming speakToFile(String text, String filename) throws IOException;
-    
+    TTSTiming speakToFile(String text, String filename) throws IOException, TTSException;
+
     /**
      * Gets the timing of the text, fills out visime, phoneme,bookmark and word
      * lists
@@ -54,5 +54,5 @@ public interface TTSBridge
      * @param text
      *            the text or script to get the timing of
      */
-    TTSTiming getTiming(String text);    
+    TTSTiming getTiming(String text) throws TTSException;
 }

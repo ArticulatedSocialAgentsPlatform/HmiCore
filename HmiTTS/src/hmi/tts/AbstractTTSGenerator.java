@@ -76,19 +76,19 @@ public abstract class AbstractTTSGenerator
         permanentCallback = cb;
     }
 
-    public abstract TTSTiming speak(String text);
+    public abstract TTSTiming speak(String text) throws TTSException;
 
     /**
-     * Speaks out the BML sentence, does the apropiate callbacks, fills out
+     * Speaks out the BML sentence, does the appropriate callbacks, fills out
      * visime, phoneme, bookmark and word lists
      * 
      * @param text
      *            the text or script to speak
      */
-    public abstract TTSTiming speakBML(String text);
+    public abstract TTSTiming speakBML(String text)throws TTSException;
 
     /**
-     * Generates a file containing the spoken sentence, does the apropiate
+     * Generates a file containing the spoken sentence, does the appropriate
      * callbacks, fills out visime, phoneme, bookmark and word lists.
      * 
      * @param text
@@ -96,17 +96,17 @@ public abstract class AbstractTTSGenerator
      * @throws FileNotFoundException 
      * @throws IOException 
      */
-    public abstract TTSTiming speakToFile(String text, String filename) throws IOException;
+    public abstract TTSTiming speakToFile(String text, String filename) throws IOException, TTSException;
 
     /**
-     * Generates a file containing the spoken BML sentence, does the apropiate
+     * Generates a file containing the spoken BML sentence, does the appropriate
      * callbacks, fills out visime, phoneme, bookmark and word lists.
      * 
      * @param text
      *            the text or script to speak
      * @throws IOException 
      */
-    public abstract TTSTiming speakBMLToFile(String text, String filename) throws IOException;
+    public abstract TTSTiming speakBMLToFile(String text, String filename) throws IOException, TTSException;
 
     /**
      * Gets the timing of the text, fills out visime, phoneme,bookmark and word
@@ -115,7 +115,7 @@ public abstract class AbstractTTSGenerator
      * @param text
      *            the text or script to get the timing of
      */
-    public abstract TTSTiming getTiming(String text);
+    public abstract TTSTiming getTiming(String text) throws TTSException;
 
     /**
      * Sets the speaker
@@ -137,7 +137,7 @@ public abstract class AbstractTTSGenerator
      * @param b
      *            the bml speech behavior
      */
-    public abstract TTSTiming getBMLTiming(String s);
+    public abstract TTSTiming getBMLTiming(String s)throws TTSException;
 
     /**
      * Get the duration of the last spoken/timed text

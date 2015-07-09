@@ -23,6 +23,7 @@
 package hmi.tts.mary5;
 
 import hmi.tts.TTSBridge;
+import hmi.tts.TTSException;
 
 import java.io.IOException;
 
@@ -43,19 +44,19 @@ abstract class AbstractMaryTTSBridge implements TTSBridge
     }
     
     @Override
-    public MaryProsody speak(String text)
+    public MaryProsody speak(String text)throws TTSException
     {
         return ttsGenerator.speak(wrap(text),inputType);
     }
 
     @Override
-    public MaryProsody speakToFile(String text, String filename) throws IOException
+    public MaryProsody speakToFile(String text, String filename) throws IOException, TTSException
     {
         return ttsGenerator.speakToFile(wrap(text),filename,inputType);        
     }
 
     @Override
-    public MaryProsody getTiming(String text)
+    public MaryProsody getTiming(String text) throws TTSException
     {
         return ttsGenerator.getTiming(wrap(text),inputType);        
     }

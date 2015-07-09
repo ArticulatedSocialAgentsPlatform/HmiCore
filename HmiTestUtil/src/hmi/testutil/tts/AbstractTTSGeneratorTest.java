@@ -27,6 +27,7 @@ import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.junit.Assert.assertEquals;
 import hmi.tts.AbstractTTSGenerator;
 import hmi.tts.Bookmark;
+import hmi.tts.TTSException;
 import hmi.tts.TTSTiming;
 import hmi.tts.Visime;
 
@@ -48,19 +49,18 @@ public abstract class AbstractTTSGeneratorTest
     protected static AbstractTTSGenerator ttsG = null;
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTTSGeneratorTest.class.getName());
     private static final double PARAMETER_PRECISION = 0.0001;
-    
+
     @Test
-    public void testVisimes()
+    public void testVisimes() throws TTSException
     {
         for (String voice : ttsG.getVoices())
         {
             ttsG.setVoice(voice);
-            TTSTiming tInfo = ttsG
-                    .getBMLTiming("<sync id=\"deicticheart1\"/>Welcome!<sync id=\"deicticheart2\"/> "
-                            + "I am Griet, I am 16 year old and I would like to tell you something about my life. "
-                            + "People know me as the girl with the pearl ear ring. My father can no longer work since he was blinded. "
-                            + "<sync id=\"beat1b1\"/>Because we still need to eat, I took service with a local painter. "
-                            + "His name is Johannes <sync id=\"vermeer1\"/>Vermeer.<sync id=\"vermeer2\"/>");
+            TTSTiming tInfo = ttsG.getBMLTiming("<sync id=\"deicticheart1\"/>Welcome!<sync id=\"deicticheart2\"/> "
+                    + "I am Griet, I am 16 year old and I would like to tell you something about my life. "
+                    + "People know me as the girl with the pearl ear ring. My father can no longer work since he was blinded. "
+                    + "<sync id=\"beat1b1\"/>Because we still need to eat, I took service with a local painter. "
+                    + "His name is Johannes <sync id=\"vermeer1\"/>Vermeer.<sync id=\"vermeer2\"/>");
             List<Visime> vs = tInfo.getVisimes();
             double totalDuration = 0;
             for (Visime v : vs)
@@ -72,18 +72,16 @@ public abstract class AbstractTTSGeneratorTest
     }
 
     @Test
-    public void testBookmarks()
+    public void testBookmarks() throws TTSException
     {
         for (String voice : ttsG.getVoices())
         {
             ttsG.setVoice(voice);
-            TTSTiming tInfo = ttsG
-                    .getBMLTiming("<sync id=\"deicticheart1\"/>Welcome!<sync id=\"deicticheart2\"/> "
-                            + "I am Griet, I am 16 year old and I would like to tell you something about my life. "
-                            + "People know me as the girl with the pearl ear ring. "
-                            + "My father can no longer work since he was blinded. "
-                            + "<sync id=\"beat1b1\"/>Because we still need to eat, I took service with a local painter. "
-                            + "His name is Johannes <sync id=\"vermeer1\"/>Vermeer.<sync id=\"vermeer2\"/>");
+            TTSTiming tInfo = ttsG.getBMLTiming("<sync id=\"deicticheart1\"/>Welcome!<sync id=\"deicticheart2\"/> "
+                    + "I am Griet, I am 16 year old and I would like to tell you something about my life. "
+                    + "People know me as the girl with the pearl ear ring. " + "My father can no longer work since he was blinded. "
+                    + "<sync id=\"beat1b1\"/>Because we still need to eat, I took service with a local painter. "
+                    + "His name is Johannes <sync id=\"vermeer1\"/>Vermeer.<sync id=\"vermeer2\"/>");
 
             Bookmark b1 = tInfo.getBookmark("deicticheart1");
             Bookmark b2 = tInfo.getBookmark("deicticheart2");
@@ -93,31 +91,28 @@ public abstract class AbstractTTSGeneratorTest
             Bookmark v1 = tInfo.getBookmark("vermeer1");
             Bookmark v2 = tInfo.getBookmark("vermeer2");
             assertThat(v2.getOffset(), greaterThan(v1.getOffset()));
-            assertEquals(v2.getOffset(),Math.round(tInfo.getDuration() * 1000), PARAMETER_PRECISION);
+            assertEquals(v2.getOffset(), Math.round(tInfo.getDuration() * 1000), PARAMETER_PRECISION);
 
             return;
         }
     }
 
     @Test
-    public void testBookmarksWav() throws IOException
+    public void testBookmarksWav() throws IOException, TTSException
     {
         for (String voice : ttsG.getVoices())
         {
             ttsG.setVoice(voice);
             File f;
             f = File.createTempFile("testBookmarksWav", ".wav");
-            TTSTiming tInfo = ttsG
-                    .speakBMLToFile(
-                            "<sync id=\"deicticheart1\"/>Welcome!<sync id=\"deicticheart2\"/>"
-                                    + " I am Griet, I am 16 year old and I would like to tell you something about my life."
-                                    + " People know me as the girl with the pearl ear ring. My father can no longer work since he was blinded. "
-                                    + "<sync id=\"beat1b1\"/>Because we still need to eat, I took service with a local painter. "
-                                    + "His name is Johannes <sync id=\"vermeer1\"/>Vermeer.<sync id=\"vermeer2\"/>",
-                            f.getAbsolutePath());
+            TTSTiming tInfo = ttsG.speakBMLToFile("<sync id=\"deicticheart1\"/>Welcome!<sync id=\"deicticheart2\"/>"
+                    + " I am Griet, I am 16 year old and I would like to tell you something about my life."
+                    + " People know me as the girl with the pearl ear ring. My father can no longer work since he was blinded. "
+                    + "<sync id=\"beat1b1\"/>Because we still need to eat, I took service with a local painter. "
+                    + "His name is Johannes <sync id=\"vermeer1\"/>Vermeer.<sync id=\"vermeer2\"/>", f.getAbsolutePath());
             if (!f.delete())
             {
-                LOGGER.warn("Can't delete temp file! {}",f.getName());
+                LOGGER.warn("Can't delete temp file! {}", f.getName());
             }
 
             Bookmark b1 = tInfo.getBookmark("deicticheart1");
@@ -133,23 +128,23 @@ public abstract class AbstractTTSGeneratorTest
     }
 
     @Test
-    public void testDuration()
+    public void testDuration() throws TTSException
     {
         TTSTiming tInfo = ttsG.getBMLTiming("test");
-        assertEquals("test",tInfo.getWordDescriptions().get(0).getWord());
+        assertEquals("test", tInfo.getWordDescriptions().get(0).getWord());
         assertThat(tInfo.getDuration(), greaterThan(0d));
     }
 
     @Test
-    public void testSpeakDuration()
+    public void testSpeakDuration() throws TTSException
     {
         TTSTiming tInfo = ttsG.speak("test");
-        assertEquals("test",tInfo.getWordDescriptions().get(0).getWord());
+        assertEquals("test", tInfo.getWordDescriptions().get(0).getWord());
         assertThat(tInfo.getDuration(), greaterThan(0d));
     }
 
     @Test
-    public void testWavDuration() throws IOException
+    public void testWavDuration() throws IOException, TTSException
     {
         java.io.File f = File.createTempFile("test", ".wav");
         TTSTiming tInfo = ttsG.speakBMLToFile("test", f.getAbsolutePath());
@@ -157,7 +152,7 @@ public abstract class AbstractTTSGeneratorTest
         {
             LOGGER.warn("Can't delete temp file!");
         }
-        assertEquals("test",tInfo.getWordDescriptions().get(0).getWord());
+        assertEquals("test", tInfo.getWordDescriptions().get(0).getWord());
         assertThat(tInfo.getDuration(), greaterThan(0d));
     }
 }

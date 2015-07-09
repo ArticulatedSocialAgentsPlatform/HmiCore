@@ -23,33 +23,35 @@
 package hmi.tts;
 
 import java.io.IOException;
+
 /**
- * Generic interface to a TTSGenerator through which speech text with BML syncs can be sent 
+ * Generic interface to a TTSGenerator through which speech text with BML syncs can be sent
  * @author welberge
  */
 public class BMLTTSBridge implements TTSBridge
 {
     private final AbstractTTSGenerator ttsGenerator;
+
     public BMLTTSBridge(AbstractTTSGenerator ttsGen)
     {
         ttsGenerator = ttsGen;
     }
-    
+
     @Override
-    public TTSTiming speak(String text)
+    public TTSTiming speak(String text) throws TTSException
     {
-        return ttsGenerator.speakBML(text);        
+        return ttsGenerator.speakBML(text);
     }
 
     @Override
-    public TTSTiming speakToFile(String text, String filename) throws IOException
+    public TTSTiming speakToFile(String text, String filename) throws IOException, TTSException
     {
-        return ttsGenerator.speakBMLToFile(text, filename);        
+        return ttsGenerator.speakBMLToFile(text, filename);
     }
 
     @Override
-    public TTSTiming getTiming(String text)
+    public TTSTiming getTiming(String text) throws TTSException
     {
-        return ttsGenerator.getBMLTiming(text);        
-    }    
+        return ttsGenerator.getBMLTiming(text);
+    }
 }

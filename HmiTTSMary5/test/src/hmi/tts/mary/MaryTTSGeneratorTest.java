@@ -29,6 +29,7 @@ import static org.junit.Assert.assertThat;
 import java.io.IOException;
 
 import hmi.testutil.tts.AbstractTTSGeneratorTest;
+import hmi.tts.TTSException;
 import hmi.tts.mary5.MaryProsody;
 import hmi.tts.mary5.MaryTTSGenerator;
 import marytts.datatypes.MaryDataType;
@@ -53,7 +54,7 @@ public class MaryTTSGeneratorTest extends AbstractTTSGeneratorTest
     }
 
     @Test
-    public void testProsody() throws InterruptedException
+    public void testProsody() throws InterruptedException, TTSException
     {
         MaryProsody pros = mttsG.speakBML("Hello world");
         assertEquals(pros.getF0().length, pros.getRmsEnergy().length);
@@ -62,14 +63,14 @@ public class MaryTTSGeneratorTest extends AbstractTTSGeneratorTest
     @Test
     @Ignore
     // FIXME: current MaryTTS daily release breaks here...
-    public void testLongSentence() throws InterruptedException
+    public void testLongSentence() throws InterruptedException, TTSException
     {
         mttsG.speak("Twente");
         Thread.sleep(5000);
     }
 
     @Test
-    public void testProsodyBreaks() throws IOException
+    public void testProsodyBreaks() throws IOException, TTSException
     {
         MaryProsody pros1 = mttsG.speak(mttsG.getSSMLStartTag()+"test<break time=\"3s\"/></speak>",MaryDataType.SSML);
         MaryProsody pros2 = mttsG.speak(mttsG.getSSMLStartTag()+"test</speak>",MaryDataType.SSML);
