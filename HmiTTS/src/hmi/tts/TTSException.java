@@ -12,8 +12,8 @@ public class TTSException extends Exception
      */
     private static final long serialVersionUID = 1L;
 
-    public TTSException(Exception ex)
+    public TTSException(String message, Exception ex)
     {
-        this.initCause(ex);
+        super(message, ex);        
     }
 }

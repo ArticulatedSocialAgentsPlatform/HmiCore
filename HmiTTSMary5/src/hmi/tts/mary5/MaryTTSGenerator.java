@@ -129,7 +129,7 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
         }
         catch (SynthesisException e)
         {
-            throw new TTSException(e);
+            throw new TTSException(e.getLocalizedMessage(),e);
         }
     }
 
@@ -150,7 +150,7 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
         }
         catch (IOException e)
         {
-            throw new TTSException(e);
+            throw new TTSException(e.getLocalizedMessage(), e);
         }
         AudioPlayer ap = new AudioPlayer(new AudioInputStream(is2, audio.getFormat(), audio.getFrameLength()), null);
         ap.start();
@@ -179,7 +179,7 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
         }
         catch (IOException e)
         {
-            throw new TTSException(e);
+            throw new TTSException(e.getLocalizedMessage(), e);
         }
     }
 
@@ -425,7 +425,7 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
             }
             catch (SynthesisException | ParserConfigurationException | SAXException | IOException e)
             {
-                throw new TTSException(e);
+                throw new TTSException(e.getLocalizedMessage(), e);
             }
         }
         else
@@ -436,7 +436,7 @@ public class MaryTTSGenerator extends AbstractTTSGenerator
             }
             catch (SynthesisException e)
             {
-                throw new TTSException(e);
+                throw new TTSException(e.getLocalizedMessage(), e);
             }
         }
     }

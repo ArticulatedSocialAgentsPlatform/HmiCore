@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Abstract implementation for Text-To-Speech generators. 
+ * Abstract implementation for Text-To-Speech generators.
  * @author Herwin
  */
 public abstract class AbstractTTSGenerator
@@ -85,7 +85,7 @@ public abstract class AbstractTTSGenerator
      * @param text
      *            the text or script to speak
      */
-    public abstract TTSTiming speakBML(String text)throws TTSException;
+    public abstract TTSTiming speakBML(String text) throws TTSException;
 
     /**
      * Generates a file containing the spoken sentence, does the appropriate
@@ -93,8 +93,8 @@ public abstract class AbstractTTSGenerator
      * 
      * @param text
      *            the text or script to speak
-     * @throws FileNotFoundException 
-     * @throws IOException 
+     * @throws FileNotFoundException
+     * @throws IOException
      */
     public abstract TTSTiming speakToFile(String text, String filename) throws IOException, TTSException;
 
@@ -104,7 +104,7 @@ public abstract class AbstractTTSGenerator
      * 
      * @param text
      *            the text or script to speak
-     * @throws IOException 
+     * @throws IOException
      */
     public abstract TTSTiming speakBMLToFile(String text, String filename) throws IOException, TTSException;
 
@@ -124,7 +124,7 @@ public abstract class AbstractTTSGenerator
      *            speaker name
      */
     public abstract void setVoice(String speaker);
-    
+
     /**
      * Get the current speaker
      * @return
@@ -137,14 +137,13 @@ public abstract class AbstractTTSGenerator
      * @param b
      *            the bml speech behavior
      */
-    public abstract TTSTiming getBMLTiming(String s)throws TTSException;
+    public abstract TTSTiming getBMLTiming(String s) throws TTSException;
 
     /**
      * Get the duration of the last spoken/timed text
      * 
      * @return duration in s
      */
-    
 
     public abstract String[] getVoices();
 
