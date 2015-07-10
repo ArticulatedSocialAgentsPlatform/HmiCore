@@ -6,5 +6,6 @@
       <dependency org="hamcrest" name="hamcrest-all"       rev="latest.release"  />                       
       <!--dependency org="marytts" name="voice-dfki-pavoque-neutral-hsmm"       rev="latest.release"  /-->                       
       <dependency org="marytts" name="voice-cmu-slt-hsmm"       rev="latest.release"  />
+      
    </dependencies>
 </ivy-module>

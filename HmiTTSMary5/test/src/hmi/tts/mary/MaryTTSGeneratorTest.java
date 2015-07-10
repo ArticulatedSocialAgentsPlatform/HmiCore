@@ -25,17 +25,17 @@ package hmi.tts.mary;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-
-import java.io.IOException;
-
 import hmi.testutil.tts.AbstractTTSGeneratorTest;
 import hmi.tts.TTSException;
 import hmi.tts.mary5.MaryProsody;
 import hmi.tts.mary5.MaryTTSGenerator;
+
+import java.io.IOException;
+
 import marytts.datatypes.MaryDataType;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -50,9 +50,15 @@ public class MaryTTSGeneratorTest extends AbstractTTSGeneratorTest
     public static void setup() throws Exception
     {
         mttsG = new MaryTTSGenerator();
-        ttsG = mttsG;
+        ttsG = mttsG;        
     }
 
+    @Before
+    public void before()
+    {
+        mttsG.setVoice("cmu-slt-hsmm");
+    }
+    
     @Test
     public void testProsody() throws InterruptedException, TTSException
     {
@@ -61,18 +67,9 @@ public class MaryTTSGeneratorTest extends AbstractTTSGeneratorTest
     }
 
     @Test
-    @Ignore
-    // FIXME: current MaryTTS daily release breaks here...
-    public void testLongSentence() throws InterruptedException, TTSException
-    {
-        mttsG.speak("Twente");
-        Thread.sleep(5000);
-    }
-
-    @Test
     public void testProsodyBreaks() throws IOException, TTSException
     {
-        MaryProsody pros1 = mttsG.speak(mttsG.getSSMLStartTag()+"test<break time=\"3s\"/></speak>",MaryDataType.SSML);
+        MaryProsody pros1 = mttsG.speak(mttsG.getSSMLStartTag()+"test<break time=\"3.0s\"/></speak>",MaryDataType.SSML);
         MaryProsody pros2 = mttsG.speak(mttsG.getSSMLStartTag()+"test</speak>",MaryDataType.SSML);
         assertThat(pros1.getF0().length, greaterThan(pros2.getF0().length));
     }

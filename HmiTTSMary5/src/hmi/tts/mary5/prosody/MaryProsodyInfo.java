@@ -122,7 +122,7 @@ public class MaryProsodyInfo
 
     private PhraseBoundary parseBoundary(Node n, int startTime)
     {
-        int duration = Integer.parseInt(getAttribute(n, "duration", "0"));
+        int duration = (int)Math.round(Double.parseDouble(getAttribute(n, "duration", "0")));
         int breakindex = Integer.parseInt(getAttribute(n, "breakindex", "0"));
         String tone = getAttribute(n, "tone", "");
         return new PhraseBoundary(breakindex, tone, startTime, startTime + duration);
@@ -170,7 +170,7 @@ public class MaryProsodyInfo
 
     private Phoneme parsePhoneme(Node n, int startTime)
     {
-        int duration = Integer.parseInt(getAttribute(n, "d", "0"));
+        int duration = (int)Math.round(Double.parseDouble(getAttribute(n, "d", "0")));
         String phoneme = getAttribute(n, "p", "");
         String f0 = getAttribute(n, "f0", "");
         return new Phoneme(phoneme, startTime, startTime + duration, duration, getF0Frames(f0));
