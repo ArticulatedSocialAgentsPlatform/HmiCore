@@ -28,7 +28,7 @@ import java.util.List;
 import net.jcip.annotations.Immutable;
 
 /**
- * Timing info for sentences spoken by a TTS generator. 
+ * Timing info for sentences spoken by a TTS generator.
  * @author welberge
  */
 @Immutable
@@ -37,7 +37,14 @@ public final class TimingInfo implements TTSTiming
     private final List<WordDescription> wordDescriptions;
     private final List<Bookmark> bookmarks;
     private final List<Visime> visimes;
-    
+    private final Prosody prosody;
+
+    @Override
+    public Prosody getProsody()
+    {
+        return prosody;
+    }
+
     public List<WordDescription> getWordDescriptions()
     {
         return Collections.unmodifiableList(wordDescriptions);
@@ -50,7 +57,7 @@ public final class TimingInfo implements TTSTiming
 
     public List<Visime> getVisimes()
     {
-        return Collections.unmodifiableList(visimes);        
+        return Collections.unmodifiableList(visimes);
     }
 
     /**
@@ -67,14 +74,20 @@ public final class TimingInfo implements TTSTiming
         }
         return null;
     }
-    
-    public TimingInfo(List<WordDescription> wd, List<Bookmark> bms, List<Visime> vis)
+
+    public TimingInfo(List<WordDescription> wd, List<Bookmark> bms, List<Visime> vis, Prosody pros)
     {
         wordDescriptions = wd;
         bookmarks = bms;
         visimes = vis;
+        prosody = pros;
     }
-    
+
+    public TimingInfo(List<WordDescription> wd, List<Bookmark> bms, List<Visime> vis)
+    {
+        this(wd, bms, vis, null);
+    }
+
     public double getDuration()
     {
         double duration = 0;
@@ -84,10 +97,10 @@ public final class TimingInfo implements TTSTiming
         }
         return duration;
     }
-    
+
     @Override
     public String toString()
     {
-        return wordDescriptions.toString()+" "+bookmarks.toString();
+        return wordDescriptions.toString() + " " + bookmarks.toString();
     }
 }
