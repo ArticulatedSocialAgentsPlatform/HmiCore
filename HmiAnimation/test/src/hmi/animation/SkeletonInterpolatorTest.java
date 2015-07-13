@@ -444,7 +444,7 @@ public class SkeletonInterpolatorTest
 
         float tr[]=Vec3f.getVec3f();
         vHuman.getPart("HumanoidRoot").getTranslation(tr);
-        assertVec3fEquals(-1,2,-3,tr, PRECISION);
+        assertVec3fEquals(-1,2,3,tr, PRECISION);
     }
     
     @Test

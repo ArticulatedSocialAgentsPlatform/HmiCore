@@ -131,7 +131,7 @@ public class ConfigList extends XMLStructureAdapter implements Cloneable
             float[] config = configList[i];
             float v[] = Vec3f.getVec3f();
             Vec3f.set(v, 0, config, index);
-            Vec3f.set(config, index, -v[Vec3f.X], v[Vec3f.Y], -v[Vec3f.Z]);
+            Vec3f.set(config, index, -v[Vec3f.X], v[Vec3f.Y], v[Vec3f.Z]);
         }
     }
     
