@@ -871,6 +871,13 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
         return subSki;
     }
 
+    public void appendInterpolator(double startTime, SkeletonInterpolator ski)
+    {
+        ConfigList cl = new ConfigList(getConfigSize()+ski.getConfigSize());
+        cl.addConfigs(getConfigList());
+        cl.addConfigs(startTime,ski.getConfigList());
+        setConfigList(cl);
+    }
     /**
      * Creates a new SkeletonInterpolator from an XML encoded file. The first argument must be a
      * Resources object that determines the resource directory, whereas the seond argument must be

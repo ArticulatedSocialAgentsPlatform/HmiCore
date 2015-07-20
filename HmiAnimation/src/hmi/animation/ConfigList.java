@@ -54,6 +54,10 @@ public class ConfigList extends XMLStructureAdapter implements Cloneable
     private int configSize; // length of a configList element, in number of
                             // floats.
 
+    /**
+     * Constructor
+     * @param configSize number of configs in the list
+     */
     public ConfigList(int configSize)
     {
         arraySize = DEFAULTARRAYSIZE;
@@ -61,7 +65,7 @@ public class ConfigList extends XMLStructureAdapter implements Cloneable
         configList = new float[arraySize][];
         listSize = 0;
         this.configSize = configSize;
-    }    
+    }
 
     public ConfigList copy()
     {
@@ -87,7 +91,6 @@ public class ConfigList extends XMLStructureAdapter implements Cloneable
         readXML(tokenizer);
     }
 
-    
     /**
      * Returns the (uniform) size of configs, in number of floats.
      */
@@ -119,8 +122,7 @@ public class ConfigList extends XMLStructureAdapter implements Cloneable
             float[] config = configList[i];
             float q[] = Quat4f.getQuat4f();
             Quat4f.set(q, 0, config, index);
-            Quat4f.set(config, index, q[Quat4f.s], q[Quat4f.x], -q[Quat4f.y],
-                    -q[Quat4f.z]);
+            Quat4f.set(config, index, q[Quat4f.s], q[Quat4f.x], -q[Quat4f.y], -q[Quat4f.z]);
         }
     }
 
@@ -134,17 +136,17 @@ public class ConfigList extends XMLStructureAdapter implements Cloneable
             Vec3f.set(config, index, -v[Vec3f.X], v[Vec3f.Y], v[Vec3f.Z]);
         }
     }
-    
+
     public ConfigList subConfigList(int start, int end)
     {
         ConfigList cl = new ConfigList(configSize);
-        for(int i=start;i<end;i++)
+        for (int i = start; i < end; i++)
         {
             cl.addConfig(getTime(i), getConfig(i));
         }
         return cl;
     }
-    
+
     /**
      * Returns the Config at index i
      */
@@ -182,14 +184,29 @@ public class ConfigList extends XMLStructureAdapter implements Cloneable
         listSize++;
     }
 
+    public void addConfigs(ConfigList cl)
+    {
+        for (int i = 0; i < cl.getConfigSize(); i++)
+        {
+            addConfig(cl.getTime(i), cl.getConfig(i));
+        }
+    }
+
+    public void addConfigs(double timeOffset, ConfigList cl)
+    {
+        for (int i = 0; i < cl.getConfigSize(); i++)
+        {
+            addConfig(timeOffset + cl.getTime(i), cl.getConfig(i));
+        }
+    }
+
     /*
      * (re)allocates the configs array such that the array size is greate or
      * equal than "requestedSize"
      */
     private void ensureArraySize(int requestedSize)
     {
-        if (requestedSize <= arraySize)
-            return;
+        if (requestedSize <= arraySize) return;
         while (arraySize < requestedSize)
             arraySize *= 2;
         float[][] newConfigList = new float[arraySize][];
@@ -215,10 +232,8 @@ public class ConfigList extends XMLStructureAdapter implements Cloneable
     {
         int low = 0;
         int high = listSize - 1;
-        if (listSize == 0 || t < time[low])
-            return 0; // empty list, or t before first element
-        if (t >= time[high])
-            return listSize; // t at or after last element
+        if (listSize == 0 || t < time[low]) return 0; // empty list, or t before first element
+        if (t >= time[high]) return listSize; // t at or after last element
         // invariant: time[low] <= t < time[high]
         while (high - low > 1)
         { // iterate until high == low+1
@@ -239,8 +254,7 @@ public class ConfigList extends XMLStructureAdapter implements Cloneable
      * Appends a String of signature attributes to buf
      */
     @Override
-    public StringBuilder appendAttributeString(StringBuilder buf,
-            XMLFormatting fmt)
+    public StringBuilder appendAttributeString(StringBuilder buf, XMLFormatting fmt)
     {
         appendAttribute(buf, "configSize", configSize);
         return buf;
@@ -250,8 +264,7 @@ public class ConfigList extends XMLStructureAdapter implements Cloneable
      * Decodes a single attribute
      */
     @Override
-    public boolean decodeAttribute(String attrName, String valCode,
-            XMLTokenizer tokenizer)
+    public boolean decodeAttribute(String attrName, String valCode, XMLTokenizer tokenizer)
     {
         if (attrName.equals("configSize"))
         {
