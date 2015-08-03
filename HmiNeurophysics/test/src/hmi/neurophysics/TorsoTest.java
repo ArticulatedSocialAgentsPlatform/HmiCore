@@ -86,7 +86,7 @@ public class TorsoTest
     public void test()
     {
         float qRes[] = new float[nLumbar*4+nThoracic*4];
-        Torso.setTorsoRotation(qRes, qRot, nLumbar, nThoracic);
+        Spine.setTorsoRotation(qRes, qRot, nLumbar, nThoracic);
         float qTotal[] = Quat4f.getIdentity();
         for(int i=0;i<nLumbar+nThoracic;i++)
         {

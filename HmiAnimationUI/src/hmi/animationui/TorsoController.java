@@ -25,7 +25,7 @@ package hmi.animationui;
 import hmi.animation.Hanim;
 import hmi.animation.VJoint;
 import hmi.animation.VJointUtils;
-import hmi.neurophysics.Torso;
+import hmi.neurophysics.Spine;
 
 import java.util.Collection;
 import java.util.List;
@@ -70,7 +70,7 @@ public class TorsoController implements RotationsController {
 			Collection<JointRotationConfiguration> rotations) {
 		JointRotationConfiguration config = rotations.iterator().next();
 		float q[] = new float[torsoJoints.size() * 4];
-		Torso.setTorsoRollPitchYawDegrees(q, config.getRpyDeg()[0],
+		Spine.setTorsoRollPitchYawDegrees(q, config.getRpyDeg()[0],
 				config.getRpyDeg()[1], config.getRpyDeg()[2],
 				torsoJoints.size() - thoracicJoints.size(),
 				thoracicJoints.size());

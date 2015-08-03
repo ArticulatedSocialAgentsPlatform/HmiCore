@@ -37,7 +37,7 @@ import org.junit.runners.Parameterized.Parameters;
  * @author Herwin
  */
 @RunWith(value = LabelledParameterized.class)
-public class TorsoDistributionsTest
+public class SpineDistributionsTest
 {
     private final int N;
     private final double rot;
@@ -60,7 +60,7 @@ public class TorsoDistributionsTest
         return objs;
     }
 
-    public TorsoDistributionsTest(String label, int N, double rot)
+    public SpineDistributionsTest(String label, int N, double rot)
     {
         this.N = N;
         this.rot = rot;
@@ -72,7 +72,7 @@ public class TorsoDistributionsTest
         double resRot = 0;
         for (int i = 1; i <= N; i++)
         {
-            resRot += Torso.getUniform(N) * rot;
+            resRot += Spine.getUniform(N) * rot;
         }
         assertEquals(resRot,rot, PRECISION);
     }
@@ -83,7 +83,7 @@ public class TorsoDistributionsTest
         double resRot = 0;
         for (int i = 1; i <= N; i++)
         {
-            resRot += Torso.getLinearIncrease(i, N) * rot;
+            resRot += Spine.getLinearIncrease(i, N) * rot;
         }
         assertEquals(resRot,rot, PRECISION);
     }
@@ -94,7 +94,7 @@ public class TorsoDistributionsTest
         double resRot = 0;
         for (int i = 1; i <= N; i++)
         {
-            resRot += Torso.getLinearDecrease(i, N) * rot;
+            resRot += Spine.getLinearDecrease(i, N) * rot;
         }
         assertEquals(resRot,rot, PRECISION);
     }

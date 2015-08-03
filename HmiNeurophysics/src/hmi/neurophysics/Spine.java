@@ -36,9 +36,9 @@ import hmi.math.Vec3f;
  * 
  * @author Herwin
  */
-public final class Torso
+public final class Spine
 {
-    private Torso(){}
+    private Spine(){}
     
     public static double getUniform(int n)
     {
@@ -60,11 +60,39 @@ public final class Torso
         setTorsoRollPitchYaw(qRes, (float)Math.toRadians(roll), (float)Math.toRadians(pitch), (float)Math.toRadians(yaw), nrOfLumbarJoint, nrOfThoracicJoints);
     }
     
+    public static void setCervicalRotationRollPitchYawDegrees(float[] qRes, float roll, float pitch, float yaw, int nrOfNeckJoints)
+    {
+        setCervicalRotationRollPitchYaw(qRes, (float)Math.toRadians(roll), (float)Math.toRadians(pitch), (float)Math.toRadians(yaw), nrOfNeckJoints);
+    }
+    
     public static void setTorsoRotation(float[] qRes, float[] qRot, int nrOfLumbarJoint, int nrOfThoracicJoints)
     {
         float []rpy = Vec3f.getVec3f();
         Quat4f.getRollPitchYaw(qRot, rpy);
         setTorsoRollPitchYaw(qRes, rpy[0], rpy[1], rpy[2], nrOfLumbarJoint, nrOfThoracicJoints);
+    }
+    
+    public static void setCervicalRotation(float[] qRes, float[] qRot, int nrOfNeckJoints)
+    {
+        float []rpy = Vec3f.getVec3f();
+        Quat4f.getRollPitchYaw(qRot, rpy);
+        setCervicalRotationRollPitchYaw(qRes, rpy[0], rpy[1], rpy[2], nrOfNeckJoints);
+    }
+    
+   /**
+    * Distribute the rotation specified in roll, pitch, yaw (in radians) over the neck joints
+    * @param qRes output: the rotation will be set in this, order from vc7 to skullbase
+    * @param roll
+    * @param pitch
+    * @param yaw
+    */   
+    public static void setCervicalRotationRollPitchYaw(float[] qRes, float roll, float pitch, float yaw, int nrOfNeckJoints)
+    {
+        for(int i=0;i<nrOfNeckJoints;i++)
+        {
+            float contribution = (float)getLinearIncrease(i,nrOfNeckJoints);
+            Quat4f.setFromRollPitchYaw(qRes,i*4, contribution*roll, contribution*pitch, contribution*yaw);
+        }
     }
     
     /**
