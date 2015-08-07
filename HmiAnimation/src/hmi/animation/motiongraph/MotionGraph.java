@@ -1,272 +1,494 @@
-/*******************************************************************************
- * The MIT License (MIT)
- * Copyright (c) 2015 University of Twente
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *******************************************************************************/
 package hmi.animation.motiongraph;
 
-import hmi.animation.ConfigList;
 import hmi.animation.SkeletonInterpolator;
-import hmi.animation.VJoint;
+import hmi.animation.motiongraph.alignment.Alignment;
+import hmi.animation.motiongraph.alignment.IAlignment;
+import hmi.animation.motiongraph.blending.Blend;
+import hmi.animation.motiongraph.blending.IBlend;
+import hmi.animation.motiongraph.metrics.Equals;
+import hmi.animation.motiongraph.metrics.IDistance;
+import hmi.animation.motiongraph.metrics.IEquals;
+import hmi.animation.motiongraph.metrics.JointAngles;
+import hmi.animation.motiongraph.split.DefaultSplit;
+import hmi.animation.motiongraph.split.ISplit;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import lombok.Data;
-
-import com.google.common.collect.ImmutableList;
+import lombok.Getter;
 
 /**
- * Implements a motion graph
- * @author herwinvw
- *
+ * Use {@link Builder} to create an Instance.
+ * <p>
+ * TODO: Frames->Seconds
+ * <p>
+ * Created by Zukie on 15/06/15.
+ * <p>
+ * @author Zukie
  */
-public class MotionGraph
-{
-    private List<MGNode> nodes = new ArrayList<MGNode>();
-    private List<MGEdge> edges = new ArrayList<MGEdge>();
-    private MGEdge currentEdge;
-    private double edgeStartTime;
-    private double edgeEndTime;
-    private final TransitionChecker transitionChecker;
-    private final Random rand = new Random(System.currentTimeMillis());
+public final class MotionGraph implements IMotionGraph {
+
+    /**
+     * Number of Frames to be blended.
+     * TODO: set
+     */
+    public static final int DEFAULT_BLENDING_FRAMES = 100;
+    /**
+     * Max distance suitable for blending.
+     * TODO: set
+     */
+    public static final double DEFAULT_THRESHOLD = 20;
+
+    /**
+     * If all motions should be added normal.
+     * TODO: set
+     */
+    public static final boolean NORMAL = true;
+    /**
+     * If all Motions should also be added mirrored.
+     * TODO: set
+     * 
+     */
+    public static final boolean MIRRORED = false;
+
+    @Getter
+    private final List<Edge> edges;
     
-    @Data
-    class Split
+    @Getter
+    private final List<Node> nodes;
+
+    private final IAlignment align;
+    private final IBlend blending;
+    
+    /**
+     * Random-Generator used in {@link #next()}.
+     */
+    private final IDistance metric;
+    private final Random r = new Random();
+    private Node currentNode;
+
+    public Node getNode(int id)
     {
-        final MGEdge edge;
-        final int splitPoint;
+        for(Node n:nodes)
+        {
+            if(n.getId()==id)
+            {
+                return n;
+            }
+        }        
+        return null;
     }
     
-    public List<MGNode> getNodes()
+    public Edge getEdge(int id)
     {
-        return ImmutableList.copyOf(nodes);
+        for(Edge e:edges)
+        {
+            if(e.getId()==id)
+            {
+                return e;
+            }
+        }        
+        return null;
     }
     
-    public List<MGEdge> getEdges()
-    {
-        return ImmutableList.copyOf(edges);
+    public MotionGraph(Collection<Edge> edges, Collection<Node>nodes, IAlignment align, IDistance metric, IBlend blending, ISplit split) {
+        this.align = align;
+        this.metric = metric;
+        this.blending = blending;
+        this.edges = new LinkedList<>(edges);
+        this.nodes = new LinkedList<>(nodes);
     }
     
-    public MotionGraph(TransitionChecker tc)
-    {
-        transitionChecker = tc;
+    public MotionGraph(List<SkeletonInterpolator> motions, IAlignment align, IDistance metric, IBlend blending, ISplit split) {
+        edges = new LinkedList<>();
+        nodes = new LinkedList<>();
+        if (motions == null || motions.isEmpty()) {
+            throw new IllegalArgumentException("motions null or empty.");
+        }
+        if (align == null) {
+            throw new IllegalArgumentException("No IAlignment specified.");
+        }
+        if (metric == null) {
+            throw new IllegalArgumentException("No IDistance specified.");
+        }
+        if (blending == null) {
+            throw new IllegalArgumentException("No IBlend specified.");
+        }
+        if (split == null) {
+            throw new IllegalArgumentException("No ISplit specified.");
+        }
+
+        this.align = align;
+        this.metric = metric;
+        this.blending = blending;
+        
+        this.init(motions, split);
     }
 
-    public void prune()
-    {
-        boolean pruneDone = false;
-        
-        while(!pruneDone)
-        {
-            pruneDone = true;
-            Set<MGNode>removeNodes = new HashSet<MGNode>();
-            for(MGNode node:nodes)
-            {
-                if(node.getOutgoingEdges().isEmpty())
-                {
-                    pruneDone = false;
-                    removeNodes.add(node);
+    /**
+     * Initialise MotionGraph. Creates Edges vor every Motion and mirrors them.
+     * <p>
+     * @param motions
+     */
+    private void init(List<SkeletonInterpolator> motions, ISplit split) {
+
+        for (SkeletonInterpolator sp : motions) {
+
+            if (NORMAL) {
+                Edge newEdge = new Edge(sp);
+                Node startNode = new Node(null, newEdge);
+                Node endNode = new Node(newEdge, null);
+
+                nodes.add(startNode);
+                nodes.add(endNode);
+                edges.add(newEdge);
+            }
+
+            // Mirror every motion
+            if (MIRRORED) {
+                SkeletonInterpolator newSp = new SkeletonInterpolator(sp);
+                newSp.mirror();
+
+                Edge mirroredEdge = new Edge(newSp);
+                Node mirroredStartNode = new Node(null, mirroredEdge);
+                Node mirroredEndNode = new Node(mirroredEdge, null);
+
+                nodes.add(mirroredEndNode);
+                nodes.add(mirroredStartNode);
+                edges.add(mirroredEdge);
+            }
+
+        }
+
+        System.out.println("NODES BEFORE: " + nodes.size());
+        System.out.println("EDGES BEFORE: " + edges.size());
+
+        this.connectMotions();
+        this.split(split);
+        this.createBlends();
+        this.prune();
+        System.out.println("NODES AFTER: " + nodes.size());
+        System.out.println("EDGES AFTER: " + edges.size());
+    }
+
+    /**
+     * Randomly splits Motions in the graph. TODO: Create Split-Class.
+     */
+    private void split(ISplit split) {
+        List<Edge> oldEdges = new LinkedList<>(edges);
+        for (Edge oldEdge : oldEdges) {
+
+            Node startNode = oldEdge.getStartNode();
+            Node endNode = oldEdge.getEndNode();
+            removeEdge(oldEdge);
+
+            List<SkeletonInterpolator> splits = split.split(oldEdge.getMotion());
+
+            for (int i = 0; i < splits.size(); i++) {
+                SkeletonInterpolator get = splits.get(i);
+                Edge newEdge = new Edge(get);
+                newEdge.setStartNode(startNode);
+
+                if (i == splits.size() - 1) {
+                    startNode = endNode;
+                } else {
+                    startNode = new Node();
+                    this.nodes.add(startNode);
+                }
+                newEdge.setEndNode(startNode);
+                this.edges.add(newEdge);
+            }
+
+        }
+    }
+
+    /**
+     * Remove Edge from MotionGraph and it's nodes.
+     * <p/>
+     *
+     * @param edge
+     */
+    private void removeEdge(Edge edge) {
+        this.edges.remove(edge);
+        edge.getStartNode().getIncomingEdges().remove(edge);
+        edge.getStartNode().getOutgoingEdges().remove(edge);
+
+        edge.getEndNode().getIncomingEdges().remove(edge);
+        edge.getEndNode().getOutgoingEdges().remove(edge);
+    }
+
+    /**
+     * Removes all Nodes, which have no successors.
+     */
+    private void prune() {
+
+        boolean pruned = true;
+
+        do {
+            pruned = true;
+            for (Iterator<Node> iterator = nodes.iterator(); iterator.hasNext();) {
+                Node node = iterator.next();
+                if (!node.hasNext()) {
+                    while (!node.getIncomingEdges().isEmpty()) {
+                        removeEdge(node.getIncomingEdges().get(0));
+                    }
+
+                    pruned = false;
+                    iterator.remove();
+                    break;
                 }
             }
-            removeNodes(removeNodes);
-        }
+        } while (!pruned);
+
     }
-    
-    private void removeNodes(Set<MGNode> removeNodes)
+
+    public void removeNodes(Set<Node> nodes)
     {
-        List<MGEdge>removeEdges = new ArrayList<MGEdge>();
-        nodes.removeAll(removeNodes);
-        for(MGEdge edge:edges)
+        for(Node n:nodes)
         {
-            if(removeNodes.contains(edge.getIncomingNode())||removeNodes.contains(edge.getOutgoingNode()))
-            {
-                removeEdges.add(edge);
+            edges.removeAll(n.getIncomingEdges());
+            edges.removeAll(n.getOutgoingEdges());
+        }
+        this.nodes.removeAll(nodes);
+    }
+    /**
+     * Returns next motion to be displayed.
+     * <p>
+     * @return Skeletoninterpolator next.
+     */
+    @Override
+    public SkeletonInterpolator next() {
+        if (currentNode == null) {
+            this.currentNode = nodes.get(r.nextInt(nodes.size()));
+        }
+
+        Edge currentEdge = currentNode.getOutgoingEdges().get(r.nextInt(currentNode.getOutgoingEdges().size()));
+        currentEdge.played++;
+        if (currentEdge.isBlend()) {
+            System.out.println("Edge: " + currentEdge.getId() + " p: " + currentEdge.played + " (blend)");
+        } else {
+            System.out.println("Edge: " + currentEdge.getId() + " p: " + currentEdge.played);
+        }
+
+        SkeletonInterpolator next = currentEdge.getMotion();
+
+        if (currentEdge.getEndNode().hasNext()) {
+            currentNode = currentEdge.getEndNode();
+            return next;
+
+        } else {
+            this.currentNode = null;
+            next();
+        }
+
+        return null;
+
+    }
+
+    /**
+     * Reconnect all Motions that have been cut in xml-format. Will not be needed in final implementation
+     */
+    private void connectMotions() {
+
+        IEquals equals = new Equals();
+
+        for (Edge start : edges) {
+            for (Edge end : edges) {
+                if (equals.startEndEquals(start.getMotion(), end.getMotion())) {
+                    Node deletedNode = end.getStartNode();
+                    nodes.remove(deletedNode);
+                    deletedNode.getOutgoingEdges().remove(end);
+                    end.setStartNode(start.getEndNode());
+
+                }
             }
         }
-        edges.removeAll(removeEdges);
-        for(MGNode node:nodes)
-        {
-            node.removeEdges(removeEdges);
-        }
+
     }
-    
-    private void connectEdge(MGEdge newEdge, int startFrame)
-    {
-        System.out.println("ConnectEdge");
-        int minFrameSize = 20;
-        for (int i = startFrame; i < newEdge.getMotion().size() - minFrameSize; i += minFrameSize)
-        {
-            List<Split> splitsTo = new ArrayList<Split>();
-            List<Split> splitsFrom = new ArrayList<Split>();
-            for (MGEdge edge : edges)
-            {
-                SkeletonInterpolator ski2 = edge.getMotion();
-                for (int j = 0; j < ski2.size() - minFrameSize; j += minFrameSize)
-                {
-                    if(edge!=newEdge || Math.abs(i-j)>minFrameSize)
-                    {
-                        if (transitionChecker.allowTransition(newEdge.getMotion(), ski2, i, j))
-                        {
-                            System.out.println("Adding split to at "+i+"," + j);
-                            splitsTo.add(new Split(edge, j));
-                        }
-                        if (transitionChecker.allowTransition(ski2, newEdge.getMotion(), j, i))
-                        {
-                            System.out.println("Adding split from at "+i+","+j);
-                            splitsFrom.add(new Split(edge, j));
-                        }
+
+    /**
+     * Connect all Motions that are similar enough with blends.
+     */
+    private void createBlends() {
+        List<Node> starts = new LinkedList<>();
+        for (Node node : nodes) {
+            if (!node.getIncomingEdges().isEmpty()) {
+                starts.add(node);
+            }
+        }
+        List<Node> ends = new LinkedList<>();
+        for (Node node : nodes) {
+            if (node.hasNext()) {
+                ends.add(node);
+            }
+        }
+
+        for (Node start : starts) {
+            for (Node end : ends) {
+                if (start == end) {
+                    //motions already connected
+                    continue;
+                }
+
+                if (start.getIncomingEdges().get(0).getMotion().size() >= DEFAULT_BLENDING_FRAMES
+                        && end.getOutgoingEdges().get(0).getMotion().size() >= DEFAULT_BLENDING_FRAMES) {
+
+                    if (metric.distance(start.getIncomingEdges().get(0).getMotion(),
+                            end.getOutgoingEdges().get(0).getMotion(), DEFAULT_BLENDING_FRAMES) <= DEFAULT_THRESHOLD) {
+                        createBlending(start.getIncomingEdges().get(0), end.getOutgoingEdges().get(0));
                     }
                 }
             }
 
-            if (!splitsTo.isEmpty() || !splitsFrom.isEmpty())
+        }
+    }
+
+    /**
+     * Creates Connection between first and second.
+     * <p>
+     * If first are longer than {@link #DEFAULT_BLENDING_FRAMES} Frames, first is splittet in two piece, with the
+     * blended Part {@link #DEFAULT_BLENDING_FRAMES} long. Else, the Start-Node of first is used of the StartNode of the
+     * Blending
+     * <p>
+     * Same for second, excpet that its End-node is used, if it isn't splitet, as the blending-End-Node.
+     * <p>
+     * @param first first motion
+     * @param second second motion
+     */
+    private void createBlending(Edge first, Edge second) {
+        Node newEnd;
+        Node newStart;
+        SkeletonInterpolator blendEnd;
+        SkeletonInterpolator blendStart;
+
+        //Split first
+        if (first.getMotion().size() > DEFAULT_BLENDING_FRAMES) {
+            blendStart = first.getMotion().subSkeletonInterpolator(first.getMotion().size() - DEFAULT_BLENDING_FRAMES);
+            Edge firstMotionPart2 = new Edge(blendStart);
+
+            SkeletonInterpolator split1 = first.getMotion().subSkeletonInterpolator(0, first.getMotion().size() - DEFAULT_BLENDING_FRAMES);//could be length 0
+            Edge firstMotionPart1 = new Edge(split1);
+
+            first.getStartNode().addOutgoingEdge(firstMotionPart1);
+            first.getEndNode().addIncomingEdge(firstMotionPart2);
+            newStart = new Node(firstMotionPart1, firstMotionPart2);
+            this.removeEdge(first);
+
+            edges.add(firstMotionPart1);
+            edges.add(firstMotionPart2);
+            nodes.add(newStart);
+        } else {
+            newStart = first.getStartNode();
+            blendStart = first.getMotion();
+        }
+
+        //split second
+        if (second.getMotion().size() > DEFAULT_BLENDING_FRAMES) {
+
+            blendEnd = second.getMotion().subSkeletonInterpolator(0, DEFAULT_BLENDING_FRAMES);
+            Edge secondMotionPart1 = new Edge(blendEnd);
+
+            SkeletonInterpolator split2 = second.getMotion().subSkeletonInterpolator(DEFAULT_BLENDING_FRAMES);//could be length 0
+            Edge secondMotionPart2 = new Edge(split2);
+
+            second.getStartNode().addOutgoingEdge(secondMotionPart1);
+            second.getEndNode().addIncomingEdge(secondMotionPart2);
+            newEnd = new Node(secondMotionPart1, secondMotionPart2);
+            this.removeEdge(second);
+            edges.add(secondMotionPart1);
+            edges.add(secondMotionPart2);
+            nodes.add(newEnd);
+        } else {
+            newEnd = second.getEndNode();
+            blendEnd = second.getMotion();
+        }
+
+        //create Blend
+        SkeletonInterpolator blendedMotion = blending.blend(blendStart, blendEnd, DEFAULT_BLENDING_FRAMES);
+        Edge blended = new Edge(blendedMotion);
+        blended.setBlend(true);
+
+        newStart.addOutgoingEdge(blended);
+        newEnd.addIncomingEdge(blended);
+
+        edges.add(blended);
+    }
+
+    @Override
+    public String toString() {
+        String ret = "Edges: " + edges.size() + "\n";
+        for (Edge edge : edges) {
+            ret += edge + "\n";
+        }
+        return ret;
+
+    }
+
+    public IAlignment getAlign() {
+        return align;
+    }
+
+    /**
+     * Builder for MotionGraph.
+     */
+    public static class Builder {
+
+        private IAlignment align;
+        private IBlend blending;
+        private IDistance metric;
+        private ISplit split;
+        private List<SkeletonInterpolator> motions = null;
+        private Collection<Edge> edges;
+        private Collection<Node> nodes;
+        
+        public Builder(Collection<Edge> edges, Collection<Node> nodes)
+        {
+            this.edges = edges;
+            this.nodes = nodes;
+        }
+        
+        public Builder(List<SkeletonInterpolator> motions) {
+            this.motions = motions;
+        }
+
+        public MotionGraph getInstance() {
+            this.align = align != null ? align : new Alignment();
+            this.metric = metric != null ? metric : new JointAngles(align);
+            this.blending = blending != null ? blending : new Blend(align);
+            this.split = split != null ? split : new DefaultSplit();            
+            if(motions==null)
             {
-                MGNode node = splitEdge(newEdge, i);
-                newEdge = node.getOutgoingEdges().get(0);
-                for (Split split : splitsTo)
-                {
-                    insertTransition(node, split.getEdge(), split.getSplitPoint());
-                }
-                for (Split split : splitsFrom)
-                {
-                    insertTransition(split.getEdge(), split.getSplitPoint(), node);
-                }
-                connectEdge(newEdge, minFrameSize);
-                return;
+                return new MotionGraph(this.edges, this.nodes, this.align, this.metric, this.blending, this.split);
+            }
+            else
+            {
+                return new MotionGraph(this.motions, this.align, this.metric, this.blending, this.split);
             }
         }
-    }
-    
-    public void addSkeletonInterpolator(SkeletonInterpolator ski)
-    {
-        MGNode outgoing = new MGNode();
-        MGNode incoming = new MGNode();
-        MGEdge newEdge = new MGEdge(ski, incoming, outgoing);
-        
-        edges.add(newEdge);
-        nodes.add(outgoing);
-        nodes.add(incoming);
 
-        connectEdge(newEdge, 0);
-    }
-
-    public MGNode splitEdge(MGEdge edge, int frame)
-    {
-        if(frame==0)
-        {
-            return edge.getIncomingNode();
+        public Builder align(IAlignment align) {
+            this.align = align;
+            return this;
         }
-        if(frame==edge.getMotion().size()-1)
-        {
-            return edge.getOutgoingNode();
+
+        public Builder blending(IBlend blending) {
+            this.blending = blending;
+            return this;
         }
-        SkeletonInterpolator ski1 = edge.getMotion().subSkeletonInterpolator(0, frame+1);
-        SkeletonInterpolator ski2 = edge.getMotion().subSkeletonInterpolator(frame);
-        MGNode node = new MGNode();
-        MGEdge edge1 = new MGEdge(ski1, edge.getIncomingNode(), node);
-        MGEdge edge2 = new MGEdge(ski2, node, edge.getOutgoingNode());
-        
-        edges.add(edge1);
-        edges.add(edge2);
-        nodes.add(node);
-        
-        edges.remove(edge);
-        for(MGNode n:nodes)
-        {
-            n.removeEdge(edge);
+
+        public Builder metric(IDistance metric) {
+            this.metric = metric;
+            return this;
         }
-        
-        return node;
-    }
 
-    private SkeletonInterpolator createTransition(float startConfig[], float endConfig[], String[] parts, String configType)
-    {
-        ConfigList configs = new ConfigList(startConfig.length);
-        configs.addConfig(0, startConfig);
-        configs.addConfig(0.4, endConfig);
-        return new SkeletonInterpolator(parts, configs, configType);
-    }
-
-    private SkeletonInterpolator createTransition(MGNode start, MGNode end)
-    {
-        float startConfig[] = start.getOutgoingEdges().get(0).getMotion().getConfig(0);
-        float endConfig[] = end.getOutgoingEdges().get(0).getMotion().getConfig(0);
-        String[] parts = start.getOutgoingEdges().get(0).getMotion().getPartIds();
-        String configType = start.getOutgoingEdges().get(0).getMotion().getConfigType();
-        return createTransition(startConfig,endConfig,parts,configType);
-    }
-
-    // /Transition from start to edge:iOut, splits edge
-    public void insertTransition(MGNode start, MGEdge edge, int iOut)
-    {
-        MGNode end = splitEdge(edge, iOut);
-        SkeletonInterpolator skiTrans = createTransition(start, end);
-        MGEdge transition = new MGEdge(skiTrans, start, end);
-        edges.add(transition);
-    }
-
-    // /Transition from edge:iOut, to end, splits edge
-    public void insertTransition(MGEdge edge, int iIn, MGNode end)
-    {
-        MGNode start = splitEdge(edge, iIn);
-        SkeletonInterpolator skiTrans = createTransition(start, end);
-        MGEdge transition = new MGEdge(skiTrans, start, end);
-        edges.add(transition);
-    }
-
-    public void randomStart(double time)
-    {
-        int index = (int) Math.round(rand.nextDouble() * (nodes.size() - 1));
-        MGNode startNode = nodes.get(index);
-        changeEdge(time, startNode.randomEdge());
-    }
-
-    private void changeEdge(double time, MGEdge edge)
-    {
-        edgeStartTime = time;
-        currentEdge = edge;
-        edgeEndTime = time + currentEdge.getDuration();
-    }
-
-    public void randomWalk(double time)
-    {
-        if (time < edgeEndTime)
-        {
-            currentEdge.play(time - edgeStartTime);
+        public Builder split(ISplit split) {
+            this.split = split;
+            return this;
         }
-        else
-        {
-            //System.out.println("Change edge!");
-            changeEdge(time, currentEdge.getOutgoingNode().randomEdge());
-        }
-    }
 
-    public void setTarget(VJoint human)
-    {
-        for (MGEdge edge : edges)
-        {
-            edge.setTarget(human);
-        }
     }
 }

@@ -50,6 +50,10 @@ import org.slf4j.LoggerFactory;
  */
 public class SkeletonInterpolator extends XMLStructureAdapter implements ClockListener
 {
+    public static final String ROOT_TRANSFORM = "T1";
+    public static final String ROTATION = "R";
+    public static final String TRANSLATION = "T";
+    
     private static Logger logger = LoggerFactory.getLogger(SkeletonInterpolator.class.getName());
 
     private static final String[] empty_PartIds = new String[0];
