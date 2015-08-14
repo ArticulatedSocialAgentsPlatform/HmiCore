@@ -120,7 +120,6 @@
    </target> 
     
    <target name="cleanAll"  description="cleans HMI projects">     
-        <antcall target="Core.clean"/> <!-- JavaProjects.clean is the clean target from  (.../JavaProjects/)ant/build-impl.xml -->
         <delegate target="clean" list="rebuildList" verbose="true"/>
    </target>
  
