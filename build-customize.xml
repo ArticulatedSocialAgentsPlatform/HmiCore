@@ -179,14 +179,14 @@
 
 
    <target name="docall" depends="-pre-docAll" description="Generate integrated Javadoc for the HMICore projects">
-        <javadoc source="1.7"
+        <javadoc source="1.8"
             destdir="${javadoc.dir}"
             Overview="javadoc-overview.html" 
             doctitle="API Documentation for HMI Core packages"
             private="true" 
             use="true"
             author="true"
-            link="http://java.sun.com/javase/6/docs/api/"
+            link="http://java.sun.com/javase/8/docs/api/"
             breakiterator="yes"
         >
 <!--
@@ -218,7 +218,7 @@
                     <pathelement path="HmiPhysics/${src.doc.dir}"/>
                     <pathelement path="HmiTestUtil/${src.doc.dir}"/>
                     <pathelement path="HmiTTS/${src.doc.dir}"/>
-                    <pathelement path="HmiTTSMary/${src.doc.dir}"/>
+                    <pathelement path="HmiTTSMary5/${src.doc.dir}"/>
                     <pathelement path="HmiTTSSapi5/${src.doc.dir}"/>
                     <pathelement path="HmiUtil/${src.doc.dir}"/>
                     <pathelement path="HmiXml/${src.doc.dir}"/>
