@@ -77,7 +77,7 @@ import com.google.common.base.Charsets;
  * The standard way to do this is the following piece of code:<br>
  * private static final String XMLTAG = "your-tag";<br>
  * public String getXMLTag() { return XMLTAG; }<br>
- * public static String xmlTag() { return XMLTAG; }<br/>
+ * public static String xmlTag() { return XMLTAG; }<br>
  * 
  * Unfortunately, you have to copy the code for getXMLTag again for every class, because XMLTag is a static field,
  * and so, the <em>default</em> getXMLTag() always returns "XMLStructureAdapter", since it ignores your

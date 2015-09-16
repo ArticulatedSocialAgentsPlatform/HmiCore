@@ -53,7 +53,7 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
     public static final String ROOT_TRANSFORM = "T1";
     public static final String ROTATION = "R";
     public static final String TRANSLATION = "T";
-    
+
     private static Logger logger = LoggerFactory.getLogger(SkeletonInterpolator.class.getName());
 
     private static final String[] empty_PartIds = new String[0];
@@ -409,6 +409,12 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
         if (configs.size() == 0) return null;
         if (conf == null) conf = new float[configs.getConfig(0).length];
         float alpha = getInterpolationConfigs(t); // sets lowerConfig and upperConfig
+        interpolateConfigs(conf, alpha, lowerConfig, upperConfig);
+        return conf;
+    }
+
+    private void interpolateConfigs(float[] conf, float alpha, float[] lowerConfig, float[] upperConfig)
+    {
         int index = 0;
         if (hasRootTranslation && partIds.length > 0)
         {
@@ -443,7 +449,6 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
                 index += 3;
             }
         }
-        return conf;
     }
 
     /**
@@ -704,7 +709,7 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
         if (hasRootTranslation)
         {
             configs.mirrorTranslation(index);
-            index += 3;            
+            index += 3;
         }
         for (int i = 0; i < partIds.length; i++)
         {
@@ -856,6 +861,38 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
         return subSkeletonInterpolator(start, size());
     }
 
+    /**
+     * Creates an SkeletonInterpolator that blends from this at time t to target at time tTarget, over interval duration.
+     */
+    public SkeletonInterpolator blend(double tSource, double tTarget, SkeletonInterpolator target, double duration)
+    {
+        SkeletonInterpolator blend = new SkeletonInterpolator();
+        blend.setPartIds(partIds.clone());
+        blend.setConfigType(configType);
+        blend.stride = stride;
+        blend.hasRootTranslation = hasRootTranslation;
+        blend.hasTranslation = hasTranslation;
+        blend.hasRotation = hasRotation;
+        blend.hasScale = hasScale;
+        blend.hasVelocity = hasVelocity;
+        blend.hasAngularVelocity = hasAngularVelocity;
+        blend.rotationEncoding = rotationEncoding;
+        blend.targetParts = targetParts;
+        blend.configs = new ConfigList((int) (duration * 50));
+        for (double t = 0; t <= duration; t += 1d / 50d)
+        {
+            float startConfig[] = new float[configSize];
+            float endConfig[] = new float[configSize];
+            float result[] = new float[configSize];
+            float alpha = (float)(t / duration);
+            getInterpolatedConfig(tSource+t, startConfig);
+            target.getInterpolatedConfig(tTarget+t, endConfig);
+            interpolateConfigs(result, alpha, startConfig, endConfig);
+            blend.configs.addConfig(t, result);
+        }
+        return blend;
+    }
+
     public SkeletonInterpolator subSkeletonInterpolator(int start, int end)
     {
         SkeletonInterpolator subSki = new SkeletonInterpolator();
@@ -877,11 +914,12 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
 
     public void appendInterpolator(double startTime, SkeletonInterpolator ski)
     {
-        ConfigList cl = new ConfigList(getConfigSize()+ski.getConfigSize());
+        ConfigList cl = new ConfigList(getConfigSize() + ski.getConfigSize());
         cl.addConfigs(getConfigList());
-        cl.addConfigs(startTime,ski.getConfigList());
+        cl.addConfigs(startTime, ski.getConfigList());
         setConfigList(cl);
     }
+
     /**
      * Creates a new SkeletonInterpolator from an XML encoded file. The first argument must be a
      * Resources object that determines the resource directory, whereas the seond argument must be
