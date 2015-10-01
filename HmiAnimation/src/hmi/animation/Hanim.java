@@ -153,8 +153,8 @@ public final class Hanim
     public static final String r_forearm_roll = "r_forearm_roll";
     public static final String l_thigh_roll = "l_thigh_roll";
     public static final String l_calf_roll = "l_calf_roll";
-    public static final String r_thigh_roll = "l_thigh_roll";
-    public static final String r_calf_roll = "l_calf_roll";
+    public static final String r_thigh_roll = "r_thigh_roll";
+    public static final String r_calf_roll = "r_calf_roll";
 
     public static final String[] all_body_joints = new String[] { HumanoidRoot, sacroiliac, l_hip, l_knee, l_ankle, l_subtalar,
             l_midtarsal, l_metatarsal, r_hip, r_knee, r_ankle, r_subtalar, r_midtarsal, r_metatarsal, vl5, vl4, vl3, vl2, vl1, vt12, vt11,
