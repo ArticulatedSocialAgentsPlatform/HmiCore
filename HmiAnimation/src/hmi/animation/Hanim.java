@@ -145,15 +145,28 @@ public final class Hanim
     public static final String r_pinky2 = "r_pinky2";
     public static final String r_pinky3 = "r_pinky3";
     public static final String r_pinky_distal_tip = "r_pinky_distal_tip";
+    
+    // non-standard joints, but available in AutoDesk skeletons
+    public static final String l_upperarm_roll = "l_upperarm_roll";
+    public static final String l_forearm_roll = "l_forearm_roll";
+    public static final String r_upperarm_roll = "r_upperarm_roll";
+    public static final String r_forearm_roll = "r_forearm_roll";
+    public static final String l_thigh_roll = "l_thigh_roll";
+    public static final String l_calf_roll = "l_calf_roll";
+    public static final String r_thigh_roll = "l_thigh_roll";
+    public static final String r_calf_roll = "l_calf_roll";
 
     public static final String[] all_body_joints = new String[] { HumanoidRoot, sacroiliac, l_hip, l_knee, l_ankle, l_subtalar,
             l_midtarsal, l_metatarsal, r_hip, r_knee, r_ankle, r_subtalar, r_midtarsal, r_metatarsal, vl5, vl4, vl3, vl2, vl1, vt12, vt11,
             vt10, vt9, vt8, vt7, vt6, vt5, vt4, vt3, vt2, vt1, vc7, vc6, vc5, vc4, vc3, vc2, vc1, skullbase, l_sternoclavicular,
             l_acromioclavicular, l_shoulder, l_elbow, l_wrist, l_thumb1, l_thumb2, l_thumb3, l_index0, l_index1, l_index2, l_index3,
-            l_middle0, l_middle1, l_middle2, l_middle3, l_ring0, l_ring1, l_ring2, l_ring3, l_pinky0, l_pinky1, l_pinky2,l_pinky3,
+            l_middle0, l_middle1, l_middle2, l_middle3, l_ring0, l_ring1, l_ring2, l_ring3, l_pinky0, l_pinky1, l_pinky2, l_pinky3,
             r_sternoclavicular, r_acromioclavicular, r_shoulder, r_elbow, r_wrist, r_thumb1, r_thumb2, r_thumb3, r_index0, r_index1,
             r_index2, r_index3, r_middle0, r_middle1, r_middle2, r_middle3, r_ring0, r_ring1, r_ring2, r_ring3, r_pinky0, r_pinky1,
             r_pinky2, r_pinky3 };
+
+    public static final String[] ROLL_JOINTS = new String[] { l_upperarm_roll, r_upperarm_roll, l_forearm_roll, r_forearm_roll,
+            l_thigh_roll, r_thigh_roll, r_calf_roll, l_calf_roll };
     public static final String[] RIGHTHAND_JOINTS = new String[] { r_thumb1, r_thumb2, r_thumb3, r_index0, r_index1, r_index2, r_index3,
             r_middle0, r_middle1, r_middle2, r_middle3, r_ring0, r_ring1, r_ring2, r_ring3, r_pinky0, r_pinky1, r_pinky2, r_pinky3 };
 
@@ -162,7 +175,7 @@ public final class Hanim
 
     public static final String[] LUMBAR_JOINTS = new String[] { vl5, vl4, vl3, vl2, vl1 };
     public static final String[] THORACIC_JOINTS = new String[] { vt12, vt11, vt10, vt9, vt8, vt7, vt6, vt5, vt4, vt3, vt2, vt1 };
-    public static final String[] CERVICAL_JOINTS = new String[] { vc7, vc6, vc5, vc4, vc3, vc2, vc1, skullbase };    
+    public static final String[] CERVICAL_JOINTS = new String[] { vc7, vc6, vc5, vc4, vc3, vc2, vc1, skullbase };
 
     // HAnim Segments (incomplete
     public static final String sacrum = "sacrum";
@@ -181,6 +194,8 @@ public final class Hanim
     public static final String r_middistal = "r_middistal";
     public static final String r_forefoot = "r_forefoot";
     public static final String r_forefoot_tip = "r_forefoot_tip";
+
+   
 
     public static final String l5 = "l5";
     public static final String l4 = "l4";
