@@ -45,4 +45,19 @@ public final class PhonemeUtil
         }
         return phonemeNr;
     }
+    
+    public static String phonemeIntToString(int phoneme)
+    {
+        StringBuffer buf = new StringBuffer();
+        for(int i=0;i<4;i++)
+        {
+            int ph = phoneme >> (i*8);
+            char ch = (char)(ph&255);
+            if(ch>0)
+            {
+                buf.append(ch);
+            }
+        }
+        return buf.toString();
+    }
 }

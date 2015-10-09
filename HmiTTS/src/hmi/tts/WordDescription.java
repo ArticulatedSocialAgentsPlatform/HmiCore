@@ -32,18 +32,18 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class WordDescription
 {
-    private final Collection<Phoneme> phonemes; ///the phonemes
+    private final List<Phoneme> phonemes; ///the phonemes
 
-    private final Collection<Visime> visimes; /// the visimes
+    private final List<Visime> visimes; /// the visimes
 
     private final String word; ///the word
 
-    public Collection<Phoneme> getPhonemes()
+    public List<Phoneme> getPhonemes()
     {
         return phonemes;
     }
 
-    public Collection<Visime> getVisimes()
+    public List<Visime> getVisimes()
     {
         return visimes;
     }
@@ -61,7 +61,7 @@ public final class WordDescription
      * @param _phonemes
      *            phonemes in the word
      */
-    public WordDescription(String word, Collection<Phoneme> phonemes, Collection<Visime> visimes)
+    public WordDescription(String word, List<Phoneme> phonemes, List<Visime> visimes)
     {
         this.word = word;
         this.phonemes = phonemes;
