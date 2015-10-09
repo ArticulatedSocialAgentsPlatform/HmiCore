@@ -20,6 +20,7 @@
       <dependency org="opennlp"    name="opennlp-tools" rev="latest.release"  />
       <dependency org="opennlp"    name="opennlp-maxent" rev="latest.release"  />
       <dependency org="gnu"    name="trove" rev="latest.release"  />
+      <dependency org="icu"    name="icu4j" rev="latest.release"  />
       <dependency org="marytts"    name="marytts-common" rev="latest.${mary.resolve.status}"  />
       <dependency org="marytts"    name="marytts-lang-de" rev="latest.${mary.resolve.status}"  />
       <dependency org="marytts"    name="marytts-lang-en" rev="latest.${mary.resolve.status}"  />
