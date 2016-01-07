@@ -502,7 +502,7 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
      * start = true if the given values are meant for the first frame of the SkeletonInterpolator, false if for the final frame
      */
     public void setHumanoidRootTranslation(float[] translation, boolean start) {
-    	float[] refFrame = start ? this.getConfig(0) : this.getConfig(this.getConfigSize()); 
+    	float[] refFrame = start ? this.getConfig(0) : this.getConfig(this.size()-1); 
     	
     	float[] refTranslation = new float[3];
     	Vec3f.set(refTranslation, refFrame[Vec3f.X], refFrame[Vec3f.Y], refFrame[Vec3f.Z]);
@@ -526,7 +526,7 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
      * start = true if the given values are meant for the first frame of the SkeletonInterpolator, false if for the final frame
      */
     public void setHumanoidRootRotation(float[] rotation, boolean start) {
-    	float[] refFrame = start ? this.getConfig(0) : this.getConfig(this.getConfigSize());
+    	float[] refFrame = start ? this.getConfig(0) : this.getConfig(this.size()-1);
     	
     	float[] refRotation = new float[4];
     	Quat4f.set(refRotation, refFrame[Quat4f.S + 3], refFrame[Quat4f.X + 3], refFrame[Quat4f.Y + 3], refFrame[Quat4f.Z + 3]);
