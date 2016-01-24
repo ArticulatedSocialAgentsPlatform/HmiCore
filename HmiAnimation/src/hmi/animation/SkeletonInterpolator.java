@@ -643,14 +643,13 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
     }
 
     /**
-     * Samples the transformations from the target VObjects, and stores these as configuration, sor
+     * Samples the transformations from the target VObjects, and stores these as configuration on
      * the specified time.
      */
     public void sampleTargetParts(double time)
     {
         if (targetParts == null) return;
-        if (configs.size() == 0) return;
-
+        
         float[] newConfig = new float[configSize];
         int index = 0;
         if (hasRootTranslation)
