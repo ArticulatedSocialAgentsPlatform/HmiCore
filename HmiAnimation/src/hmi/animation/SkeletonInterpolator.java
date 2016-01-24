@@ -497,7 +497,84 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
             }
         }
     }
+    
+    /**
+     * start = true if the given values are meant for the first frame of the SkeletonInterpolator, false if for the final frame
+     */
+    public void setHumanoidRootTranslation(float[] translation, boolean start) {
+    	float[] refFrame = start ? this.getConfig(0) : this.getConfig(this.size()-1); 
+    	
+    	float[] refTranslation = new float[3];
+    	Vec3f.set(refTranslation, refFrame[Vec3f.X], refFrame[Vec3f.Y], refFrame[Vec3f.Z]);
+    	Vec3f.sub(translation, refTranslation);
+    	ConfigList newConfig = new ConfigList(this.getConfigSize());
+    	for (int i = 0; i < this.getConfigList().size(); i++) {
+            float[] config = this.getConfig(i);
+            
+            double time = this.getTime(i);
+            config[Vec3f.X] = config[Vec3f.X] + translation[Vec3f.X];
+            //config[Vec3f.Y] = config[Vec3f.Y] + translation[Vec3f.Y];
+            config[Vec3f.Z] = config[Vec3f.Z] + translation[Vec3f.Z];
 
+            newConfig.addConfig(time, config);
+        }
+
+        this.setConfigList(newConfig);            
+    }
+
+    /**
+     * start = true if the given values are meant for the first frame of the SkeletonInterpolator, false if for the final frame
+     */
+    public void setHumanoidRootRotation(float[] rotation, boolean start) {
+    	float[] refFrame = start ? this.getConfig(0) : this.getConfig(this.size()-1);
+    	
+    	float[] refRotation = new float[4];
+    	Quat4f.set(refRotation, refFrame[Quat4f.S + 3], refFrame[Quat4f.X + 3], refFrame[Quat4f.Y + 3], refFrame[Quat4f.Z + 3]);
+    	
+    	float[] inverseRotation = Quat4f.getQuat4f(refRotation);
+    	Quat4f.inverse(inverseRotation);
+    	
+    	float[] applyingRotation = new float[4];
+    	Quat4f.mul(applyingRotation, rotation, inverseRotation);
+
+    	ConfigList newConfig = new ConfigList(this.getConfigSize());
+    	for (int i = 0; i < this.getConfigList().size(); i++) {
+            float[] config = this.getConfig(i);
+            
+            double time = this.getTime(i);
+            
+            float[] frameRotation = new float[4];
+            Quat4f.set(frameRotation, config[Quat4f.S + 3], config[Quat4f.X + 3], config[Quat4f.Y + 3], config[Quat4f.Z + 3]);
+            
+            float[] newRotation = Quat4f.getQuat4f();
+            Quat4f.mul(newRotation, rotation, frameRotation);
+            Quat4f.set(config, 3, newRotation, 0);
+            
+            Quat4f.transformVec3f(rotation, config);
+            
+            newConfig.addConfig(time, config);
+        }
+
+        this.setConfigList(newConfig);            
+    }
+    
+    public void mirrorYAxis() {
+    	ConfigList newConfig = new ConfigList(this.getConfigSize());
+    	for (int i = 0; i < this.getConfigList().size(); i++) {
+            float[] config = this.getConfig(i);
+            
+            double time = this.getTime(i);
+            
+            config[Quat4f.X+3] = -1 * config[Quat4f.X+3]; 
+            config[Quat4f.Z+3] = -1 * config[Quat4f.Z+3]; 
+            		
+            newConfig.addConfig(time, config);
+        }
+
+        this.setConfigList(newConfig);            
+    	
+    }
+    
     /**
      * Interpolates two float array configurations lowerConfig and upperConfig, and places the
      * result in the target VObjects. Only translation, rotation, and scale can be interpolated. The
