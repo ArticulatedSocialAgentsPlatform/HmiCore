@@ -1435,7 +1435,7 @@ public class VJoint implements VObject
             }
             else
             {
-                Quat4f.setIdentity(rotation);
+                Quat4f.set(quat,rotation);
             }
         }
     }
