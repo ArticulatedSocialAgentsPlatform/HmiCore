@@ -508,7 +508,7 @@ public class AnalyticalIKSolver
     public static void translateToLocalSystem(VJoint obj1, VJoint obj2, float src[], float dst[])
     {
         float q[] = new float[4];
-        obj2.getParent().getPathRotation(obj1, q);
+        obj2.getParent().getFullPathRotation(obj1, q);
 
         float v[] = new float[3];
         obj2.getPathTranslation(obj1, v);
