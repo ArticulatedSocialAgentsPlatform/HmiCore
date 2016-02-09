@@ -1408,6 +1408,37 @@ public class VJoint implements VObject
             }
         }
     }
+    
+    /**
+     * Calculates the "path" rotation, for the scene graph path starting at the specified root VJoint, and ending in this VJoint. The resulting
+     * quaternion is stored in quat. If rootJoint == null the complete scenegraph path starting at AND INCLUDING the world root will be used.
+     */
+    public void getFullPathRotation(VJoint rootJoint, float[] quat)
+    {
+        if (rootJoint == this)
+        {
+            Quat4f.setIdentity(quat);
+        }
+        else if (parent != null)
+        {
+            parent.getFullPathRotation(rootJoint, quat);
+            if (rotation[Quat4f.s] < 1.0) {
+                Quat4f.mul(quat, rotation);
+            } // avoid multiplication if local
+                                            // rotation is Id transform.
+        }
+        else
+        {
+            if (rootJoint != null)
+            {
+                throw new IllegalArgumentException("Root joint not found " + rootJoint.sid);
+            }
+            else
+            {
+                Quat4f.set(quat,rotation);
+            }
+        }
+    }
 
     /**
      * Calculates the "path" translation, for the scene graph path starting at the specified root VJoint, and ending in this VJoint. The resulting
