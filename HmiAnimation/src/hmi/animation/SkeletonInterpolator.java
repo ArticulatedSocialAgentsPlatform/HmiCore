@@ -176,7 +176,8 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
      */
     public void setPartIds(String[] partIds)
     {
-        this.partIds = partIds;
+        this.partIds = partIds;        
+        calculateConfigSize();
     }
 
     /**
@@ -204,6 +205,7 @@ public class SkeletonInterpolator extends XMLStructureAdapter implements ClockLi
         hasScale = configType.indexOf('S') >= 0;
         hasVelocity = configType.indexOf('V') >= 0;
         hasAngularVelocity = configType.indexOf('W') >= 0;
+        calculateConfigSize();
     }
 
     private void calculateConfigSize()
