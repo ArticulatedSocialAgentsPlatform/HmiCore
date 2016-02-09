@@ -35,10 +35,17 @@ import hmi.math.Vec3f;
 public class EyeLidMorpher
 {
     private final String[] morphTargets;
+    private float morphWeight;
 
     public EyeLidMorpher(String[] morphTargets)
     {
         this.morphTargets = morphTargets;
+        this.morphWeight = 1.0f;
+    }
+    public EyeLidMorpher(String[] morphTargets, float weight)
+    {
+        this.morphTargets = morphTargets;
+        this.morphWeight = weight;
     }
 
     public void setEyeLidMorph(float[] qLeftEye, float[] qRightEye, FaceController faceController)
@@ -47,7 +54,7 @@ public class EyeLidMorpher
         float rpyR[] = Vec3f.getVec3f();
         Quat4f.getRollPitchYaw(qRightEye, rpyL);
         Quat4f.getRollPitchYaw(qLeftEye, rpyR);
-        float morphValue = rpyL[1] + rpyR[1];
+        float morphValue = (rpyL[1] + rpyR[1]) * this.morphWeight;
         float values[] = new float[morphTargets.length];
         for (int i = 0; i < morphTargets.length; i++)
         {
