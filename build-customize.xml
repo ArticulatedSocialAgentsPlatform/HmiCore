@@ -227,15 +227,5 @@
         <mkdir dir="${dist.dir}"/>
 	     <zip basedir="${javadoc.dir}" destfile="${dist.dir}/javadoc.zip" />
     </target>
-    
-    <target name="javancssAll" description="Generate a javancs report">
-      <mkdir dir="${build.classes.dir}"/>
-      <javancss srcdir="."
-            generateReport="true"
-            format="xml"
-             outputfile="${build.classes.dir}/javancss_metrics.xml"
-            abortOnFail="false"
-            includes="**/*.java"
-            />
-    </target> 
+   
 </project>
