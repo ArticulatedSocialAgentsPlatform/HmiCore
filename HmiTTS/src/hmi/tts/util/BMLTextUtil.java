@@ -22,6 +22,7 @@
  *******************************************************************************/
 package hmi.tts.util;
 
+import java.util.regex.*;
 import hmi.tts.Bookmark;
 import hmi.tts.WordDescription;
 
@@ -31,6 +32,8 @@ import java.util.List;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Various utils to manipulate BML text in the speech behaviour
@@ -38,6 +41,8 @@ import com.google.common.collect.Iterables;
  */
 public final class BMLTextUtil
 {
+    private final static Logger log = LoggerFactory.getLogger(BMLTextUtil.class.getName());
+
     private BMLTextUtil()
     {
         
@@ -145,5 +150,36 @@ public final class BMLTextUtil
         text = stripSyncNameSpace(text);
         String str = text.replaceAll("<sync\\s+id", "<bookmark mark");
         return str.replaceAll("</sync>", "</bookmark>");
+    }
+
+    /**
+     * Converts BML speech text to Fluency speech text, that is: <sync id="..."/> or <sync id="..."></sync> with various whitespacing becomes => \bookmark=...\ 
+     BECAUSE FLUENCY WANTS NUMERIC IDS, WHICH ARE FORBIDDING IN BML, WE NEED TO STRIP ALL NON-NUMERIC FROM THE ID!
+     */
+    public static String BMLToFluency(String text)
+    {
+        String str = stripSyncNameSpace(text);
+        //capture 1 of the match is the id!
+        String regex = "<sync\\s+id\\s*=\\s*\\\"([^\\\"]*)\\\"\\s*(\\/\\>|\\>([^\\<])*\\<\\/sync\\>)";
+        //first get all matches to the sync pattern
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(str);
+        //grab all $1 (that is, the actual ids) and put them in syncIds
+        ArrayList<String> syncIds = new ArrayList<String>();
+        while (m.find())
+        {
+            String nextId = m.group(1);
+            log.info("found sync id in input: {}",nextId);
+            syncIds.add(nextId);
+        }
+        //for every syncId in the input, strip the non-digits from the syncid
+        for (String id:syncIds)
+        {
+            str = str.replaceAll(id,id.replaceAll("\\D",""));
+        }
+        /* in remaining string, use the matcher to remove the <sync etc> in favour of \bookmark=...\ */
+        str=str.replaceAll(regex,"\\bookmark=$1\\");
+        log.info("resulting text after replacing bml syncs by fluency syncs: {}",str);
+        return str;
     }
 }
