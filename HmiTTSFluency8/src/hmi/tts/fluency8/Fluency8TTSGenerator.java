@@ -146,6 +146,7 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
      */
     public Fluency8TTSGenerator(PhonemeToVisemeMapping ptvm)
     {
+        if (ptvm==null) ptvm = new NullPhonemeToVisemeMapping();
     	visemeMapping = ptvm;
         initialized = false;
         executorService = Executors.newSingleThreadExecutor();
