@@ -570,8 +570,9 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
         }
         ftg.setVoice("Piet"); //will not work; also Fluency will pop up a warning dialog
         ftg.setVoice("Isabelle (MBROLA)"); //this one generally exists...
-        ftg.speak("Dit is een andere test");
+        ftg.speakBML("Dit is een andere <sync id=\"s67\"/> test");
         ftg.cleanup();
     }
     */
+    
 }
