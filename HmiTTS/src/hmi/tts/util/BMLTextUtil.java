@@ -178,7 +178,7 @@ public final class BMLTextUtil
             str = str.replaceAll(id,id.replaceAll("\\D",""));
         }
         /* in remaining string, use the matcher to remove the <sync etc> in favour of \bookmark=...\ */
-        str=str.replaceAll(regex,"\\bookmark=$1\\");
+        str=str.replaceAll(regex,"\\\\bookmark=$1\\\\");
         log.info("resulting text after replacing bml syncs by fluency syncs: {}",str);
         return str;
     }
