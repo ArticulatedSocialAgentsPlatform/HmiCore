@@ -366,7 +366,7 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
     {
     	int phnr = PhonemeNameToNumber.getPhonemeNumber(phoneme);
     	int nphnr = PhonemeNameToNumber.getPhonemeNumber(nextPhoneme);
-        System.out.println("phcall " + phoneme + " " + duration + " " + nextPhoneme + " " + stress);
+        //System.out.println("phcall " + phoneme + " " + duration + " " + nextPhoneme + " " + stress);
     	currentPhonemes.add(new Phoneme(phnr, duration, stress == 1));
         
         int visime = visemeMapping.getVisemeForPhoneme(PhonemeNameToNumber.getPhonemeNumber(phoneme));
