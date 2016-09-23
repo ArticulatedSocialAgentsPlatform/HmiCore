@@ -23,6 +23,7 @@
 package hmi.tts.fluency8;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -79,6 +80,9 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
     private boolean initialized;
 
     // temp vars used to gather bookmarks, visimes and phonemes while speaking
+    @GuardedBy("this")
+    HashMap<String,String> fluencySyncToBmlSync = new HashMap<String,String>();
+
     @GuardedBy("this")
     private ArrayList<BookMarker> currentBookmarks = new ArrayList<BookMarker>();
 
@@ -360,23 +364,49 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
     private void phonemeCallback(String phoneme, int duration, String nextPhoneme, int stress)
     {
     	int phnr = PhonemeNameToNumber.getPhonemeNumber(phoneme);
+    	int nphnr = PhonemeNameToNumber.getPhonemeNumber(nextPhoneme);
+        System.out.println("phcall " + phoneme + " " + duration + " " + nextPhoneme + " " + stress);
     	currentPhonemes.add(new Phoneme(phnr, duration, stress == 1));
+        
+        int visime = visemeMapping.getVisemeForPhoneme(PhonemeNameToNumber.getPhonemeNumber(phoneme));
+        int nextVisime = visemeMapping.getVisemeForPhoneme(PhonemeNameToNumber.getPhonemeNumber(nextPhoneme));
     	if (phnr >= 1 && phnr <= 3) //h, H, ? --> use next phoneme for viseme!
     	{
-    		currentVisimes.add(new Visime(visemeMapping.getVisemeForPhoneme(PhonemeNameToNumber.getPhonemeNumber(nextPhoneme)), duration, stress == 1));
+            visime = nextVisime;
     	}
-    	else
-    	{
-    		currentVisimes.add(new Visime(visemeMapping.getVisemeForPhoneme(phnr), duration, stress == 1));
-    	}
+   		currentVisimes.add(new Visime(visime, duration, stress == 1));
+        if (callback != null)
+        {
+            callback.phonemeCallback(phnr, duration, nphnr, stress == 1);
+        }
+        if (permanentCallback != null)
+        {
+            permanentCallback.phonemeCallback(phnr, duration, nphnr, stress == 1);
+        }
+        if (callback != null)
+        {
+            callback.visimeCallback(visime, duration, nextVisime, stress == 1);
+        }
+        if (permanentCallback != null)
+        {
+            permanentCallback.visimeCallback(visime, duration, nextVisime, stress == 1);
+        }
     }
 
     private void bookmarkCallback(String bookmark)
     {
-        // System.out.println("Bookmark "+bookmark+"!");
-        BookMarker m = new BookMarker(bookmark, false);
+        //System.out.println("Bookmark "+fluencySyncToBmlSync.get(bookmark)+"!");
+        BookMarker m = new BookMarker(fluencySyncToBmlSync.get(bookmark), false);
 
         currentBookmarks.add(m);
+        if (callback != null)
+        {
+            callback.bookmarkCallback(bookmark);
+        }
+        if (permanentCallback != null)
+        {
+            permanentCallback.bookmarkCallback(bookmark);
+        }
     }
 
     private void handleBookmarks(WordDescription wd)
@@ -406,7 +436,7 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
          * phonemeCallback before a wordBoundryCallback
          */
         WordDescription wd = null;
-        // System.out.println("Word boundry "+currentWord);
+        //System.out.println("Word boundry "+currentWord);
         if (currentWord == null)
         {
             if (currentPhonemes.isEmpty())
@@ -447,14 +477,38 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
             currentWordOffset += wd.getDuration();
         }
         currentWord = text.substring(offset, offset + length);
+        if (callback != null)
+        {
+            callback.wordBoundryCallback(offset, length);
+        }
+        if (permanentCallback != null)
+        {
+            permanentCallback.wordBoundryCallback(offset, length);
+        }
     }
 
     private void sentenceBoundryCallback(int offset, int length)
     {
+        if (callback != null)
+        {
+            callback.sentenceBoundryCallback(offset, length);
+        }
+        if (permanentCallback != null)
+        {
+            permanentCallback.sentenceBoundryCallback(offset, length);
+        }
     }
 
     private boolean stopCallback()
     {
+        if (callback != null)
+        {
+            return callback.stopCallback();
+        }
+        if (permanentCallback != null)
+        {
+            return permanentCallback.stopCallback();
+        }
         return false;
     }
 
@@ -488,6 +542,7 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
         vis.addAll(visimes);
         //TODO: misschien op dit punt even doorlopen en duplicaten samenvoegen
         visimes.clear();
+        fluencySyncToBmlSync.clear();
         return new TimingInfo(des, bms, vis);
     }
 
@@ -499,7 +554,7 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
             logger.error("Not initialized in getBMLTiming");
             throw new RuntimeException("Not initialized");
         }
-        speak(BMLTextUtil.BMLToFluency(s), true, null);
+        speak(BMLTextUtil.BMLToFluency(s,fluencySyncToBmlSync), true, null);
         return getAndClearTimingInfo();
     }
 
@@ -511,7 +566,7 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
             logger.error("Not initialized in speakBML");
             throw new RuntimeException("Not initialized");
         }
-        speak(BMLTextUtil.BMLToFluency(s), false, null);
+        speak(BMLTextUtil.BMLToFluency(s, fluencySyncToBmlSync), false, null);
         return getAndClearTimingInfo();
     }
 
@@ -523,7 +578,7 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
             logger.error("Not initialized in speakBMLToFile text:{} filename:{}", s, filename);
             throw new RuntimeException("Not initialized");
         }
-        return speakToFile(BMLTextUtil.BMLToFluency(s), filename);
+        return speakToFile(BMLTextUtil.BMLToFluency(s,fluencySyncToBmlSync), filename);
     }
 
     @Override
@@ -555,7 +610,7 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
             }
         });
     }
-    /*
+
     public static void main(String[] args)
     {
         Fluency8TTSGenerator  ftg = new Fluency8TTSGenerator();
@@ -568,11 +623,10 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
         {
             System.out.println("Voice: " + voices[i]);
         }
-        ftg.setVoice("Piet"); //will not work; also Fluency will pop up a warning dialog
+        //ftg.setVoice("Piet"); //will not do a voice change as the voice does not exist; also Fluency will pop up a warning dialog
         ftg.setVoice("Isabelle (MBROLA)"); //this one generally exists...
         ftg.speakBML("Dit is een andere <sync id=\"s67\"/> test");
         ftg.cleanup();
     }
-    */
     
 }

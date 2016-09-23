@@ -17,14 +17,6 @@ JNIEXPORT jint JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_FluencySpeak
 
 /*
  * Class:     hmi_tts_fluency8_Fluency8TTSGenerator
- * Method:    FluencyDummySpeak
- * Signature: (Ljava/lang/String;)I
- */
-JNIEXPORT jint JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_FluencyDummySpeak
-  (JNIEnv *, jobject, jstring);
-
-/*
- * Class:     hmi_tts_fluency8_Fluency8TTSGenerator
  * Method:    FluencyInit
  * Signature: ()I
  */

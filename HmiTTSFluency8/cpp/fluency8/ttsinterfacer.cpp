@@ -34,7 +34,6 @@ bool fluencyDone;
 HINSTANCE hFluencyDLL;
 
 int Voices;
-jobjectArray voices;
 wchar_t VoiceName[200];
 void *Voice;
 void *Channel;
@@ -44,6 +43,14 @@ unsigned TextIndex;
 unsigned Samples;
 unsigned WordLength;
 unsigned Bookmark;
+
+JNIEnv *cacheEnv;
+jobject cacheObj;
+jmethodID wordCallbackMid;
+jmethodID sentenceCallbackMid;
+jmethodID phonemeCallbackMid;
+jmethodID bookmarkCallbackMid;
+jmethodID stopCallbackMid;
 
 jstring wsz2jstr(JNIEnv *env, wchar_t *str)
 {
@@ -81,6 +88,7 @@ void WINAPI FLUENCYSYNC(unsigned Event, unsigned Param1, unsigned Param2, unsign
 		break;
 
 	case SYNC_PROGRESS:
+		cacheEnv->CallVoidMethod(cacheObj, wordCallbackMid, Param1, Param2);
 		break;
 
 	case SYNC_FINISH:
@@ -89,12 +97,13 @@ void WINAPI FLUENCYSYNC(unsigned Event, unsigned Param1, unsigned Param2, unsign
 		break;
 
 	case SYNC_PHONEME:
+		{
 		//get current phoneme
 		char p[3];
 		p[0] = (char)Param1;
 		p[1] = (char)(Param1 >> 8);
 		p[2] = (char)0;
-		printf("%s ", p);
+		//printf("%s ", p);
 		Param1 = Param1 >> 16;
 		//get next phoneme
 		char pn[3];
@@ -102,12 +111,40 @@ void WINAPI FLUENCYSYNC(unsigned Event, unsigned Param1, unsigned Param2, unsign
 		pn[1] = (char)(Param1 >> 8);
 		pn[2] = (char)0;
 		//printf("(%s) ", pn);
-		break;
+		int duration = (int)(Param2 / 22.0500f);
+		//printf("%s (%i) ", p, duration);
 
+		jclass strClass = cacheEnv->FindClass("java/lang/String");
+		jmethodID ctorID = cacheEnv->GetMethodID(strClass, "<init>", "([BLjava/lang/String;)V");
+		jstring encoding = cacheEnv->NewStringUTF("GBK");
+
+		jbyteArray pbytes = cacheEnv->NewByteArray(strlen(p));
+		cacheEnv->SetByteArrayRegion(pbytes, 0, strlen(p), (jbyte*)p);
+		jstring pstr = (jstring)cacheEnv->NewObject(strClass, ctorID, pbytes, encoding);
+
+		jbyteArray pnbytes = cacheEnv->NewByteArray(strlen(pn));
+		cacheEnv->SetByteArrayRegion(pnbytes, 0, strlen(pn), (jbyte*)pn);
+		jstring pnstr = (jstring)cacheEnv->NewObject(strClass, ctorID, pnbytes, encoding);
+
+		cacheEnv->CallVoidMethod(cacheObj, phonemeCallbackMid, pstr, duration, pnstr, 0);
+		break;
+		}
 	case SYNC_BOOKMARK:
-		printf("<%d> ", Param1);
-		break;
+		{
+		jclass strClass = cacheEnv->FindClass("java/lang/String");
+		jmethodID ctorID = cacheEnv->GetMethodID(strClass, "<init>", "([BLjava/lang/String;)V");
+		jstring encoding = cacheEnv->NewStringUTF("GBK");
 
+		char b[200];
+		itoa(Param1, b, 10);
+		jbyteArray bbytes = cacheEnv->NewByteArray(strlen(b));
+		cacheEnv->SetByteArrayRegion(bbytes, 0, strlen(b), (jbyte*)b);
+		jstring bstr = (jstring)cacheEnv->NewObject(strClass, ctorID, bbytes, encoding);
+
+		cacheEnv->CallVoidMethod(cacheObj, bookmarkCallbackMid, bstr);
+		//printf("<%d> ", Param1);
+		break;
+		}
 	}
 }
 
@@ -168,21 +205,6 @@ JNIEXPORT jint JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_FluencyInit(JN
 			//}
 
 			Voices = fluencyGetVoiceCount();
-			voices = env->NewObjectArray(Voices, env->FindClass("java/lang/String"), env->NewStringUTF(""));
-			//wprintf(L"\n%d voices:\n", Voices);
-			for (int i = 1; i <= Voices; i++) {
-				fluencyGetVoiceNameW(i, VoiceName, 200 * sizeof(wchar_t));
-				//wprintf(L"%s \n", VoiceName);
-				jstring str = wsz2jstr(env, VoiceName);
-				env->SetObjectArrayElement(voices, i - 1, str);
-				//to check that conversion back leads to right string again:
-				/*
-				const char *nativeString = env->GetStringUTFChars(str, 0);
-				// use your string
-				printf("... %s\n", nativeString);
-				env->ReleaseStringUTFChars(str, nativeString);
-				*/
-			}
 
 			// get preferred voice
 			fluencyGetPreferredVoiceNameW(VoiceName, 200 * sizeof(wchar_t));
@@ -228,12 +250,37 @@ JNIEXPORT jint JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_FluencySetSpea
 
 JNIEXPORT jobjectArray JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_FluencyGetVoices(JNIEnv *env, jobject obj)
 {
-	return voices;
+	Voices = fluencyGetVoiceCount();
+	jobjectArray voicesList = env->NewObjectArray(Voices, env->FindClass("java/lang/String"), env->NewStringUTF(""));
+	//wprintf(L"\n%d voices:\n", Voices);
+	for (int i = 1; i <= Voices; i++) {
+		fluencyGetVoiceNameW(i, VoiceName, 200 * sizeof(wchar_t));
+		//wprintf(L"%s \n", VoiceName);
+		jstring str = wsz2jstr(env, VoiceName);
+		env->SetObjectArrayElement(voicesList, i - 1, str);
+		//to check that conversion back leads to right string again:
+		/*
+		const char *nativeString = env->GetStringUTFChars(str, 0);
+		// use your string
+		printf("... %s\n", nativeString);
+		env->ReleaseStringUTFChars(str, nativeString);
+		*/
+	}
+	return voicesList;
 }
 
 					   
 JNIEXPORT jint JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_FluencySpeakToFile (JNIEnv *env, jobject obj, jstring _text, jstring _filename)
 {
+	jclass cls = env->GetObjectClass(obj);
+	wordCallbackMid = env->GetMethodID(cls, "wordBoundryCallback", "(II)V");
+	sentenceCallbackMid = env->GetMethodID(cls, "sentenceBoundryCallback", "(II)V");
+	phonemeCallbackMid = env->GetMethodID(cls, "phonemeCallback", "(Ljava/lang/String;ILjava/lang/String;I)V");
+	bookmarkCallbackMid = env->GetMethodID(cls, "bookmarkCallback", "(Ljava/lang/String;)V");
+	stopCallbackMid = env->GetMethodID(cls, "stopCallback", "()Z");
+	cacheEnv = env;
+	cacheObj = obj;
+
 	fluencyDone = FALSE;
 	wchar_t *text = (wchar_t*)((*env).GetStringChars(_text, 0));
 	wchar_t *filename = (wchar_t*)((*env).GetStringChars(_filename, 0));
@@ -249,6 +296,15 @@ JNIEXPORT jint JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_FluencySpeakTo
 
 JNIEXPORT jint JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_FluencySpeak (JNIEnv *env, jobject obj, jstring _text)
 {
+	jclass cls = env->GetObjectClass(obj);
+	wordCallbackMid = env->GetMethodID(cls, "wordBoundryCallback", "(II)V");
+	sentenceCallbackMid = env->GetMethodID(cls, "sentenceBoundryCallback", "(II)V");
+	phonemeCallbackMid = env->GetMethodID(cls, "phonemeCallback", "(Ljava/lang/String;ILjava/lang/String;I)V");
+	bookmarkCallbackMid = env->GetMethodID(cls, "bookmarkCallback", "(Ljava/lang/String;)V");
+	stopCallbackMid = env->GetMethodID(cls, "stopCallback", "()Z");
+	cacheEnv = env;
+	cacheObj = obj;
+
 	fluencyDone = FALSE;
 	wchar_t *text = (wchar_t*)((*env).GetStringChars(_text, 0));
 	fluencySetInputTextW(Channel, text);
@@ -258,6 +314,10 @@ JNIEXPORT jint JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_FluencySpeak (
 	// Fake Main message loop: fluencySpeak only works as long as emssages are being dispatched! strangely enough, this is not the case for the speaktofile...
 	while (!fluencyDone && GetMessage(&msg, nullptr, 0, 0))
 	{
+		if (cacheEnv->CallBooleanMethod(obj, stopCallbackMid))
+		{
+			fluencyStopSpeaking(Channel);
+		}
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
