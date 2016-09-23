@@ -23,6 +23,8 @@
 package hmi.tts.util;
 
 import java.util.regex.*;
+import java.util.HashMap;
+
 import hmi.tts.Bookmark;
 import hmi.tts.WordDescription;
 
@@ -156,7 +158,7 @@ public final class BMLTextUtil
      * Converts BML speech text to Fluency speech text, that is: <sync id="..."/> or <sync id="..."></sync> with various whitespacing becomes => \bookmark=...\ 
      BECAUSE FLUENCY WANTS NUMERIC IDS, WHICH ARE FORBIDDING IN BML, WE NEED TO STRIP ALL NON-NUMERIC FROM THE ID!
      */
-    public static String BMLToFluency(String text)
+    public static String BMLToFluency(String text, HashMap<String,String> fluencySyncToBmlSync)
     {
         String str = stripSyncNameSpace(text);
         //capture 1 of the match is the id!
@@ -175,7 +177,9 @@ public final class BMLTextUtil
         //for every syncId in the input, strip the non-digits from the syncid
         for (String id:syncIds)
         {
-            str = str.replaceAll(id,id.replaceAll("\\D",""));
+            String cleanId = id.replaceAll("\\D","");
+            str = str.replaceAll(id,cleanId);
+            fluencySyncToBmlSync.put(cleanId,id);
         }
         /* in remaining string, use the matcher to remove the <sync etc> in favour of \bookmark=...\ */
         str=str.replaceAll(regex,"\\\\bookmark=$1\\\\");
