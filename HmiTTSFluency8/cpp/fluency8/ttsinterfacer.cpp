@@ -46,7 +46,10 @@ unsigned Bookmark;
 
 JNIEnv *cacheEnv;
 jobject cacheObj;
-jmethodID wordCallbackMid;
+jclass strClass;
+jmethodID ctorID;
+jstring encoding;
+jmethodID wordCallbackMid = NULL;
 jmethodID sentenceCallbackMid;
 jmethodID phonemeCallbackMid;
 jmethodID bookmarkCallbackMid;
@@ -111,12 +114,9 @@ void WINAPI FLUENCYSYNC(unsigned Event, unsigned Param1, unsigned Param2, unsign
 		pn[1] = (char)(Param1 >> 8);
 		pn[2] = (char)0;
 		//printf("(%s) ", pn);
-		int duration = (int)(Param2 / 22.0500f);
+		int duration = (int)(Param2 / 44.100f);
 		//printf("%s (%i) ", p, duration);
 
-		jclass strClass = cacheEnv->FindClass("java/lang/String");
-		jmethodID ctorID = cacheEnv->GetMethodID(strClass, "<init>", "([BLjava/lang/String;)V");
-		jstring encoding = cacheEnv->NewStringUTF("GBK");
 
 		jbyteArray pbytes = cacheEnv->NewByteArray(strlen(p));
 		cacheEnv->SetByteArrayRegion(pbytes, 0, strlen(p), (jbyte*)p);
@@ -131,9 +131,6 @@ void WINAPI FLUENCYSYNC(unsigned Event, unsigned Param1, unsigned Param2, unsign
 		}
 	case SYNC_BOOKMARK:
 		{
-		jclass strClass = cacheEnv->FindClass("java/lang/String");
-		jmethodID ctorID = cacheEnv->GetMethodID(strClass, "<init>", "([BLjava/lang/String;)V");
-		jstring encoding = cacheEnv->NewStringUTF("GBK");
 
 		char b[200];
 		itoa(Param1, b, 10);
@@ -212,7 +209,7 @@ JNIEXPORT jint JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_FluencyInit(JN
 
 			// create voice and channel
 			Voice = fluencyCreateVoiceW(VoiceName);
-			Channel = fluencyCreateChannel(Voice, 0, TRUE);
+			Channel = fluencyCreateChannel(Voice, 44100, TRUE);
 			
 
 		}
@@ -272,13 +269,19 @@ JNIEXPORT jobjectArray JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_Fluenc
 					   
 JNIEXPORT jint JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_FluencySpeakToFile (JNIEnv *env, jobject obj, jstring _text, jstring _filename)
 {
-	jclass cls = env->GetObjectClass(obj);
-	wordCallbackMid = env->GetMethodID(cls, "wordBoundryCallback", "(II)V");
-	sentenceCallbackMid = env->GetMethodID(cls, "sentenceBoundryCallback", "(II)V");
-	phonemeCallbackMid = env->GetMethodID(cls, "phonemeCallback", "(Ljava/lang/String;ILjava/lang/String;I)V");
-	bookmarkCallbackMid = env->GetMethodID(cls, "bookmarkCallback", "(Ljava/lang/String;)V");
-	stopCallbackMid = env->GetMethodID(cls, "stopCallback", "()Z");
-	cacheEnv = env;
+	//if (wordCallbackMid == NULL)
+	{
+		jclass cls = env->GetObjectClass(obj);
+		wordCallbackMid = env->GetMethodID(cls, "wordBoundryCallback", "(II)V");
+		sentenceCallbackMid = env->GetMethodID(cls, "sentenceBoundryCallback", "(II)V");
+		phonemeCallbackMid = env->GetMethodID(cls, "phonemeCallback", "(Ljava/lang/String;ILjava/lang/String;I)V");
+		bookmarkCallbackMid = env->GetMethodID(cls, "bookmarkCallback", "(Ljava/lang/String;)V");
+		stopCallbackMid = env->GetMethodID(cls, "stopCallback", "()Z");
+		cacheEnv = env;
+		strClass = cacheEnv->FindClass("java/lang/String");
+		ctorID = cacheEnv->GetMethodID(strClass, "<init>", "([BLjava/lang/String;)V");
+		encoding = cacheEnv->NewStringUTF("GBK");
+	}
 	cacheObj = obj;
 
 	fluencyDone = FALSE;
@@ -296,13 +299,19 @@ JNIEXPORT jint JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_FluencySpeakTo
 
 JNIEXPORT jint JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_FluencySpeak (JNIEnv *env, jobject obj, jstring _text)
 {
-	jclass cls = env->GetObjectClass(obj);
-	wordCallbackMid = env->GetMethodID(cls, "wordBoundryCallback", "(II)V");
-	sentenceCallbackMid = env->GetMethodID(cls, "sentenceBoundryCallback", "(II)V");
-	phonemeCallbackMid = env->GetMethodID(cls, "phonemeCallback", "(Ljava/lang/String;ILjava/lang/String;I)V");
-	bookmarkCallbackMid = env->GetMethodID(cls, "bookmarkCallback", "(Ljava/lang/String;)V");
-	stopCallbackMid = env->GetMethodID(cls, "stopCallback", "()Z");
-	cacheEnv = env;
+	//if (wordCallbackMid == NULL)
+	{
+		jclass cls = env->GetObjectClass(obj);
+		wordCallbackMid = env->GetMethodID(cls, "wordBoundryCallback", "(II)V");
+		sentenceCallbackMid = env->GetMethodID(cls, "sentenceBoundryCallback", "(II)V");
+		phonemeCallbackMid = env->GetMethodID(cls, "phonemeCallback", "(Ljava/lang/String;ILjava/lang/String;I)V");
+		bookmarkCallbackMid = env->GetMethodID(cls, "bookmarkCallback", "(Ljava/lang/String;)V");
+		stopCallbackMid = env->GetMethodID(cls, "stopCallback", "()Z");
+		cacheEnv = env;
+		strClass = cacheEnv->FindClass("java/lang/String");
+		ctorID = cacheEnv->GetMethodID(strClass, "<init>", "([BLjava/lang/String;)V");
+		encoding = cacheEnv->NewStringUTF("GBK");
+	}
 	cacheObj = obj;
 
 	fluencyDone = FALSE;

@@ -178,6 +178,10 @@ public final class BMLTextUtil
         for (String id:syncIds)
         {
             String cleanId = id.replaceAll("\\D","");
+            if (cleanId.equals(""))
+{
+log.error("Fluency can only use BML bookmarks that contain digits, and within the speech block the sync ids should be unique even when all non-digits have been stripped");
+}
             str = str.replaceAll(id,cleanId);
             fluencySyncToBmlSync.put(cleanId,id);
         }

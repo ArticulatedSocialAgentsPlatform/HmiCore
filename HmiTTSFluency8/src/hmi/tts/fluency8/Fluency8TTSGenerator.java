@@ -434,10 +434,10 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
     {
         /*
          * Loquendo does a wordBoundryCallback before a phonemeCallback, Microsoft voices create a
-         * phonemeCallback before a wordBoundryCallback
+         * phonemeCallback before a wordBoundryCallback. That's why we still have that choice below (since this code is based on SAPI). For fluency might not make sense.
          */
         WordDescription wd = null;
-        //System.out.println("Word boundry "+currentWord);
+        //System.out.println("Word boundry "+currentWord + " " + offset + " " + length);
         if (currentWord == null)
         {
             if (currentPhonemes.isEmpty())
@@ -626,7 +626,8 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
         }
         //ftg.setVoice("Piet"); //will not do a voice change as the voice does not exist; also Fluency will pop up a warning dialog
         ftg.setVoice("Isabelle (MBROLA)"); //this one generally exists...
-        ftg.speakBML("Dit is een andere <sync id=\"s67\"/> test");
+        ftg.speakBML("test sync no digits <sync id=\"sf\"/> test");
+        ftg.speakBML("Dit is een andere <sync id=\"sf54\"/> test");
         ftg.cleanup();
     }
     
