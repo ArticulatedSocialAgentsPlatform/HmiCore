@@ -171,23 +171,20 @@ public final class BMLTextUtil
         while (m.find())
         {
             String nextId = m.group(1);
-            log.info("found sync id in input: {}",nextId);
+            //log.info("found sync id in input: {}",nextId);
             syncIds.add(nextId);
         }
         //for every syncId in the input, strip the non-digits from the syncid
         for (String id:syncIds)
         {
-            String cleanId = id.replaceAll("\\D","");
-            if (cleanId.equals(""))
-{
-log.error("Fluency can only use BML bookmarks that contain digits, and within the speech block the sync ids should be unique even when all non-digits have been stripped");
-}
+            String cleanId = ""+id.hashCode();
+            System.out.println("cid:"+cleanId);
             str = str.replaceAll(id,cleanId);
             fluencySyncToBmlSync.put(cleanId,id);
         }
         /* in remaining string, use the matcher to remove the <sync etc> in favour of \bookmark=...\ */
         str=str.replaceAll(regex,"\\\\bookmark=$1\\\\");
-        log.info("resulting text after replacing bml syncs by fluency syncs: {}",str);
+        //log.info("resulting text after replacing bml syncs by fluency syncs: {}",str);
         return str;
     }
 }
