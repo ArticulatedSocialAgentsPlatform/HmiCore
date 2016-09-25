@@ -667,6 +667,6 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
         System.out.println(ti.getDuration());
                  
         ftg.cleanup();
-    }*/
-    
+    }
+*/    
 }

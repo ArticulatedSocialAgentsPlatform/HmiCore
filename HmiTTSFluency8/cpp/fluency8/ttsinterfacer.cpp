@@ -205,7 +205,7 @@ JNIEXPORT jint JNICALL Java_hmi_tts_fluency8_Fluency8TTSGenerator_FluencyInit(JN
 
 			// get preferred voice
 			fluencyGetPreferredVoiceNameW(VoiceName, 200 * sizeof(wchar_t));
-			wprintf(L"Fluency 8.0 initializing. \nPreferred voice: %s\n", VoiceName);
+			//wprintf(L"Fluency 8.0 initializing. \nPreferred voice: %s\n", VoiceName);
 
 			// create voice and channel
 			Voice = fluencyCreateVoiceW(VoiceName);
