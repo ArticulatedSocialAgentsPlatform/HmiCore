@@ -177,13 +177,13 @@ public final class BMLTextUtil
         //for every syncId in the input, strip the non-digits from the syncid
         for (String id:syncIds)
         {
-            String cleanId = ""+id.hashCode();
+            String cleanId = ""+fluencySyncToBmlSync.size();
             System.out.println("cid:"+cleanId);
-            str = str.replaceAll(id,cleanId);
+            str = str.replaceAll("id\\s*=\\s*\\\""+id+"\\\"","id=\\\""+cleanId+"\\\"");
             fluencySyncToBmlSync.put(cleanId,id);
         }
         /* in remaining string, use the matcher to remove the <sync etc> in favour of \bookmark=...\ */
-        str=str.replaceAll(regex,"\\\\bookmark=$1\\\\");
+        str=str.replaceAll(regex," \\\\bookmark=$1\\\\ ");
         //log.info("resulting text after replacing bml syncs by fluency syncs: {}",str);
         return str;
     }

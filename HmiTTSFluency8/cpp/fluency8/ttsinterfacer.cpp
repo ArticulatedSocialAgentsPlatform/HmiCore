@@ -95,7 +95,7 @@ void WINAPI FLUENCYSYNC(unsigned Event, unsigned Param1, unsigned Param2, unsign
 		break;
 
 	case SYNC_FINISH:
-		//printf("\nfinish\n");
+		cacheEnv->CallVoidMethod(cacheObj, wordCallbackMid, -1, -1);
 		fluencyDone = TRUE;
 		break;
 

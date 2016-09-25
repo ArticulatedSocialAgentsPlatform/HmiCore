@@ -110,11 +110,11 @@ public abstract class AbstractTTSGeneratorTest
                     + " People know me as the girl with the pearl ear ring. My father can no longer work since he was blinded. "
                     + "<sync id=\"beat1b1\"/>Because we still need to eat, I took service with a local painter. "
                     + "His name is Johannes <sync id=\"vermeer1\"/>Vermeer.<sync id=\"vermeer2\"/>", f.getAbsolutePath());
+            
             if (!f.delete())
             {
                 LOGGER.warn("Can't delete temp file! {}", f.getName());
             }
-
             Bookmark b1 = tInfo.getBookmark("deicticheart1");
             Bookmark b2 = tInfo.getBookmark("deicticheart2");
             assertThat(b2.getOffset(), greaterThan(b1.getOffset()));

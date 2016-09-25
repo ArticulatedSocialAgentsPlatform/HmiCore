@@ -33,7 +33,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import java.nio.file.*;
-
+import java.io.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +98,10 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
     @GuardedBy("this")
     private int currentWordOffset = 0;
 
+    @GuardedBy("this")
+    int prevOffset=0;
+    @GuardedBy("this")
+    int prevLength=0;
     @GuardedBy("this")
     private boolean wordBeforePhoneme = false;
 
@@ -266,8 +270,10 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
 
     private void speak(String str, boolean timeOnly, final String filename)
     {
-        text = str;
+        text = str + " ";
         currentWordOffset = 0;
+        prevOffset=0;
+        prevLength=0;
         currentWord = null;
         currentPhonemes.clear();
         currentVisimes.clear();
@@ -350,8 +356,10 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
             {
                 b = new Bookmark(bmr.name, null, currentWordOffset + wd.getDuration());
             }
+            //System.out.println("adding bookmark: " + bmr.name + " " + b);
             bookmarks.add(b);
         }
+        
         //collect all word-by-word visemes into one list
         for (WordDescription wdesc : wordDescriptions)
         {
@@ -396,8 +404,17 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
 
     private void bookmarkCallback(String bookmark)
     {
-        //System.out.println("Bookmark "+fluencySyncToBmlSync.get(bookmark)+"!");
-        BookMarker m = new BookMarker(fluencySyncToBmlSync.get(bookmark), false);
+        //System.out.println("Bookmark "+fluencySyncToBmlSync.get(bookmark)+"!"+currentPhonemes.size());
+        BookMarker m;
+        if(currentPhonemes.size()>0&&wordDescriptions.size()>0)
+        {
+            //it's a bookmark at the end of the sentence; do something with the offset.
+            m = new BookMarker(fluencySyncToBmlSync.get(bookmark), false, true);
+        }
+        else
+        {
+            m = new BookMarker(fluencySyncToBmlSync.get(bookmark), false);
+        }
 
         currentBookmarks.add(m);
         if (callback != null)
@@ -415,11 +432,21 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
         ArrayList<BookMarker> removeMarks = new ArrayList<BookMarker>();
         for (BookMarker bm : currentBookmarks)
         {
-            if (bm.wordStart)
+            if (bm.isEnd && bm.wordStart)
             {
                 removeMarks.add(bm);
-                // System.out.println("Bookmarker => bookmark "+currentWordOffset+" "+bm.name);
-                bookmarks.add(new Bookmark(bm.name, wd, currentWordOffset));
+                //System.out.println("Bookmarker => bookmark "+currentWordOffset+" "+bm.name);
+                Bookmark b = new Bookmark(bm.name, null, currentWordOffset+wd.getDuration());
+                bookmarks.add(b);
+                //System.out.println("adding "+b);                
+            }
+            else if (!bm.isEnd && bm.wordStart)
+            {
+                removeMarks.add(bm);
+                //System.out.println("Bookmarker => bookmark "+currentWordOffset+" "+bm.name);
+                Bookmark b = new Bookmark(bm.name, wd, currentWordOffset);
+                bookmarks.add(b);
+                //System.out.println("adding "+b);
             }
             else
             {
@@ -432,33 +459,22 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
 
     private void wordBoundryCallback(int offset, int length)
     {
-        /*
-         * Loquendo does a wordBoundryCallback before a phonemeCallback, Microsoft voices create a
-         * phonemeCallback before a wordBoundryCallback. That's why we still have that choice below (since this code is based on SAPI). For fluency might not make sense.
-         */
         WordDescription wd = null;
         //System.out.println("Word boundry "+currentWord + " " + offset + " " + length);
         if (currentWord == null)
         {
-            if (currentPhonemes.isEmpty())
-            {
-                wordBeforePhoneme = true;
-            }
-            else
-            {
-                wordBeforePhoneme = false;
-            }
             handleBookmarks(wd);
         }
         else
         {
-            if (wordBeforePhoneme)
-            {
+            handleBookmarks(wd);
+//            if (wordBeforePhoneme)
+  //          {
                 wd = new WordDescription(currentWord, currentPhonemes, currentVisimes);
                 wordDescriptions.add(wd);
                 currentPhonemes = new ArrayList<Phoneme>();
                 currentVisimes = new ArrayList<Visime>();
-            }
+    /*        }
             else
             {
                 Phoneme p = currentPhonemes.get(currentPhonemes.size() - 1);
@@ -473,9 +489,16 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
 
                 currentVisimes = new ArrayList<Visime>();
                 currentVisimes.add(v);
-            }
+            }*/
             handleBookmarks(wd);
             currentWordOffset += wd.getDuration();
+            if (offset==-1)
+            {
+                offset=prevOffset+prevLength;
+                length=0;
+            }
+            prevOffset = offset;
+            prevLength = length;
         }
         currentWord = text.substring(offset, offset + length);
         if (callback != null)
@@ -490,6 +513,7 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
 
     private void sentenceBoundryCallback(int offset, int length)
     {
+        //System.out.println("Sentence boundary");
         if (callback != null)
         {
             callback.sentenceBoundryCallback(offset, length);
@@ -517,13 +541,20 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
     {
         private BookMarker(String n, boolean ws)
         {
+            this(n,ws,false);
+        }
+        private BookMarker(String n, boolean ws, boolean isEndOfSentence)
+        {
             name = n;
             wordStart = ws;
+            isEnd = isEndOfSentence;
         }
 
         private String name;
 
         private boolean wordStart;
+        
+        private boolean isEnd;
     }
 
     static
@@ -612,23 +643,30 @@ public class Fluency8TTSGenerator extends AbstractTTSGenerator
         });
     }
 
-    public static void main(String[] args)
+    /*
+    public static void main(String[] args) throws Exception
     {
         Fluency8TTSGenerator  ftg = new Fluency8TTSGenerator();
-        ftg.speakToFile("Dit is een andere test test", "tttqp.wav");
-        ftg.speak("Dit is een andere test");
-        ftg.getTiming("blabla");
+        //ftg.speakToFile("Dit is een andere test test", "tttqp.wav");
+        //ftg.speak("Dit is een andere test");
+        //ftg.getTiming("blabla");
+
         String[] voices = ftg.getVoices();
         System.out.println("Number of voices: " + voices.length);
         for (int i = 0; i < voices.length; i++)
         {
             System.out.println("Voice: " + voices[i]);
         }
+
         //ftg.setVoice("Piet"); //will not do a voice change as the voice does not exist; also Fluency will pop up a warning dialog
-        ftg.setVoice("Isabelle (MBROLA)"); //this one generally exists...
-        ftg.speakBML("test sync no digits <sync id=\"sf\"/> test");
-        ftg.speakBML("Dit is een andere <sync id=\"sf54\"/> test");
+        //ftg.setVoice("Isabelle (MBROLA)"); //this one generally exists...
+        //ftg.speakBML("test sync no digits <sync id=\"sf\"/> test");
+        ftg.speakBML("<sync id=\"dd\"/>Dit<sync id=\"dwa\"/> is <sync id=\"pddd\"/>een<sync id=\"fdsd\"/> andere <sync id=\"sf1\"/>test.<sync id=\"sf2\"/>");
+        TimingInfo ti = ftg.speak("test");
+        System.out.println(ti.getWordDescriptions().get(0).getWord());
+        System.out.println(ti.getDuration());
+                 
         ftg.cleanup();
-    }
+    }*/
     
 }
