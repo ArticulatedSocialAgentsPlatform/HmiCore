@@ -51,6 +51,7 @@ public class Fluency8TTSGeneratorTest extends AbstractTTSGeneratorTest
     public void testSpeakDuration() throws TTSException
     {
         //override: this crashes with fluency, don't understand why
+//TODO: rather find out what goes wronG ;9
     }    
     @After
     public void cleanup()
