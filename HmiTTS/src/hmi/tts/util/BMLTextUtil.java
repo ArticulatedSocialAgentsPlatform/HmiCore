@@ -178,7 +178,7 @@ public final class BMLTextUtil
         for (String id:syncIds)
         {
             String cleanId = ""+fluencySyncToBmlSync.size();
-            System.out.println("cid:"+cleanId);
+            //System.out.println("cid:"+cleanId);
             str = str.replaceAll("id\\s*=\\s*\\\""+id+"\\\"","id=\\\""+cleanId+"\\\"");
             fluencySyncToBmlSync.put(cleanId,id);
         }
