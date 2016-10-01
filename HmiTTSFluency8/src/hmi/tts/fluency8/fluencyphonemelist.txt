@@ -4,7 +4,7 @@ there are 3 diphtongues in fluency (ei, Au, 9y) that are returned as "single pho
 
 looks a lot like slightly modified X-SAMPA (http://www.phon.ucl.ac.uk/home/sampa/x-sampa.htm), but not sure whether that is true
 in that case:
-n_0 becomes n0
+n_0 becomes n0 etc (see below--so no _ for tying suffixes to phonemes in fluency format)
 
 they use the subset below -- so only limited duration / intonation diacritics
 
