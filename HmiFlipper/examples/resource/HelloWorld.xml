@@ -1,0 +1,47 @@
+<behaviourtemplates xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3schools.com template.xsd">
+	
+	<template id="1" name="Return greeting">
+	   <preconditions>
+	      <compare value1="$userturn.intention" value2="greeting" />
+	   </preconditions>
+	
+	   <effects>
+	      <function name="count_welcomes">
+	      	<argument value="$userturn.text" />
+	      </function>
+	   </effects>
+	
+	   <behaviour class="HelloWorld.HelloWorldBehaviour">
+	      <argument name="response" value="Hello, how are you?" />
+	   </behaviour>
+	</template>
+	
+	<template id="2" name="Return ending">
+	   <preconditions>
+	      <compare value1="$userturn.intention" value2="ending" />
+	   </preconditions>
+	
+	   <effects>
+	      <function name="count_endings">
+	      	<argument value="$userturn.text" />
+	      </function>
+	   </effects>
+	
+	   <behaviour class="HelloWorld.HelloWorldBehaviour">
+	      <argument name="response" value="Goodbye!" />
+	   </behaviour>
+	</template>
+	
+	<template id="3" name="Unknown intention">
+	   <preconditions>
+	      <compare value1="$userturn.intention" comparator="not_equals" value2="greeting" />
+	      <compare value1="$userturn.intention" comparator="not_equals" value2="ending" />
+	   </preconditions>
+	
+	   <behaviour class="HelloWorld.HelloWorldBehaviour">
+	      <argument name="response" value="Huh, I did not understand that." />
+	   </behaviour>
+	</template>
+	
+
+</behaviourtemplates>
