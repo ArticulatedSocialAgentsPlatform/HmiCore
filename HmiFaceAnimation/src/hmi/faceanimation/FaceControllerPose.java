@@ -72,6 +72,17 @@ public class FaceControllerPose implements FaceController
             targetFc.setMPEG4Configuration(mpeg4config);
         }
     }
+    public synchronized void toTargetAdditive()
+    {
+        synchronized (targetFc)
+        {
+            for (Entry<String, Float> entry : morphs.entrySet())
+            {
+                targetFc.addMorphTargets(new String[] { entry.getKey() }, new float[] { entry.getValue() });
+            }
+            targetFc.addMPEG4Configuration(mpeg4config);
+        }
+    }
 
     @Override
     public synchronized void copy()
