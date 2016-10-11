@@ -1,0 +1,39 @@
+Fluency uses its own notation, see http://www.fluency.nl/help/lexicon.htm 
+
+there are 3 diphtongues in fluency (ei, Au, 9y) that are returned as "single phonemes" (that is, they are returned in one callback in the fluencyAPI; we will also keep them as one "diphoneme" in the normal phoneme callback)
+
+looks a lot like slightly modified X-SAMPA (http://www.phon.ucl.ac.uk/home/sampa/x-sampa.htm), but not sure whether that is true
+in that case:
+n_0 becomes n0 etc (see below--so no _ for tying suffixes to phonemes in fluency format)
+
+they use the subset below -- so only limited duration / intonation diacritics
+
+
+----
+this list is more or less ordered by which codes could be taken as the same viseme. Note that in the calllback we also get the next phoneme which might even allow us to do visual coarticulation between phonemes
+
+        - h, H, ? (viseem is dat van volgende foneem, en dat is altijd een
+klinker)
+        - i, J
+        - p, b, m, w
+        - t, d, D, n, nj, n0
+        - k, g, N
+        - f, v
+        - s, z
+        - S, Z, tj, dj, nj
+        - x, G
+        - l, L, r, R, j
+        - a, Au
+        - y, u, 2, W
+        - e
+        - o
+        - I, I:
+        - E, Ei
+        - Y, Y:, Y~
+        - O, O:, O~
+        - A, Q, A~, 9y (opmerking: Q is alleen voor Friese teksten nodig)
+        - @ (schwa)
+        - _ (stilte)
+
+Voor de diftongen Ei, Au, 9y heb je een tweede viseem nodig (i, u, y) op
+ongeveer 70% van de duur.

@@ -1,0 +1,11 @@
+<ivy-module version="2.0">
+   <info organisation="HMI" module="HmiTTSFluency8"/>
+   <dependencies> 
+      <dependency org="google"   name="guava"     rev="latest.${resolve.status}"   />
+      <dependency org="jcip"       name="jcip-annotations"   rev="latest.release"  />   
+      <dependency org="slf4j"      name="slf4j-api"          rev="latest.release"  />   
+      <dependency org="HMI"        name="HmiUtil"            rev="latest.${resolve.status}"  />
+      <dependency org="HMI"        name="HmiXml"             rev="latest.${resolve.status}"  />
+      <dependency org="HMI"        name="HmiTTS"             rev="latest.${resolve.status}"  />
+   </dependencies>
+</ivy-module>

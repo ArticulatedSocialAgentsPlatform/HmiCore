@@ -1,0 +1,45 @@
+<project name="sera" default="compile" basedir=".">
+	<property name="src" location="src" />
+	<property name="bin" location="bin" />
+	<property name="resource" location="resource" />
+	<property name="flipperdist" location="../dist" />
+	
+	<path id="project.class.path">
+		<pathelement path="${resource}"/>
+		<pathelement path="${flipperdist}/Flipper.jar" />
+	</path>
+	
+	<target name="clean" description="Delete all class files">
+		<mkdir dir="${bin}" />
+		<delete dir="${bin}/*" />
+		<delete includeemptydirs="true">
+			<fileset dir=".">
+				<include name="classes" />
+			</fileset>
+		</delete>
+	</target>
+	
+	<target name="init" depends="clean" >
+		<fileset id="fileset.libs" dir="${flipperdist}">
+			<include name="Flipper.jar" />
+		</fileset>
+		<path id="project.classpath">
+			<pathelement location="${bin}" />
+			<fileset refid="fileset.libs" />
+		</path>
+	</target>
+	
+	<target name="compile" depends="init" description="Compile Flipper">
+		<javac srcdir="${src}" destdir="${bin}" encoding="ISO-8859-1" debug="true">
+			<classpath refid="project.classpath" />
+			<include name="**/*.java" />
+		</javac>
+	</target>
+	
+	<target name="run1" depends="compile" description="Run Flipper Example 1">
+		<java classname="HelloWorld.HelloWorld" fork="true" classpathref="project.class.path">
+			<classpath refid="project.classpath" />
+		</java>
+	</target>
+
+</project>

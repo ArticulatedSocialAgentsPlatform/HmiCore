@@ -1,0 +1,9 @@
+<ivy-module version="2.0">
+   <info organisation="HMI" module="HmiFlipper"/>
+   <configurations>
+      <include file="${ivy.settings.dir}/configurations.xml"/>
+   </configurations>
+   <dependencies>
+         <dependency org="slf4j"   name="slf4j-api"             rev="latest.release"  />
+   </dependencies>
+</ivy-module>

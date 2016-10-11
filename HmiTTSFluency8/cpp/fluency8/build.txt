@@ -1,0 +1,4 @@
+1. Generate header files, copy to this directory
+In build/classes dir:
+javah -jni hmi.tts.fluency8.Fluency8TTSGenerator
+

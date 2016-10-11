@@ -22,7 +22,7 @@
  *******************************************************************************/
 package hmi.faceanimationui.converters;
 
-import hmi.faceanimation.FaceController;
+import hmi.faceanimation.*;
 import hmi.faceanimation.converters.EmotionConverter;
 import hmi.faceanimation.model.MPEG4Configuration;
 
@@ -102,6 +102,10 @@ public class EmotionPanel extends JPanel implements ParameterListener
     faceController.removeMPEG4Configuration(mpeg4Config);
     mpeg4Config = emotionConverter.convert(angle, activation);
     faceController.addMPEG4Configuration(mpeg4Config);
+    if (faceController instanceof FaceControllerPose)
+    {
+        ((FaceControllerPose)faceController).toTarget();
+    }
   }
   public void clear()
   {
