@@ -32,8 +32,7 @@ public class GenericMiddlewareLoader {
 		actualProps = new Properties();
 		actualProps.putAll(getGlobalProperties());
 		actualProps.putAll(ps);
-		//logger.debug("rEADY TO LOAD WITH with props: {}; requested props was: {}", actualProps.toString(),ps.toString());
-		
+		logger.debug("READY TO LOAD WITH with props: {}; requested props was: {}", actualProps.toString(),ps.toString());
 	}
 	
 	public static void setGlobalPropertiesFile(String propFile)
@@ -52,7 +51,7 @@ public class GenericMiddlewareLoader {
 					logger.error("Sorry, unable to find properties file: {}", propFile);
 				} else {
 					//load the actual properties
-					logger.info("Loading properties: {}",propFile);
+					logger.info("Loading properties enzo: {}",propFile);
 					globalProps.load(input);
 					//logger.debug("loaded globalprops: {}",globalProps.toString());
 				}
@@ -89,6 +88,7 @@ public class GenericMiddlewareLoader {
 				MiddlewareLoader ml = (MiddlewareLoader)loaderObject;
 				//logger.debug("Loading with props: {}; global props was: {}", actualProps.toString(),globalProps.toString());
 				m = ml.loadMiddleware(actualProps);
+				
 			}
             else
             {
