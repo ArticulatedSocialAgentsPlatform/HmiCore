@@ -114,7 +114,7 @@ public class DefaultList implements Serializable, List
             if(val.startsWith("ROOT.")){
             	if(rootIS != null){            	
             		Item valItem = rootIS.getValueOfPath("$"+val.substring(5), rootIS);
-            		if(valItem.getType() == Item.Type.Double || valItem.getType() == Item.Type.Integer || valItem.getType() == Item.Type.String){
+            		if(valItem != null && (valItem.getType() == Item.Type.Double || valItem.getType() == Item.Type.Integer || valItem.getType() == Item.Type.String)){
             			val = valItem.getValue().toString();
             		} else {
             			val = "notfound";
