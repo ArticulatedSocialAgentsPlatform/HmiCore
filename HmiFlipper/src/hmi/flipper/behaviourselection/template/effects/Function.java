@@ -88,7 +88,10 @@ public class Function extends Effect
                     /* Make a list with the current values of the arguments */
                     ArrayList<Value> argValues = new ArrayList<Value>();
                     for( AbstractValue av : arguments ) {
-                        argValues.add(av.getValue(is));
+                    	Value tmpVal = av.getValue(is);
+                    	if(tmpVal != null){
+                    		argValues.add(tmpVal);
+                    	}
                     }
                     String[] args = new String[argValues.size()];
                     for( int i=0; i<argValues.size(); i++ ) {
