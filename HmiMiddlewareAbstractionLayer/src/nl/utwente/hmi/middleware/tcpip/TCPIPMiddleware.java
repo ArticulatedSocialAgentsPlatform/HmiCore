@@ -360,6 +360,8 @@ public final class TCPIPMiddleware implements Runnable, Middleware
                             if(msg != null){
                             	logger.debug("Got message: "+ msg);
                             	readQueue.add(msg);
+                            } else {
+                            	throw new IOException("Received TCP msg was null.. socket is broken..?");
                             }
                         }
                         catch (IOException e)
@@ -559,6 +561,11 @@ public final class TCPIPMiddleware implements Runnable, Middleware
         {
         	logger.debug("Sending msg: {}", msg);
             sendWriter.println(msg);
+            
+            //try to detect a broken socket
+            if(sendWriter.checkError()){
+            	throw new IOException("Error while flushing to socket");
+            }
         }
         catch (Exception e)
         {
@@ -692,9 +699,10 @@ public final class TCPIPMiddleware implements Runnable, Middleware
     	Middleware m = new TCPIPMiddleware(7500, 7501);
 		ObjectMapper om = new ObjectMapper();
 
-    	ObjectNode root = om.createObjectNode().put("test", "value");
+    	ObjectNode root = om.createObjectNode().put("keepalive", "ping");
     	
     	while(true){
+    		System.out.println("Sending data: "+ root.toString());
     		m.sendData(root);
     		try {
 				Thread.sleep(1000);
