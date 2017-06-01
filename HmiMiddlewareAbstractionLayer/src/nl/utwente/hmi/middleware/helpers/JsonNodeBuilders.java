@@ -78,6 +78,10 @@ public final class JsonNodeBuilders {
   public static ArrayNodeBuilder array(@NonNull int... values) {
     return array().with(values);
   }
+  
+  public static ArrayNodeBuilder array(@NonNull float... values) {
+	return array().with(values);
+  }
 
   public static ArrayNodeBuilder array(@NonNull String... values) {
     return array().with(values);
@@ -201,6 +205,12 @@ public final class JsonNodeBuilders {
       for (val value : values)
         with(value);
       return this;
+    }
+    
+    public ArrayNodeBuilder with(@NonNull float... values) {
+       for (val value : values)
+	     with(value);
+	   return this;
     }
 
     public ArrayNodeBuilder with(float value) {
