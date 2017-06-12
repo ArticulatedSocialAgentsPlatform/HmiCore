@@ -39,7 +39,7 @@ public class FACS2MorphConverter {
 	public Map<String, Double> convert(FACSConfiguration facsConfig) {
 		Map<String, Double> res = new HashMap<String, Double>();
 		Float[] values = facsConfig.getValues();
-		if (mappedMorphNames.equals(null) || mappedMorphNames.length == 0) {
+		if (mappedMorphNames == null || mappedMorphNames.length == 0) {
 			return res;
 		}
 
