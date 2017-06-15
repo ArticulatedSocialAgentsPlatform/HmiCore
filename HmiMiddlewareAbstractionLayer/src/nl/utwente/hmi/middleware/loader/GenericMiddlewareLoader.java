@@ -63,6 +63,14 @@ public class GenericMiddlewareLoader {
 		}
 	}
 	
+	public static void setGlobalProperties(Properties ps)
+	{
+		synchronized (globalProps)
+		{
+			globalProps = new Properties(ps);
+		}
+	}
+	
     public static Properties getGlobalProperties()
     {
 		synchronized (globalProps)
