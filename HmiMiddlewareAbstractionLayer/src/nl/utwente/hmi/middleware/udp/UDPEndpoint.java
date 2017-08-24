@@ -18,12 +18,29 @@ public class UDPEndpoint implements Runnable {
 	public long lastHeartbeat;
 	public final InetSocketAddress remoteClient;
 	private ConcurrentLinkedQueue<String> sendQueue;
+	DatagramSocket sendSocket;
+	
+	/// TODO: Should we listen and pass back data received back to the send socket?
+	
 	
 	/** 
      * Create sender thread object. This does not start the thread.
      * @param remoteClient representing the remote endpoint to send to.
      */
-	public UDPEndpoint(InetSocketAddress remoteClient) {
+	public UDPEndpoint(InetSocketAddress remoteClient, DatagramSocket socket) {
+		if (socket != null) sendSocket = socket;
+		else {
+			sendSocket = null;
+			try { // Open the socket
+				sendSocket = new DatagramSocket();
+				running = true;
+			} catch (SocketException e1) {
+				running = false;
+				UDPMiddleware.logger.error("Failed to open send socket.");
+				e1.printStackTrace();
+			}
+		}
+		
     	this.remoteClient = remoteClient;
 		this.sendQueue = new ConcurrentLinkedQueue<String>();
 		lastHeartbeat = System.currentTimeMillis();
@@ -34,8 +51,8 @@ public class UDPEndpoint implements Runnable {
      * @param remoteAddr address of remote endpoint
      * @param remotePort port on remote endpoint
      */
-    public UDPEndpoint(InetAddress remoteAddr, int remotePort) {
-    	this(new InetSocketAddress(remoteAddr, remotePort));
+    public UDPEndpoint(InetAddress remoteAddr, int remotePort, DatagramSocket socket) {
+    	this(new InetSocketAddress(remoteAddr, remotePort), socket);
     }
 
 	/** 
@@ -47,14 +64,6 @@ public class UDPEndpoint implements Runnable {
     }
     
     public void run() {
-    	running = true;
-    	DatagramSocket sendSocket = null;
-		try { // Open the socket
-			sendSocket = new DatagramSocket();
-		} catch (SocketException e1) {
-			UDPMiddleware.logger.error("Failed to open send socket.");
-			e1.printStackTrace();
-		}
 		
     	while (running) { // See if there is a new message to be sent
     		String data = sendQueue.poll();

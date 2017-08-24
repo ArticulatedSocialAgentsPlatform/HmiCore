@@ -37,7 +37,9 @@ public class UDPMiddleware implements Middleware, Runnable {
 	private Set<MiddlewareListener> mwListeners; // Local middleware listeners (in ASAP env)
 	private Set<UDPEndpoint> endpoints; // Represents endpoints of remote udp clients
 	private boolean singleMode; // See constructors
-	private int timeout; // Timeout interval length before inactive clients are removed.
+	private int timeout;    // Timeout interval length before inactive clients are removed (for multi remote).
+	private int heartbeat; // Heartbeat interval sent to remote (for single remote).
+	private long lastHeartbeatSent; // ...
 	
 	
 	/**
@@ -67,10 +69,13 @@ public class UDPMiddleware implements Middleware, Runnable {
 	 * The default sender does not time out.
 	 * @param listenPort the port to listen on incoming data
 	 * @param defaultRemote used to set the default sender.
+	 * @param heartbeat if > 0, sends a heartbeat to defaultRemote every $heartbeat$ms.
 	 */
-	public UDPMiddleware(int listenPort, InetSocketAddress defaultRemote) {
-		this(listenPort, -1);
-		UDPEndpoint defaultEndpoint = new UDPEndpoint(defaultRemote);
+	public UDPMiddleware(int listenPort, InetSocketAddress defaultRemote, int heartbeat) {
+		this(listenPort, -1); // UDPListener is initialized and running
+		this.heartbeat = heartbeat;
+		// Default endpoint sends from the same socket we're also listening on!
+		UDPEndpoint defaultEndpoint = new UDPEndpoint(defaultRemote, listener.listenSocket); 
 		endpoints.add(defaultEndpoint);
 		new Thread(defaultEndpoint).start();
 		singleMode = true;
@@ -88,7 +93,21 @@ public class UDPMiddleware implements Middleware, Runnable {
     public void run() {
     	running = true;
     	while (running) { // look at data from listen thread
+    		long now = System.currentTimeMillis();
     		Map.Entry<InetSocketAddress,String> data = listener.poll();
+    		
+    		// Send heartbeat
+    		if (heartbeat > 0 && lastHeartbeatSent+heartbeat < now) {
+    			lastHeartbeatSent = now;
+
+        		logger.debug("Queueing Heartbeat!");
+    			Iterator<UDPEndpoint> i = endpoints.iterator();
+    			while (i.hasNext()) {
+    				UDPEndpoint s = i.next();
+    				s.enqueue("");
+    			}
+    		}
+    		
     		if (data == null) continue;
     		
     		// TODO: in single client mode, we might want to check if data is really
@@ -106,14 +125,14 @@ public class UDPMiddleware implements Middleware, Runnable {
     		boolean exists = false;
     		for (UDPEndpoint sender : endpoints) {// Don't start a new sender if client already exists
     			if (sender.remoteClient.equals(data.getKey())) {
-    				sender.lastHeartbeat = System.currentTimeMillis();
+    				sender.lastHeartbeat = now;
     				exists = true; break;
 				}
     		}
     		if (exists) continue;
     		
     		// Add client to list of clients that receives data.
-    		UDPEndpoint newClient = new UDPEndpoint(data.getKey());
+    		UDPEndpoint newClient = new UDPEndpoint(data.getKey(), null);
     		endpoints.add(newClient);
     		new Thread(newClient).start();
 
@@ -121,15 +140,15 @@ public class UDPMiddleware implements Middleware, Runnable {
 					newClient.remoteClient.getAddress().toString(), newClient.remoteClient.getPort());
     	}
     }
-	
+
 	@Override
 	public void sendData(JsonNode jn) {
 		if (jn == null) return;
+		long now = System.currentTimeMillis();
 
 		logger.debug("Sending data: {}", jn.toString());
 		
 		Iterator<UDPEndpoint> i = endpoints.iterator();
-		long now = System.currentTimeMillis();
 		while (i.hasNext()) {
 			UDPEndpoint s = i.next();
 			boolean timedOut = (s.lastHeartbeat+timeout) < now;

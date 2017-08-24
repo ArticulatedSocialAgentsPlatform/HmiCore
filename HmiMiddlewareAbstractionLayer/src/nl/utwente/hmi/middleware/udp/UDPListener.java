@@ -17,6 +17,7 @@ public class UDPListener implements Runnable {
 	private boolean running;
 	private int iPort;
 	private ConcurrentLinkedQueue<Map.Entry<InetSocketAddress,String>> listenQueue;
+	public DatagramSocket listenSocket;
 	
     /** 
      * Create a listener thread object. This does not start the thread.
@@ -25,20 +26,19 @@ public class UDPListener implements Runnable {
     public UDPListener(int iPort) {
     	this.iPort = iPort;
 		this.listenQueue = new ConcurrentLinkedQueue<Map.Entry<InetSocketAddress,String>>();
-    }
-
-    public void run() {
-    	running = true;
-    	DatagramSocket listenSocket = null;
-    	byte[] receiveBuffer = new byte[65507]; // Max UDP packet size.
-    	
+		
 		try { // Open the socket
 			listenSocket = new DatagramSocket(this.iPort);
+	    	running = true;
 		} catch (SocketException e1) {
 			UDPMiddleware.logger.error("Failed to open listen socket.");
 			e1.printStackTrace();
 			running = false;
 		}
+    }
+
+    public void run() {
+    	byte[] receiveBuffer = new byte[65507]; // Max UDP packet size.
 		
     	while (running) {
     		DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);

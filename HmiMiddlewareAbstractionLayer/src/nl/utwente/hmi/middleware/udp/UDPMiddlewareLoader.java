@@ -30,38 +30,43 @@ public class UDPMiddlewareLoader implements MiddlewareLoader {
 	@Override
 	public Middleware loadMiddleware(Properties ps) {
 		Middleware m = null;
-		String udpIP = "";
-		int iPort = -1;
-		int oPort = -1;
+		String remoteIP = "";
+		int localPort = 0;
+		int remotePort = -1;
+		int heartbeat = -1;
 		
 		for(Entry<Object, Object> entry : ps.entrySet()){
             System.out.println("propkey:"+(String)entry.getKey());
             System.out.println("propval:"+(String)entry.getValue());
 			if(((String)entry.getKey()).equals("remoteIP")){
-				udpIP = (String)entry.getValue();
+				remoteIP = (String)entry.getValue();
 			}
 			if(((String)entry.getKey()).equals("localPort")){
-				iPort = Integer.parseInt((String)entry.getValue());
+				localPort = Integer.parseInt((String)entry.getValue());
 			}
 
 			if(((String)entry.getKey()).equals("remotePort")){
-				oPort = Integer.parseInt((String)entry.getValue());
+				remotePort = Integer.parseInt((String)entry.getValue());
+			}
+
+			if(((String)entry.getKey()).equals("heartbeat")){
+				heartbeat = Integer.parseInt((String)entry.getValue());
 			}
 		}
 		
-		if (udpIP.equals("") || iPort < 1 || oPort < 1) {
-			logger.error("Could not load the UDPMiddleware, need at least properties: remoteIP, remotePort, localPort. Can be set in the global middleware props or in the load call.");
+		if (remoteIP.equals("") || remotePort < 1) {
+			logger.error("Could not load the UDPMiddleware, need at least properties: remoteIP, remotePort. Can be set in the global middleware props or in the load call.");
 		} else {
 			InetAddress addr;
 			try {
-				addr = InetAddress.getByName(udpIP);
+				addr = InetAddress.getByName(remoteIP);
 			} catch (UnknownHostException e) {
-				logger.error("Could not parse remoteIP: "+udpIP);
+				logger.error("Could not parse remoteIP: "+remoteIP);
 				e.printStackTrace();
 				return null;
 			}
 			
-			m = new UDPMiddleware(iPort, new InetSocketAddress(addr, oPort));
+			m = new UDPMiddleware(localPort, new InetSocketAddress(addr, remotePort), heartbeat);
 		}
 		
 		return m;
