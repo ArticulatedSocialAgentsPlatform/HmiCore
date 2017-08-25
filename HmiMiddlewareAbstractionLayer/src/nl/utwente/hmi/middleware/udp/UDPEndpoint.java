@@ -20,8 +20,7 @@ public class UDPEndpoint implements Runnable {
 	private ConcurrentLinkedQueue<String> sendQueue;
 	DatagramSocket sendSocket;
 	
-	/// TODO: Should we listen and pass back data received back to the send socket?
-	
+	private ManualResetEvent send_MRE = new ManualResetEvent(false);
 	
 	/** 
      * Create sender thread object. This does not start the thread.
@@ -60,21 +59,41 @@ public class UDPEndpoint implements Runnable {
      * @param msg message to be queued
      */
     public void enqueue(String msg) {
-    	if (running) sendQueue.add(msg);
+    	if (running) {
+    		sendQueue.add(msg);
+    		send_MRE.set();
+    		send_MRE.reset();
+    	}
     }
     
     public void run() {
-		
+    	
     	while (running) { // See if there is a new message to be sent
-    		String data = sendQueue.poll();
-    		if (data == null) continue;
-    		DatagramPacket sendPacket = new DatagramPacket(data.getBytes(), data.length(), remoteClient);
+
     		try {
-    			sendSocket.send(sendPacket);
-    		} catch (IOException e) {
+				send_MRE.waitOne(100);
+			} catch (InterruptedException e1) {
     			running = false;
-    			UDPMiddleware.logger.info("Failed to send data. Closing sender.");
-    			e.printStackTrace();
+    			UDPMiddleware.logger.info("Send thread interrupted.");
+				e1.printStackTrace();
+			}
+    		
+    		boolean haveData = true;
+    		while (haveData) {
+	    		String data = sendQueue.poll();
+	    		if (data == null) {
+	    			haveData = false;
+	    			continue;
+	    		}
+	    		
+	    		DatagramPacket sendPacket = new DatagramPacket(data.getBytes(), data.length(), remoteClient);
+	    		try {
+	    			sendSocket.send(sendPacket);
+	    		} catch (IOException e) {
+	    			running = false;
+	    			UDPMiddleware.logger.info("Failed to send data. Closing sender.");
+	    			e.printStackTrace();
+	    		}
     		}
     	}
     	
@@ -87,5 +106,7 @@ public class UDPEndpoint implements Runnable {
     
 	public void close() {
 		running = false;
+		send_MRE.set();
+		send_MRE.reset();
 	}
 }

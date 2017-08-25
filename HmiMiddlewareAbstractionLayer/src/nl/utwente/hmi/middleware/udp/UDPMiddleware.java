@@ -40,6 +40,7 @@ public class UDPMiddleware implements Middleware, Runnable {
 	private int timeout;    // Timeout interval length before inactive clients are removed (for multi remote).
 	private int heartbeat; // Heartbeat interval sent to remote (for single remote).
 	private long lastHeartbeatSent; // ...
+	private ManualResetEvent main_MRE = new ManualResetEvent(false);
 	
 	
 	/**
@@ -57,7 +58,7 @@ public class UDPMiddleware implements Middleware, Runnable {
 		this.mwListeners = Collections.synchronizedSet(new HashSet<MiddlewareListener>());
 		this.endpoints = Collections.synchronizedSet(new HashSet<UDPEndpoint>());
 		
-		this.listener = new UDPListener(this.listenPort);
+		this.listener = new UDPListener(this.listenPort, this);
 		new Thread(this.listener).start();
 		new Thread(this).start();
 		singleMode = false;
@@ -83,6 +84,8 @@ public class UDPMiddleware implements Middleware, Runnable {
 	
 	public void close() {
 		running = false;
+		main_MRE.set();
+		main_MRE.reset();
 		for (UDPEndpoint sender : endpoints) {
 			sender.close();
 		}
@@ -93,8 +96,16 @@ public class UDPMiddleware implements Middleware, Runnable {
     public void run() {
     	running = true;
     	while (running) { // look at data from listen thread
+    		
+    		try {
+				main_MRE.waitOne(100);
+			} catch (InterruptedException e1) {
+    			running = false;
+    			UDPMiddleware.logger.info("Send thread interrupted.");
+				e1.printStackTrace();
+			}
+    		
     		long now = System.currentTimeMillis();
-    		Map.Entry<InetSocketAddress,String> data = listener.poll();
     		
     		// Send heartbeat
     		if (heartbeat > 0 && lastHeartbeatSent+heartbeat < now) {
@@ -108,36 +119,44 @@ public class UDPMiddleware implements Middleware, Runnable {
     			}
     		}
     		
-    		if (data == null) continue;
-    		
-    		// TODO: in single client mode, we might want to check if data is really
-    		// coming from default client.
-
-    		if (data.getValue().length() > 0 && !data.getValue().equals("{}")) {
-        		logger.debug("Got message on port {}: <{}>", listenPort, data.getValue());
-        		receiveCallback(data.getValue());
-    		} else {
-        		logger.debug("Got heartbeat on port {}: <{}>", listenPort, data.getValue());
-    		}
-    		
-    		if (singleMode) continue;
-    		
-    		boolean exists = false;
-    		for (UDPEndpoint sender : endpoints) {// Don't start a new sender if client already exists
-    			if (sender.remoteClient.equals(data.getKey())) {
-    				sender.lastHeartbeat = now;
-    				exists = true; break;
-				}
-    		}
-    		if (exists) continue;
-    		
-    		// Add client to list of clients that receives data.
-    		UDPEndpoint newClient = new UDPEndpoint(data.getKey(), null);
-    		endpoints.add(newClient);
-    		new Thread(newClient).start();
-
-			logger.info("Added remote client at: {}:{}",
-					newClient.remoteClient.getAddress().toString(), newClient.remoteClient.getPort());
+    		boolean haveData = true;
+    		while (haveData) {
+	
+	    		Map.Entry<InetSocketAddress,String> data = listener.poll();
+	    		if (data == null) {
+	    			haveData = false;
+	    			continue;
+	    		}
+	    		
+	    		// TODO: in single client mode, we might want to check if data is really
+	    		// coming from default client.
+	
+	    		if (data.getValue().length() > 0 && !data.getValue().equals("{}")) {
+	        		logger.debug("Got message on port {}: <{}>", listenPort, data.getValue());
+	        		receiveCallback(data.getValue());
+	    		} else {
+	        		logger.debug("Got heartbeat on port {}: <{}>", listenPort, data.getValue());
+	    		}
+	    		
+	    		if (singleMode) continue;
+	    		
+	    		boolean exists = false;
+	    		for (UDPEndpoint sender : endpoints) {// Don't start a new sender if client already exists
+	    			if (sender.remoteClient.equals(data.getKey())) {
+	    				sender.lastHeartbeat = now;
+	    				exists = true; break;
+					}
+	    		}
+	    		if (exists) continue;
+	    		
+	    		// Add client to list of clients that receives data.
+	    		UDPEndpoint newClient = new UDPEndpoint(data.getKey(), null);
+	    		endpoints.add(newClient);
+	    		new Thread(newClient).start();
+	
+				logger.info("Added remote client at: {}:{}",
+						newClient.remoteClient.getAddress().toString(), newClient.remoteClient.getPort());
+	    	}
     	}
     }
 
@@ -168,6 +187,11 @@ public class UDPMiddleware implements Middleware, Runnable {
 	@Override
 	public void addListener(MiddlewareListener ml) {
 		this.mwListeners.add(ml);
+	}
+	
+	public void notifyListener() {
+		main_MRE.set();
+		main_MRE.reset();
 	}
 	
 	public void receiveCallback(String data) {

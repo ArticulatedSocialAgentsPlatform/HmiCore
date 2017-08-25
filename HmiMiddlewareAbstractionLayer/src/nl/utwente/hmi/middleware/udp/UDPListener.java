@@ -19,14 +19,16 @@ public class UDPListener implements Runnable {
 	private ConcurrentLinkedQueue<Map.Entry<InetSocketAddress,String>> listenQueue;
 	public DatagramSocket listenSocket;
 	
+	private UDPMiddleware mw;
+	
     /** 
      * Create a listener thread object. This does not start the thread.
      * @param iPort the port to listen on.
      */
-    public UDPListener(int iPort) {
+    public UDPListener(int iPort, UDPMiddleware mw) {
     	this.iPort = iPort;
 		this.listenQueue = new ConcurrentLinkedQueue<Map.Entry<InetSocketAddress,String>>();
-		
+		this.mw = mw;
 		try { // Open the socket
 			listenSocket = new DatagramSocket(this.iPort);
 	    	running = true;
@@ -58,6 +60,7 @@ public class UDPListener implements Runnable {
             // Add message to queue.
     		listenQueue.add(new AbstractMap.SimpleEntry<InetSocketAddress, String>
     				((InetSocketAddress) receivePacket.getSocketAddress(), new String(data)));
+    		mw.notifyListener();
     	}
 		if (listenSocket != null) listenSocket.close();
     }
