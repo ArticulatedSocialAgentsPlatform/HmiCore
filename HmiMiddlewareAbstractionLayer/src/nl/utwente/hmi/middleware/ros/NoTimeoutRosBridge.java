@@ -10,7 +10,7 @@ import ros.RosBridge;
  * @author davisond
  *
  */
-@WebSocket(maxIdleTime=-1)
+@WebSocket(maxIdleTime=1000000000)
 public class NoTimeoutRosBridge extends RosBridge {
 
 }
