@@ -44,7 +44,7 @@ public class ROSMiddleware  implements Middleware {
         this.websocketURI = websocketURI;
         this.publisher = publisher;
         this.subscriber = subscriber;
-        this.bridge = new RosBridge();
+        this.bridge = new NoTimeoutRosBridge();
         this.listeners = Collections.synchronizedSet(new HashSet<MiddlewareListener>());
 
         setupMiddleware();
