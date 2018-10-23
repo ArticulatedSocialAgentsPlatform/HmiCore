@@ -12,7 +12,6 @@ import nl.utwente.hmi.middleware.loader.MiddlewareLoader;
 
 /**
  * UDPMultiClientMiddlewareLoader class for one-to-many communication over UDP.
- * @param ps contains the required properties port and optionally timeout (in ms, default: 10000).
  * @see UDPMiddleware
  * @author jankolkmeier
  */
@@ -21,7 +20,8 @@ public class UDPMultiClientMiddlewareLoader implements MiddlewareLoader {
 
 	@Override
 	/**
-	 * This loads the UDPMiddleware instance with multiple client support 
+	 * This loads the UDPMiddleware instance with multiple client support
+	 *  @param ps contains the required properties port and optionally timeout (in ms, default: 10000).
 	 */
 	public Middleware loadMiddleware(Properties ps) {
 		Middleware m = null;
@@ -29,7 +29,8 @@ public class UDPMultiClientMiddlewareLoader implements MiddlewareLoader {
 		int timeout = 10000;
 		
 		for(Entry<Object, Object> entry : ps.entrySet()){
-			logger.info(" "+(String)entry.getKey()+": "+(String)entry.getValue());
+			logger.debug("propkey: {}",(String)entry.getKey());
+			logger.debug("propval: {}",(String)entry.getValue());
 			if(((String)entry.getKey()).equals("port")){
 				listenPort = Integer.parseInt((String)entry.getValue());
 			}

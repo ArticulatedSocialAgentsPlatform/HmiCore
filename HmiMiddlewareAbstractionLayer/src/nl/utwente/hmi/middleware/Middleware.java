@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 
 /**
- * Very basic interface for sending and recieving "a data package" to and from "a middleware"
- * Implementing classes are responsible for converting the Data structure to and from a suitable middleware-specific message format.
+ * Very basic interface for sending and receiving "a data package" to and from "a middleware"
+ * Implementing classes are responsible for converting the data structure to and from a suitable middleware-specific message format.
  * @author davisond
  *
  */
@@ -18,9 +18,11 @@ public interface Middleware {
 	public void sendData(JsonNode jn);
 	
 	/**
-	 * Add a listener to this middleware, which is notified via the MiddlewareListener.recieveData() when a data package is recieved from the middleware
+	 * Add a listener to this middleware, which is notified via the MiddlewareListener.receiveData() when a data package is received from the middleware
 	 * @param ml the listener instance
 	 */
 	public void addListener(MiddlewareListener ml);
+
+
 	
 }

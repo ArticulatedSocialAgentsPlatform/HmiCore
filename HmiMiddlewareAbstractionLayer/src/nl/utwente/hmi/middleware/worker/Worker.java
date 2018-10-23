@@ -12,7 +12,7 @@ public interface Worker extends Runnable {
 
 	/**
 	 * Place data in processingQueue of the worker
-	 * @param d
+	 * @param jn, the JsonNode with data to add to the queue of the worker
 	 */
 	public void addDataToQueue(JsonNode jn);
 	
