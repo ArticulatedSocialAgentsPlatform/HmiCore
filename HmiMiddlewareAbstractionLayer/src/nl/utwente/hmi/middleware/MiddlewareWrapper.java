@@ -173,4 +173,12 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener{
         logger.debug("Sending data: {}",data);
         middleware.sendData(on.end());
     }
+
+    /**
+     * Sends data in UTF-8 format over the middleware, which is of form { "content" : $data}
+     * @param data, a JsonNode representation of the data to send
+     */
+    public void sendData(JsonNode data) {
+        middleware.sendData(data);
+    }
 }
