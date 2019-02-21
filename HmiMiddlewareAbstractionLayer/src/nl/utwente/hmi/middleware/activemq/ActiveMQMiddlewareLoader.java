@@ -1,6 +1,5 @@
 package nl.utwente.hmi.middleware.activemq;
 
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -24,8 +23,8 @@ public class ActiveMQMiddlewareLoader implements MiddlewareLoader {
 		String oTopic = "";
 		
 		for(Entry<Object, Object> entry : ps.entrySet()){
-            System.out.println("propkey:"+(String)entry.getKey());
-            System.out.println("propval:"+(String)entry.getValue());
+            logger.debug("propkey: {}",(String)entry.getKey());
+            logger.debug("propval: {}",(String)entry.getValue());
 			if(((String)entry.getKey()).equals("amqBrokerURI")){
 				amqBrokerURI = (String)entry.getValue();
 			}

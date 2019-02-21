@@ -23,6 +23,8 @@ public class TCPIPMiddlewareLoader implements MiddlewareLoader {
 		int sendPort = -1;
 		
 		for(Entry<Object, Object> entry : ps.entrySet()){
+			logger.debug("propkey: {}",(String)entry.getKey());
+			logger.debug("propval: {}",(String)entry.getValue());
 			try{
 				if(((String)entry.getKey()).equals("readPort")){
 					readPort = Integer.parseInt(((String)entry.getValue()));

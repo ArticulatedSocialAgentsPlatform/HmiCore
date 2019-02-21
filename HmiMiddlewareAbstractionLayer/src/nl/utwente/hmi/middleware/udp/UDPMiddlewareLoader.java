@@ -36,8 +36,8 @@ public class UDPMiddlewareLoader implements MiddlewareLoader {
 		int heartbeat = -1;
 		
 		for(Entry<Object, Object> entry : ps.entrySet()){
-            System.out.println("propkey:"+(String)entry.getKey());
-            System.out.println("propval:"+(String)entry.getValue());
+			logger.debug("propkey: {}",(String)entry.getKey());
+			logger.debug("propval: {}",(String)entry.getValue());
 			if(((String)entry.getKey()).equals("remoteIP")){
 				remoteIP = (String)entry.getValue();
 			}

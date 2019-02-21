@@ -25,8 +25,8 @@ public class STOMPMiddlewareLoader implements MiddlewareLoader {
 		String oTopic = "";
 		
 		for(Entry<Object, Object> entry : ps.entrySet()){
-            System.out.println("propkey:"+(String)entry.getKey());
-            System.out.println("propval:"+(String)entry.getValue());
+			logger.debug("propkey: {}",(String)entry.getKey());
+			logger.debug("propval: {}",(String)entry.getValue());
 			if(((String)entry.getKey()).equals("apolloIP")){
 				apolloIP = (String)entry.getValue();
 			}
