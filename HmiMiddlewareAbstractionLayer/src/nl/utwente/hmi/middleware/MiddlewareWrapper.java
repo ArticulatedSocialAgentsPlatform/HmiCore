@@ -2,6 +2,7 @@ package nl.utwente.hmi.middleware;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import nl.utwente.hmi.middleware.helpers.JsonNodeBuilders;
 import nl.utwente.hmi.middleware.loader.GenericMiddlewareLoader;
 import nl.utwente.hmi.middleware.worker.Worker;
@@ -26,7 +27,7 @@ import static nl.utwente.hmi.middleware.helpers.JsonNodeBuilders.object;
  * @author WaterschootJB
  */
 
-public abstract class MiddlewareWrapper implements Worker, MiddlewareListener{
+public abstract class MiddlewareWrapper implements Worker, MiddlewareListener {
 
     private ObjectMapper mapper;
     private boolean running = true;
@@ -38,9 +39,10 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener{
      * Constructor for instantiating a thread with an abstracted middleware wrapper using a
      * LinkedBlockingQueue. This wrapper has two separate threads for retrieving data (itself) from
      * middleware and processing the received data (a worker thread).
+     *
      * @param middleware, the middleware being used for creating the wrapper
      */
-    public MiddlewareWrapper(Middleware middleware){
+    public MiddlewareWrapper(Middleware middleware) {
         this.middleware = middleware;
         this.mapper = new ObjectMapper();
         middleware.addListener(this);
@@ -53,12 +55,13 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener{
     /**
      * Constructor for the middleware wrapper that requires properties, convenient if you don't want to
      * use files for configuration.
+     *
      * @param ps, properties that require the following properties
      *            "middleware", e.g. middleware: nl.utwente.hmi.middleware.activemq.ActiveMQMiddleWare
      *            "address of middleware", e.g. amqBrokerURI: tcp://localhost:61616
      *            "other required properties of the specific middleware", e.g. iTopic:in and oTopic:out
      */
-    public MiddlewareWrapper(Properties ps){
+    public MiddlewareWrapper(Properties ps) {
         GenericMiddlewareLoader.setGlobalProperties(ps);
         GenericMiddlewareLoader gml = new GenericMiddlewareLoader(ps.getProperty("middleware"), ps);
         this.middleware = gml.load();
@@ -73,10 +76,11 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener{
     /**
      * Constructor for the middleware wrapper that requires two property file names. The wrapper has two
      * separate threads for retrieving data (itself) and processing data (a worker thread).
-     * @param generalProps, property file containing the connecting link for the middleware
+     *
+     * @param generalProps,  property file containing the connecting link for the middleware
      * @param specificProps, property file containing the middleware instantiation and its required properties
      */
-    public MiddlewareWrapper(String generalProps, String specificProps){
+    public MiddlewareWrapper(String generalProps, String specificProps) {
         Properties ps = new Properties();
         InputStream mwProps = MiddlewareWrapper.class.getClassLoader().getResourceAsStream(specificProps);
         try {
@@ -98,6 +102,7 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener{
     /**
      * Does the required processing on the data
      * Each worker is responsible for implementing this method as required.
+     *
      * @param jn the incoming data in JsonNode format
      */
     public abstract void processData(JsonNode jn);
@@ -110,7 +115,7 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener{
     @Override
     public void run() {
         logger.debug("Worker started.");
-        while(running){
+        while (running) {
             try {
                 JsonNode jn = queue.take();
                 processData(jn);
@@ -123,18 +128,20 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener{
 
     /**
      * Check if new data is present in the queue
+     *
      * @return true if there is new data
      */
-    public boolean hasMessage(){
+    public boolean hasMessage() {
         return !queue.isEmpty();
     }
 
     /**
      * Retrieves the data from the middleware
+     *
      * @return the data
      */
     public JsonNode getMessage() {
-        logger.debug("Retrieving message: {}",queue.peek());
+        logger.debug("Retrieving message: {}", queue.peek());
         try {
             return queue.take();
         } catch (InterruptedException e) {
@@ -145,6 +152,7 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener{
 
     /**
      * Returns if the middleware is created and connected
+     *
      * @return true if connected, false if not
      */
     public boolean isConnected() {
@@ -152,33 +160,18 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener{
     }
 
 
-    public void receiveData(JsonNode jn){
+    public void receiveData(JsonNode jn) {
         logger.debug("Received data: {}", jn.toString());
         queue.clear();
         queue.add(jn);
     }
 
     /**
-     * Sends data in UTF-8 format over the middleware, which is of form { "content" : $data}
+     * Sends data in UTF-8 format over the middleware, which is of form { "content" : $data}     *
      * @param data, a String representation of the data to send
-     */
-    public void sendData(String data) {
-        JsonNodeBuilders.ObjectNodeBuilder on = object();
-        try {
-            on.with("content", URLEncoder.encode(data, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return;
-        }
-        logger.debug("Sending data: {}",data);
-        middleware.sendData(on.end());
-    }
-
-    /**
-     * Sends data in UTF-8 format over the middleware, which is of form { "content" : $data}
-     * @param data, a JsonNode representation of the data to send
      */
     public void sendData(JsonNode data) {
         middleware.sendData(data);
     }
 }
+

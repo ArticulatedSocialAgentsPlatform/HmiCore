@@ -25,8 +25,8 @@ public class ExampleApp {
 
         public static void main(String[] args){
             //sendBMLAMQtoASAP();
-            //sendBMLUDPtoASAP();
-            sendBMLAMQtoASAPProps();
+            sendBMLUDPtoASAP();
+            //sendBMLAMQtoASAPProps();
         }
 
         private static void AMQ(String[] args){
@@ -102,6 +102,7 @@ public class ExampleApp {
 
             private boolean running = true;
             private MiddlewareWrapper amlw;
+            private ObjectNode node;
 
             public SendingMessages(MiddlewareWrapper amlw){
                 this.amlw = amlw;
@@ -112,7 +113,7 @@ public class ExampleApp {
                 while(running){
                     try {
                         Thread.sleep(3000);
-                        amlw.sendData("Hello World!");
+                        amlw.sendData(node.put("hello","world"));
 
                     }
                     catch(Exception e){
