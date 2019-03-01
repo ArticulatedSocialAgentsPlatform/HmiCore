@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -77,7 +79,41 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener {
         GenericMiddlewareLoader gml = new GenericMiddlewareLoader(ps.getProperty("loader"), ps);
         this.middleware = gml.load();
         initializeWrapper();
+    }
 
+    /**
+     * Method for creating a MiddlewareWrapper with a configuration file
+     * @param jn, a JsonNode that represents properties of the middleware in the format of
+     *        {
+     *          "loader" : "nl.utwente.hmi.*",
+     *          "properties" : {}
+     *        }
+     * @return, the MiddlewareWrapper
+     **/
+    public MiddlewareWrapper(JsonNode jsonNode){
+        Properties ps = loadMWProps(jsonNode);
+        GenericMiddlewareLoader.setGlobalProperties(ps);
+        GenericMiddlewareLoader gml = new GenericMiddlewareLoader(ps.getProperty("loader"), ps);
+        this.middleware = gml.load();
+        initializeWrapper();
+    }
+
+    private Properties loadMWProps(JsonNode jn){
+        if(jn.has("loader")) {
+            Properties mwProps = new Properties();
+            String mw = jn.get("loader").textValue();
+            mwProps.put("loader",mw);
+            JsonNode props = jn.get("properties");
+            Iterator<Map.Entry<String, JsonNode>> it = props.fields();
+            while(it.hasNext()) {
+                Map.Entry<String, JsonNode> prop = it.next();
+                mwProps.setProperty(prop.getKey(),prop.getValue().textValue());
+            }
+            return mwProps;
+        }
+        else{
+            return null;
+        }
     }
 
     private void initializeWrapper(){
@@ -88,20 +124,7 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener {
         new Thread(this).start();
     }
 
-    /**
-     * Constructor for the middleware wrapper that requires one property file that contains both the global
-     * and local settings. The wrapper has two separate threads for retrieving data (itself) and
-     * processing data (a worker thread).
-     * @param mwProps, to instantiate your middleware with.
-     * Required:
-     * - Class (e.g. nl.utwente.hmi.middleware.ActiveMQMiddleware)
-     * - Properties specific to the middleware (e.g. amqBrokerURI, iTopic and oTopic)
-     */
-    public MiddlewareWrapper(String mwProps) {
-        this(mwProps,mwProps);
-    }
-
-    /**
+     /**
      * Does the required processing on the data
      * Each worker is responsible for implementing this method as required. Use this method
      * for processing data

@@ -1,9 +1,11 @@
 package nl.utwente.hmi.middleware;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -11,6 +13,7 @@ import java.util.Properties;
 public class MiddlewareWrapperFactory {
 
     private static Logger logger = LoggerFactory.getLogger(MiddlewareWrapperFactory.class.getName());
+
 
     /**
      * Method for creating a MiddlewareWrapper with a configuration file
@@ -45,6 +48,27 @@ public class MiddlewareWrapperFactory {
             logger.error("Invalid format for instantiating middleware");
             return null;
         }
+    }
 
+    /**
+     * Method for creating a MiddlewareWrapper with a configuration file
+     * @param node, a String representation in JSON that represents properties of the middleware in the format of
+     *            {
+     *              "loader" : "nl.utwente.hmi.*",
+     *              "properties" : {
+     *
+     *              }
+     *            }
+     * @return, the MiddlewareWrapper
+     */
+    public static MiddlewareWrapper createMiddlewareWrapper(String node){
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return MiddlewareWrapperFactory.createMiddlewareWrapper(mapper.readTree(node));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        logger.error("Invalid format for instantiating middleware");
+        return null;
     }
 }
