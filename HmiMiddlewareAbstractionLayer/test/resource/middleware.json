@@ -1,0 +1,9 @@
+{
+  "loader": "nl.utwente.hmi.middleware.activemq.ActiveMQMiddlewareLoader",
+  "properties": {
+    "iTopic": "speechInFeedback",
+    "oTopic": "speechIn",
+    "amqBrokerURI": "tcp://localhost:61616"
+  }
+}
+

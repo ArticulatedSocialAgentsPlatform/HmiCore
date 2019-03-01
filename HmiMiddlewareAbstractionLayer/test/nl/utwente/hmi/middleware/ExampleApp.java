@@ -1,20 +1,14 @@
-package nl.utwente.hmi.middleware.test;
+package nl.utwente.hmi.middleware;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import nl.utwente.hmi.middleware.MiddlewareWrapper;
-import nl.utwente.hmi.middleware.loader.GenericMiddlewareLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.net.www.content.text.Generic;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Properties;
 
@@ -25,11 +19,25 @@ public class ExampleApp {
 
         public static void main(String[] args){
             //sendBMLAMQtoASAP();
-            sendBMLUDPtoASAP();
+            //sendBMLUDPtoASAP();
             //sendBMLAMQtoASAPProps();
+            testNewMiddleware();
         }
 
-        private static void AMQ(String[] args){
+    private static void testNewMiddleware() {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                InputStream inputStream = ExampleApp.class.getClassLoader().getResourceAsStream("middleware.json");
+                JsonNode props = mapper.readTree(inputStream);
+                MiddlewareWrapper wrapper = MiddlewareWrapperFactory.createMiddlewareWrapper(props);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+    }
+
+    private static void AMQ(String[] args){
             String defaultProperties = "defaultmiddleware.properties";
             String specificProperties = "ActiveMQ.properties";
             MiddlewareWrapper mw = null;
@@ -60,7 +68,7 @@ public class ExampleApp {
                 try{
                     Properties ps = new Properties();
                     ps.put("amqBrokerURI","tcp://localhost:61616");
-                    ps.put("middleware","nl.utwente.hmi.middleware.activemq.ActiveMQMiddlewareLoader");
+                    ps.put("loader","nl.utwente.hmi.middleware.activemq.ActiveMQMiddlewareLoader");
                     ps.put("iTopic","input");
                     ps.put("oTopic","output");
                     mw = new MiddlewareWrapper(ps) {
@@ -128,7 +136,7 @@ public class ExampleApp {
      */
     private static void sendBMLUDPtoASAP(){
             Properties mwUDP = new Properties();
-            mwUDP.put("middleware","nl.utwente.hmi.middleware.udp.UDPMiddlewareLoader");
+            mwUDP.put("loader","nl.utwente.hmi.middleware.udp.UDPMiddlewareLoader");
             mwUDP.put("remotePort","6662");
             mwUDP.put("remoteIP","127.0.0.1");
             MiddlewareWrapper bmlOutput = new MiddlewareWrapper(mwUDP) {
@@ -170,7 +178,7 @@ public class ExampleApp {
         private static void sendBMLAMQtoASAP(){
             Properties mwps2 = new Properties();
             mwps2.put("amqBrokerURI", "tcp://localhost:61616");
-            mwps2.put("middleware", "nl.utwente.hmi.middleware.activemq.ActiveMQMiddlewareLoader");
+            mwps2.put("loader", "nl.utwente.hmi.middleware.activemq.ActiveMQMiddlewareLoader");
             mwps2.put("iTopic", "couch.bml.feedback.ASAP");
             mwps2.put("oTopic", "couch.bml.request.ASAP");
             MiddlewareWrapper mwAMQBML = new MiddlewareWrapper(mwps2) {

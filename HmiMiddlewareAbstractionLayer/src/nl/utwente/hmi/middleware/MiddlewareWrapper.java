@@ -2,8 +2,6 @@ package nl.utwente.hmi.middleware;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import nl.utwente.hmi.middleware.helpers.JsonNodeBuilders;
 import nl.utwente.hmi.middleware.loader.GenericMiddlewareLoader;
 import nl.utwente.hmi.middleware.worker.Worker;
 import org.slf4j.Logger;
@@ -11,13 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import static nl.utwente.hmi.middleware.helpers.JsonNodeBuilders.object;
 
 /**
  * The MiddlewareWrapper is designed to have a simple implementation for creating a middleware with a listener
@@ -29,11 +23,11 @@ import static nl.utwente.hmi.middleware.helpers.JsonNodeBuilders.object;
 
 public abstract class MiddlewareWrapper implements Worker, MiddlewareListener {
 
-    private ObjectMapper mapper;
-    private boolean running = true;
-    private static Logger logger = LoggerFactory.getLogger(MiddlewareWrapper.class.getName());
-    private BlockingQueue<JsonNode> queue;
-    private Middleware middleware;
+    protected ObjectMapper mapper;
+    protected boolean running = true;
+    protected static Logger logger = LoggerFactory.getLogger(MiddlewareWrapper.class.getName());
+    protected BlockingQueue<JsonNode> queue;
+    protected Middleware middleware;
 
     /**
      * Constructor for instantiating a thread with an abstracted middleware wrapper using a
@@ -44,12 +38,7 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener {
      */
     public MiddlewareWrapper(Middleware middleware) {
         this.middleware = middleware;
-        this.mapper = new ObjectMapper();
-        middleware.addListener(this);
-        logger.debug("Listener created");
-        this.queue = new LinkedBlockingQueue<>();
-        new Thread(this).start();
-
+        initializeWrapper();
     }
 
     /**
@@ -63,15 +52,10 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener {
      */
     public MiddlewareWrapper(Properties ps) {
         GenericMiddlewareLoader.setGlobalProperties(ps);
-        GenericMiddlewareLoader gml = new GenericMiddlewareLoader(ps.getProperty("middleware"), ps);
+        GenericMiddlewareLoader gml = new GenericMiddlewareLoader(ps.getProperty("loader"), ps);
         this.middleware = gml.load();
-        this.mapper = new ObjectMapper();
-        middleware.addListener(this);
-        logger.debug("Listener created");
-        this.queue = new LinkedBlockingQueue<>();
-        new Thread(this).start();
+        initializeWrapper();
     }
-
 
     /**
      * Constructor for the middleware wrapper that requires two property file names. The wrapper has two
@@ -90,8 +74,13 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener {
             e.printStackTrace();
         }
         GenericMiddlewareLoader.setGlobalPropertiesFile(generalProps);
-        GenericMiddlewareLoader gml = new GenericMiddlewareLoader(ps.getProperty("middleware"), ps);
+        GenericMiddlewareLoader gml = new GenericMiddlewareLoader(ps.getProperty("loader"), ps);
         this.middleware = gml.load();
+        initializeWrapper();
+
+    }
+
+    private void initializeWrapper(){
         this.mapper = new ObjectMapper();
         middleware.addListener(this);
         logger.debug("Listener created");
@@ -100,8 +89,22 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener {
     }
 
     /**
+     * Constructor for the middleware wrapper that requires one property file that contains both the global
+     * and local settings. The wrapper has two separate threads for retrieving data (itself) and
+     * processing data (a worker thread).
+     * @param mwProps, to instantiate your middleware with.
+     * Required:
+     * - Class (e.g. nl.utwente.hmi.middleware.ActiveMQMiddleware)
+     * - Properties specific to the middleware (e.g. amqBrokerURI, iTopic and oTopic)
+     */
+    public MiddlewareWrapper(String mwProps) {
+        this(mwProps,mwProps);
+    }
+
+    /**
      * Does the required processing on the data
-     * Each worker is responsible for implementing this method as required.
+     * Each worker is responsible for implementing this method as required. Use this method
+     * for processing data
      *
      * @param jn the incoming data in JsonNode format
      */
@@ -126,33 +129,8 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener {
         }
     }
 
-    /**
-     * Check if new data is present in the queue
-     *
-     * @return true if there is new data
-     */
-    public boolean hasMessage() {
-        return !queue.isEmpty();
-    }
-
-    /**
-     * Retrieves the data from the middleware
-     *
-     * @return the data
-     */
-    public JsonNode getMessage() {
-        logger.debug("Retrieving message: {}", queue.peek());
-        try {
-            return queue.take();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return mapper.createObjectNode();
-    }
-
-    /**
-     * Returns if the middleware is created and connected
-     *
+     /**
+     * Returns if the middleware is created and connected     *
      * @return true if connected, false if not
      */
     public boolean isConnected() {
@@ -173,5 +151,7 @@ public abstract class MiddlewareWrapper implements Worker, MiddlewareListener {
     public void sendData(JsonNode data) {
         middleware.sendData(data);
     }
+
+
 }
 
