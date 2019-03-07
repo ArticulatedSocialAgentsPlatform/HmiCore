@@ -31,6 +31,8 @@ public class ROSMiddleware  implements Middleware {
     static {
         logger = LoggerFactory.getLogger(ROSMiddleware.class.getName());
     }
+    
+    private static final String KEEPALIVE = "{\"keepalive\":true}";
 
     String websocketURI;
     String publisher;
@@ -99,8 +101,14 @@ public class ROSMiddleware  implements Middleware {
                     public void receive(JsonNode data, String stringRep) {
                         MessageUnpacker<PrimitiveMsg<String>> unpacker = new MessageUnpacker<PrimitiveMsg<String>>(PrimitiveMsg.class);
                         PrimitiveMsg<String> msg = unpacker.unpackRosMessage(data);
-
-                        convertMsg(msg.data.toString());
+                        
+                        logger.debug("Got ROS msg from topic {}: {}", subscriber, msg.data.toString());
+                        
+                        if(KEEPALIVE.equals(msg.data.toString())){
+                        	logger.debug("Got keepalive message on topic {} - Not forwarding to listeners.", subscriber);
+                        } else {
+                        	convertMsg(msg.data.toString());
+                        }
 
                         /* System.out.println("jason msg");
                         System.out.println(data);
@@ -118,7 +126,38 @@ public class ROSMiddleware  implements Middleware {
                 }
         );
         this.pub = new Publisher(this.publisher, "std_msgs/String", this.bridge);
-
+        
+        //start sending the keepalive messages
+        Thread keepAlive = new Thread(new KeepAlive());
+        keepAlive.start();
+    }
+    
+    /**
+     * A small class to send periodic keepalive messages. This should prevent the ROS server from killing our publisher websocket *GRRR*
+     * TODO: in future, we could try to detect when the websocket connection has closed and do a reconnect... but this might be difficult because the rosbridge implementation seems to catch all exceptions and hide them... it might require quite a deep hack
+     * @author davisond
+     *
+     */
+    class KeepAlive implements Runnable {
+    	
+		@Override
+		public void run() {
+			while(true) {
+				if(bridge.hasConnected()) {
+					//send keepalive messages to prevent timeout
+					logger.debug("Sending keepalive message on topic {}", publisher);
+		            pub.publish(new PrimitiveMsg<>(KEEPALIVE));
+		            
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+				        Thread.currentThread().interrupt();
+					}
+				}
+			}
+		}
+    	
     }
     
 }
