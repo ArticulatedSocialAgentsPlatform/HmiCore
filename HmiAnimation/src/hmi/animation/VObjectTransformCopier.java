@@ -49,6 +49,8 @@ public class VObjectTransformCopier
 
     private float[] buf = new float[4]; // local buffer for copying Vec3f and Quat4f values.
 
+	private int rootTranslationIdx = 0;
+
     private static final VObject[] emptyParts = new VObject[0];
      private static Logger logger = LoggerFactory.getLogger(VObjectTransformCopier.class.getName());
 
@@ -117,6 +119,12 @@ public class VObjectTransformCopier
                 || (src.getSid() != null && src.getSid().equals(dst.getSid())) 
                 || (src.getName() != null && src.getName().equals(dst.getName())));
     }
+    
+
+    public void setRootTranslationIdx(int rootTranslationIdx)
+    {
+    	this.rootTranslationIdx  = rootTranslationIdx;
+    }
 
     public void setConfigType(String configType)
     {
@@ -141,8 +149,8 @@ public class VObjectTransformCopier
         }
         if (hasRootTranslation)
         {
-            srcParts[0].getTranslation(buf);
-            dstParts[0].setTranslation(buf);
+            srcParts[rootTranslationIdx].getTranslation(buf);
+            dstParts[rootTranslationIdx].setTranslation(buf);
         }
         if (hasTranslation)
         {
