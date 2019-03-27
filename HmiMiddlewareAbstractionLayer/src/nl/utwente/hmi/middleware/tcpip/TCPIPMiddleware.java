@@ -685,6 +685,10 @@ public final class TCPIPMiddleware implements Runnable, Middleware
 	public void sendData(JsonNode jn) {
 		queueSend(jn.toString());
 	}
+	
+	public void sendData(String data) {
+		queueSend(data);
+	}
 
 	@Override
 	public void addListener(MiddlewareListener ml) {
@@ -708,6 +712,11 @@ public final class TCPIPMiddleware implements Runnable, Middleware
 			}
     	}
     }
+
+	@Override
+	public void sendDataRaw(String data) {
+		queueSend(data);
+	}
 
 }
 

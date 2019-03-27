@@ -57,6 +57,13 @@ public class STOMPMiddleware implements Middleware, MessageHandler {
 	
 	}
 	
+	public void sendDataRaw(String data) {
+		if(data != null){
+			stompHandler.sendMessage(data, oTopic);
+			logger.debug("Sending data: {}", data);
+		}
+	}
+	
 	@Override
 	public void sendData(JsonNode jn) {
 		if(jn != null){
