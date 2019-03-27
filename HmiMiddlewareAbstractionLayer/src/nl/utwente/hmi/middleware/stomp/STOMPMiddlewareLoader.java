@@ -1,6 +1,5 @@
 package nl.utwente.hmi.middleware.stomp;
 
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 

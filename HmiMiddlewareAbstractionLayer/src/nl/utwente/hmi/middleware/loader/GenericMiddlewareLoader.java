@@ -1,5 +1,6 @@
 package nl.utwente.hmi.middleware.loader;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -7,6 +8,9 @@ import nl.utwente.hmi.middleware.Middleware;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import hmi.xml.XMLScanException;
+import hmi.xml.XMLTokenizer;
 
 /**
  * This GenericMiddlewareLoader acts as a kind of factory for loading a specific MiddlewareLoader
@@ -34,7 +38,7 @@ public class GenericMiddlewareLoader {
 		actualProps.putAll(ps);
 		logger.debug("READY TO LOAD WITH with props: {}; requested props was: {}", actualProps.toString(),ps.toString());
 	}
-	
+		
 	public static void setGlobalPropertiesFile(String propFile)
 	{
 		synchronized (globalProps)
@@ -51,9 +55,9 @@ public class GenericMiddlewareLoader {
 					logger.error("Sorry, unable to find properties file: {}", propFile);
 				} else {
 					//load the actual properties
-					logger.info("Loading properties enzo: {}",propFile);
+					logger.info("Loaded properties: {}", propFile);
 					globalProps.load(input);
-					//logger.debug("loaded globalprops: {}",globalProps.toString());
+					logger.info("Loaded globalprops: {}",globalProps.toString());
 				}
 			}
 			catch (Exception ex)
@@ -81,6 +85,21 @@ public class GenericMiddlewareLoader {
     	
     }
     
+    /**
+     * Static loader function (WILL NOT USE GLOBAL PROPS!)
+     * @author: jankolkmeier
+     * TODO: turn this loader into a proper XMLStructureAdapter?
+     */ 
+	public static Middleware load(XMLTokenizer tokenizer) throws IOException {
+        if(!tokenizer.atSTag(MiddlewareOptions.xmlTag())) {
+            throw new XMLScanException("GenericMiddlewareLoader requires an inner MiddlewareOptions element");            
+        }
+        MiddlewareOptions mwOptsXML = new MiddlewareOptions();
+        mwOptsXML.readXML(tokenizer);
+        GenericMiddlewareLoader gml = new GenericMiddlewareLoader(mwOptsXML.getLoaderclass(), mwOptsXML.getProperties());
+        return gml.load();
+	}
+	
 	/**
 	 * Actually load the Middleware
 	 * @return an instance of the Middleware which is instantiated by the specific MiddlewareLoader
@@ -89,7 +108,7 @@ public class GenericMiddlewareLoader {
 		Middleware m = null;
 		ClassLoader cl = GenericMiddlewareLoader.class.getClassLoader();
 		try {
-            System.out.println("middleware requested: "+specificLoader);		
+            logger.info("middleware requested: "+specificLoader);		
 			Class<?> loaderClass = cl.loadClass(specificLoader);
 			Object loaderObject = loaderClass.newInstance();
 			if(loaderObject instanceof MiddlewareLoader){
@@ -100,7 +119,7 @@ public class GenericMiddlewareLoader {
 			}
             else
             {
-                System.out.println("failed making loader object");		
+            	logger.warn("failed making loader object");		
             }
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block

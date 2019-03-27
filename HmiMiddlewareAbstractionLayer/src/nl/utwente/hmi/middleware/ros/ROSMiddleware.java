@@ -120,6 +120,14 @@ public class ROSMiddleware  implements Middleware {
         this.pub = new Publisher(this.publisher, "std_msgs/String", this.bridge);
 
     }
+
+	@Override
+	public void sendDataRaw(String data) {
+        if (data != null){
+            pub.publish(new PrimitiveMsg<>(data));
+            logger.debug("Sending data: {}", data);
+        }
+	}
     
 }
 
