@@ -65,6 +65,9 @@ public class SAPI5TTSGenerator extends AbstractTTSGenerator
     private String speaker;
     
     @GuardedBy("this")
+    private static int nrOfSAPI5Generators = 0;
+    
+    @GuardedBy("this")
     private boolean initialized;
 
     // temp vars used to gather bookmarks, visimes and phonemes while speaking
@@ -126,6 +129,7 @@ public class SAPI5TTSGenerator extends AbstractTTSGenerator
         });
         if (error == -1) throw new RuntimeException("SAPI5TTSGenerator initialization failed");
         initialized = (error == 0);
+        if (initialized)nrOfSAPI5Generators++;
     }
 
     /**
@@ -142,6 +146,7 @@ public class SAPI5TTSGenerator extends AbstractTTSGenerator
                     return SAPICleanup();
                 }
             });
+            nrOfSAPI5Generators--;
             initialized = false;
         }
         else
@@ -226,6 +231,16 @@ public class SAPI5TTSGenerator extends AbstractTTSGenerator
 
     private void speak(String str, boolean timeOnly, final String filename)
     {
+        final String sp = this.speaker;
+        if (nrOfSAPI5Generators>1) {
+            callAndWait(new Callable<Integer>()
+            {
+                public Integer call()
+                {
+                    return SAPISetSpeaker(sp);
+                }
+            });            
+        }
         text = str;
         currentWordOffset = 0;
         currentWord = null;
