@@ -1,6 +1,8 @@
 package nl.utwente.hmi.middleware.loader;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Properties;
 
 import nl.utwente.hmi.middleware.Middleware;
@@ -34,7 +36,11 @@ public class GenericMiddlewareLoader {
 		actualProps.putAll(ps);
 		logger.debug("READY TO LOAD WITH with props: {}; requested props was: {}", actualProps.toString(),ps.toString());
 	}
-	
+
+	/**
+	 * Setter for global properties
+	 * @param propFile, file name in the classpath containing the properties
+	 */
 	public static void setGlobalPropertiesFile(String propFile)
 	{
 		synchronized (globalProps)
@@ -48,21 +54,35 @@ public class GenericMiddlewareLoader {
 				input = GenericMiddlewareLoader.class.getClassLoader().getResourceAsStream(propFile);
 				if (input == null) 
 				{
-					logger.error("Sorry, unable to find properties file: {}", propFile);
+					logger.warn("Sorry, unable to find properties file in resource folder: {}", propFile);
+					logger.warn("Trying to load file outside resource folder");
+					try{
+						input = new FileInputStream(propFile);
+						globalProps.load(input);
+					}
+					catch (Exception e){
+						logger.warn("Could not load global middleware props {}",propFile);
+						e.printStackTrace();
+					}
+
 				} else {
 					//load the actual properties
-					logger.info("Loading properties enzo: {}",propFile);
+					logger.info("Loading properties: {}",propFile);
 					globalProps.load(input);
 					//logger.debug("loaded globalprops: {}",globalProps.toString());
 				}
 			}
 			catch (Exception ex)
 			{
-				logger.warn("Could not load global middleware props {}",propFile);
+				logger.error("Could not load global middleware props {}",propFile);
 			}
 		}
 	}
-	
+
+	/**
+	 * Setter for global properties
+	 * @param ps, properties to set
+	 */
 	public static void setGlobalProperties(Properties ps)
 	{
 		synchronized (globalProps)
@@ -70,12 +90,15 @@ public class GenericMiddlewareLoader {
 			globalProps = new Properties(ps);
 		}
 	}
-	
+
+	/**
+	 * Getter for global properties
+	 * @return
+	 */
     public static Properties getGlobalProperties()
     {
 		synchronized (globalProps)
 		{
-			
 			return globalProps;
 		}
     	
@@ -89,18 +112,18 @@ public class GenericMiddlewareLoader {
 		Middleware m = null;
 		ClassLoader cl = GenericMiddlewareLoader.class.getClassLoader();
 		try {
-            System.out.println("middleware requested: "+specificLoader);		
+            logger.info("middleware requested: {}",specificLoader);
 			Class<?> loaderClass = cl.loadClass(specificLoader);
 			Object loaderObject = loaderClass.newInstance();
 			if(loaderObject instanceof MiddlewareLoader){
 				MiddlewareLoader ml = (MiddlewareLoader)loaderObject;
-				//logger.debug("Loading with props: {}; global props was: {}", actualProps.toString(),globalProps.toString());
+				logger.debug("Loading with props: {}; global props was: {}", actualProps.toString(),globalProps.toString());
 				m = ml.loadMiddleware(actualProps);
 				
 			}
             else
             {
-                System.out.println("failed making loader object");		
+                logger.error("failed making loader object with classloader {}",cl);
             }
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block

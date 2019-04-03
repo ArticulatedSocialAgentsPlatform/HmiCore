@@ -1,37 +1,19 @@
 package nl.utwente.hmi.middleware.activemq;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.Topic;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import nl.utwente.hmi.middleware.Middleware;
 import nl.utwente.hmi.middleware.MiddlewareListener;
-import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.jms.*;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Implementation for the ActiveMQ middleware.
@@ -95,19 +77,22 @@ public class ActiveMQMiddleware implements Middleware,  MessageListener {
 	
 	@Override
 	public void sendData(JsonNode jn) {
+	    if(jn == null){
+	        return;
+        }
+        logger.debug("Sending data: {}", jn.toString());
         try {
             if(jn != null){
                 TextMessage message = session.createTextMessage();
                 message.setText(jn.toString());
                 oTopicMessageProducer.send(message);
-                logger.debug("Sending data: {}", jn.toString());
             }
         }
         catch (JMSException e)
         {
             logger.debug("Error sending data: {}", e.toString());
         }
-	}
+    }
 	
 	@Override
 	public void addListener(MiddlewareListener ml) {

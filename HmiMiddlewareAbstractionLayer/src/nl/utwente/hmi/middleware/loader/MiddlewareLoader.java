@@ -12,6 +12,11 @@ import nl.utwente.hmi.middleware.Middleware;
  */
 public interface MiddlewareLoader {
 
+	/**
+	 * Loads the middleware with given properties
+	 * @param ps, properties for the middleware
+	 * @return the middleware that has been loaded
+	 */
 	public Middleware loadMiddleware(Properties ps);
 	
 }
