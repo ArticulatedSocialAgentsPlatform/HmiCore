@@ -1,10 +1,7 @@
 package nl.utwente.hmi.middleware.loader;
 
-<<<<<<< HEAD
 import java.io.FileInputStream;
-=======
 import java.io.IOException;
->>>>>>> e135b0a4287245e7dd532627bee935b592b47ce4
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
