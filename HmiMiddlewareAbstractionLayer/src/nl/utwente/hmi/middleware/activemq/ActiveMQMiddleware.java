@@ -140,5 +140,20 @@ public class ActiveMQMiddleware implements Middleware,  MessageListener {
         }
             
 	}
+
+	@Override
+	public void sendDataRaw(String data) {
+        try {
+            if(data != null){
+                TextMessage message = session.createTextMessage();
+                message.setText(data);
+                oTopicMessageProducer.send(message);
+            }
+        }
+        catch (JMSException e)
+        {
+            logger.debug("Error sending raw data: {}", e.toString());
+        }
+	}
 	
 }

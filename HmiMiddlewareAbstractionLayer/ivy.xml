@@ -4,9 +4,10 @@
       <include file="${ivy.settings.dir}/configurations.xml"/>
    </configurations>
    <dependencies>
-         <dependency org="slf4j"   name="slf4j-api"             rev="latest.release"  />
-        <dependency org="lombok"   name="lombok"         rev="latest.release"  />
-	  <dependency org="apache"    name="activemq-nolog"     rev="latest.release"  />   
+      <dependency org="slf4j"   name="slf4j-api"       rev="latest.release"  />
+      <dependency org="lombok"  name="lombok"          rev="latest.release"  />
+	  <dependency org="apache"  name="activemq-nolog"  rev="latest.release"  />   
+      <dependency org="HMI"     name="HmiXml"          rev="latest.${resolve.status}" />
          
    </dependencies>
 </ivy-module>

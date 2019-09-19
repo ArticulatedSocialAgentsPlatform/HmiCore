@@ -23,6 +23,6 @@ public interface Middleware {
 	 */
 	public void addListener(MiddlewareListener ml);
 
-
+	public void sendDataRaw(String data);
 	
 }

@@ -159,6 +159,14 @@ public class ROSMiddleware  implements Middleware {
 		}
     	
     }
+
+	@Override
+	public void sendDataRaw(String data) {
+        if (data != null){
+            pub.publish(new PrimitiveMsg<>(data));
+            logger.debug("Sending data: {}", data);
+        }
+	}
     
 }
 
