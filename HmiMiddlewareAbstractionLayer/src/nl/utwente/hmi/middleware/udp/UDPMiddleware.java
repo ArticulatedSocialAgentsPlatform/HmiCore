@@ -162,26 +162,7 @@ public class UDPMiddleware implements Middleware, Runnable {
 
 	@Override
 	public void sendData(JsonNode jn) {
-		if (jn == null) return;
-		long now = System.currentTimeMillis();
-
-		logger.debug("Sending data: {}", jn.toString());
-		
-		Iterator<UDPEndpoint> i = endpoints.iterator();
-		while (i.hasNext()) {
-			UDPEndpoint s = i.next();
-			boolean timedOut = (s.lastHeartbeat+timeout) < now;
-			boolean checkTimeout = !singleMode && timeout > 0;
-			if (s.isRunning() && (!checkTimeout || !timedOut)) {
-				s.enqueue(jn.toString());
-				logger.debug("\t to "+s.remoteClient.getHostString()+":"+s.remoteClient.getPort());
-			} else {
-				logger.info("Removing client "+s.remoteClient.getHostString()+":"+s.remoteClient.getPort()+
-						". Timed out: {} running: {}", timedOut, s.isRunning());
-				i.remove();
-			}
-			
-		}
+		this.sendDataRaw(jn.toString());
 	}
 
 	@Override
@@ -207,6 +188,30 @@ public class UDPMiddleware implements Middleware, Runnable {
 		} catch (Exception e) { // JsonProcessingException, IOException
 			logger.warn("Error while parsing JSON string \"{}\": {}", data, e.getMessage());
 			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void sendDataRaw(String data) {
+		// TODO Auto-generated method stub
+		if (data == null) return;
+		long now = System.currentTimeMillis();
+
+		logger.debug("Sending data: {}", data);
+		
+		Iterator<UDPEndpoint> i = endpoints.iterator();
+		while (i.hasNext()) {
+			UDPEndpoint s = i.next();
+			boolean timedOut = (s.lastHeartbeat+timeout) < now;
+			boolean checkTimeout = !singleMode && timeout > 0;
+			if (s.isRunning() && (!checkTimeout || !timedOut)) {
+				s.enqueue(data);
+				logger.debug("\t to "+s.remoteClient.getHostString()+":"+s.remoteClient.getPort());
+			} else {
+				logger.info("Removing client "+s.remoteClient.getHostString()+":"+s.remoteClient.getPort()+
+						". Timed out: {} running: {}", timedOut, s.isRunning());
+				i.remove();
+			}
 		}
 	}
 }

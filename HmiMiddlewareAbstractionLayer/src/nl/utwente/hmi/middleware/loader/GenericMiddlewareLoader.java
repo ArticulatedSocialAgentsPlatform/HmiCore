@@ -1,6 +1,10 @@
 package nl.utwente.hmi.middleware.loader;
 
+<<<<<<< HEAD
 import java.io.FileInputStream;
+=======
+import java.io.IOException;
+>>>>>>> e135b0a4287245e7dd532627bee935b592b47ce4
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
@@ -9,6 +13,9 @@ import nl.utwente.hmi.middleware.Middleware;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import hmi.xml.XMLScanException;
+import hmi.xml.XMLTokenizer;
 
 /**
  * This GenericMiddlewareLoader acts as a kind of factory for loading a specific MiddlewareLoader
@@ -36,7 +43,7 @@ public class GenericMiddlewareLoader {
 		actualProps.putAll(ps);
 		logger.debug("READY TO LOAD WITH with props: {}; requested props was: {}", actualProps.toString(),ps.toString());
 	}
-
+	
 	/**
 	 * Setter for global properties
 	 * @param propFile, file name in the classpath containing the properties
@@ -69,7 +76,7 @@ public class GenericMiddlewareLoader {
 					//load the actual properties
 					logger.info("Loading properties: {}",propFile);
 					globalProps.load(input);
-					//logger.debug("loaded globalprops: {}",globalProps.toString());
+					logger.info("Loaded globalprops: {}",globalProps.toString());
 				}
 			}
 			catch (Exception ex)
@@ -104,6 +111,21 @@ public class GenericMiddlewareLoader {
     	
     }
     
+    /**
+     * Static loader function (WILL NOT USE GLOBAL PROPS!)
+     * @author: jankolkmeier
+     * TODO: turn this loader into a proper XMLStructureAdapter?
+     */ 
+	public static Middleware load(XMLTokenizer tokenizer) throws IOException {
+        if(!tokenizer.atSTag(MiddlewareOptions.xmlTag())) {
+            throw new XMLScanException("GenericMiddlewareLoader requires an inner MiddlewareOptions element");            
+        }
+        MiddlewareOptions mwOptsXML = new MiddlewareOptions();
+        mwOptsXML.readXML(tokenizer);
+        GenericMiddlewareLoader gml = new GenericMiddlewareLoader(mwOptsXML.getLoaderclass(), mwOptsXML.getProperties());
+        return gml.load();
+	}
+	
 	/**
 	 * Actually load the Middleware
 	 * @return an instance of the Middleware which is instantiated by the specific MiddlewareLoader

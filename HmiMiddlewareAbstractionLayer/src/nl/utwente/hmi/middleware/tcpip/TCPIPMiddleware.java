@@ -1,8 +1,5 @@
 package nl.utwente.hmi.middleware.tcpip;
 
-import static nl.utwente.hmi.middleware.helpers.JsonNodeBuilders.array;
-import static nl.utwente.hmi.middleware.helpers.JsonNodeBuilders.object;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,7 +13,6 @@ import java.net.SocketTimeoutException;
 import java.nio.channels.IllegalBlockingModeException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.slf4j.Logger;
@@ -689,6 +685,10 @@ public final class TCPIPMiddleware implements Runnable, Middleware
 	public void sendData(JsonNode jn) {
 		queueSend(jn.toString());
 	}
+	
+	public void sendData(String data) {
+		queueSend(data);
+	}
 
 	@Override
 	public void addListener(MiddlewareListener ml) {
@@ -712,6 +712,11 @@ public final class TCPIPMiddleware implements Runnable, Middleware
 			}
     	}
     }
+
+	@Override
+	public void sendDataRaw(String data) {
+		queueSend(data);
+	}
 
 }
 
