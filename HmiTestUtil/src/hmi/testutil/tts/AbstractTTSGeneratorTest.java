@@ -67,7 +67,7 @@ public abstract class AbstractTTSGeneratorTest
             {
                 totalDuration += v.getDuration() / 1000d;
             }
-            assertEquals(totalDuration, tInfo.getDuration(), 0.015);
+            assertEquals(totalDuration, tInfo.getDuration(), 0.05);
         }
     }
 
