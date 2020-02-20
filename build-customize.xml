@@ -110,12 +110,10 @@
    <target name="buildAll" depends="cleanAll, compileAll" description="cleanAll, compileAll"/>  
   
    <target name="compileAll"  description="compile HMI projects">     
-    <antcall target="Core.compile"/>
     <delegate target="compile" list="rebuildList" verbose="true"/>
    </target>
    
    <target name="compilelistAll">
-    <antcall target="Core.compile"/>
     <delegate target="compilelist" list="rebuildList" verbose="true"/>     
    </target> 
     
