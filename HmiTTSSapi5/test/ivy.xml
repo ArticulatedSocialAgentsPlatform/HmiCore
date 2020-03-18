@@ -2,8 +2,8 @@
    <info organisation="HMI" module="HmiTTSSapi5Test"/>
    <dependencies> 
       <dependency org="junit"    name="junit-dep"         rev="latest.release" />
-      <dependency org="HMI"      name="HmiTestUtil"   transitive="false" rev="latest.release"/>    
-      <dependency org="HMI"      name="HmiTTSnative"  rev="latest.release"/>     
+      <dependency org="HMI"      name="HmiTestUtil"   transitive="false" rev="latest.${resolve.status}"/>    
+      <dependency org="HMI"      name="HmiTTSnative"  rev="latest.${resolve.status}"/>     
       <dependency org="hamcrest" name="hamcrest-all"       rev="latest.release"  />                  
       <dependency org="logback"   name="logback-classic"               rev="latest.release"  />   
       <dependency org="logback"   name="logback-core"               rev="latest.release"  />   
