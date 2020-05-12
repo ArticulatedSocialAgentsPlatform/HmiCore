@@ -8,6 +8,9 @@
       <dependency org="lombok"  name="lombok"          rev="latest.release"  />
 	  <dependency org="apache"  name="activemq-nolog"  rev="latest.release"  />   
       <dependency org="HMI"     name="HmiXml"          rev="latest.${resolve.status}" />
+      
+	<dependency org="javax.json"						name="javax.json-api"			rev="1.0" />
+	<dependency org="com.squareup.okhttp3"				name="okhttp"					rev="4.2.2"/>
          
    </dependencies>
 </ivy-module>
