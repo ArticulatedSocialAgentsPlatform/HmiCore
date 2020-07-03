@@ -119,44 +119,64 @@ public class ActiveMQMiddleware implements Middleware,  MessageListener {
 
 	@Override
 	public void onMessage(Message msg) {
+		String stringMessage = getStringFromMessage(msg);
+		
+        //parse json string and create JsonObject
+        ObjectMapper mapper = new ObjectMapper();
+        
         try {
+            JsonNode jn = mapper.readTree(stringMessage);
+            logger.debug("Transformed to json object: {}", jn.toString());
+            
+            if(jn != null){
+                for(MiddlewareListener ml : listeners){
+                    ml.receiveData(jn);
+                }
+            }
+        } catch (JsonProcessingException e) {
+            logger.warn("Error while parsing JSON string \"{}\": {}", stringMessage, e.getMessage());
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+            
+	}
+	
+	/**
+	 * Attempts to extract the message as a string. Currently supports TextMessage and BytesMessage
+	 * For a TextMessage this is obviously not an issue, but a BytesMessage will be converted to new String(byteData) (with potential errors down the line if it turns out to be non-String data)
+	 * @param msg of type TextMessage or BytesMessage
+	 * @return the data of the message represented as a string
+	 */
+	private String getStringFromMessage(Message msg) {
+		String stringMessage = "";
+		try {
             if (msg instanceof TextMessage)
             {
                 TextMessage textMessage = (TextMessage) msg;
-                logger.debug("Got message on topic {}: {}", iTopic, textMessage.getText());	
-                String jsonString = textMessage.getText();
-                
-                //parse json string and create JsonObject
-                ObjectMapper mapper = new ObjectMapper();
-                
-                try {
-                    JsonNode jn = mapper.readTree(jsonString);
-                    logger.debug("Transformed to json object: {}", jn.toString());
-                    
-                    if(jn != null){
-                        for(MiddlewareListener ml : listeners){
-                            ml.receiveData(jn);
-                        }
-                    }
-                } catch (JsonProcessingException e) {
-                    logger.warn("Error while parsing JSON string \"{}\": {}", jsonString, e.getMessage());
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                stringMessage = textMessage.getText();
+                logger.debug("Got text message on topic {}: {}", iTopic, stringMessage);	
             }
-            else
+            else if(msg instanceof BytesMessage){
+            	BytesMessage byteMessage = (BytesMessage) msg;
+				byte[] byteData = new byte[(int) byteMessage.getBodyLength()];
+				byteMessage.readBytes(byteData);
+				//TODO: is there a way to figure out whether the binary data is actually a string..?
+				stringMessage =  new String(byteData);
+				logger.debug("Got bytes message on topic {}: {}", iTopic, stringMessage);
+            } else
             {
-                logger.error("Received message of type {} on ActiveMQConnection: not a text message!", msg.getClass().getName());
+                logger.error("Received message of unsupported type {} on ActiveMQConnection: not a text message!", msg.getClass().getName());
             }
         }
         catch (JMSException e)
         {
             logger.debug("Error receiving data: {}", e.toString());
         }
-            
+		
+		return stringMessage;
 	}
 
 	@Override
