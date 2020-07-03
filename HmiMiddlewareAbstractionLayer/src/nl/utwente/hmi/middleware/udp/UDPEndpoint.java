@@ -106,6 +106,7 @@ public class UDPEndpoint implements Runnable {
 	    		
 	    		DatagramPacket sendPacket = new DatagramPacket(data.getBytes(), data.length(), remoteClient);
 	    		try {
+	    			UDPMiddleware.logger.debug("Sending data to endpoint {}:{} -- {}", new String[] {remoteClient.getAddress().toString(), Integer.toString(remoteClient.getPort()), data});
 	    			sendSocket.send(sendPacket);
 	    		} catch (IOException e) {
 	    			running = false;

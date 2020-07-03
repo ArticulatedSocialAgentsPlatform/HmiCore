@@ -150,7 +150,7 @@ public class UDPMiddleware implements Middleware, Runnable {
 	    		// coming from default client.
 	
 	    		if (data.getValue().length() > 0 && !data.getValue().equals("{}")) {
-	        		logger.debug("Got message on port {}: <{}>", listenPort, data.getValue());
+	        		logger.debug("Got message on port {} from client {}:{} -- <{}>", new String[] {Integer.toString(listenPort), data.getKey().getAddress().toString(), Integer.toString(data.getKey().getPort()), data.getValue()});
 	        		receiveCallback(data.getValue());
 	    		} else {
 	        		logger.debug("Got heartbeat on port {}: <{}>", listenPort, data.getValue());
